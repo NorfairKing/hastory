@@ -7,7 +7,7 @@ import           Introduction
 import qualified Data.Aeson           as JSON
 import qualified Data.ByteString.Lazy as LB
 import qualified Data.Text.IO         as T
-import           System.IO
+import qualified Data.Time.LocalTime  as Time
 
 import           Hastory.OptParse
 import           Hastory.Types
@@ -15,7 +15,12 @@ import           Hastory.Types
 hastory :: IO ()
 hastory = do
     (DispatchGather, Settings) <- getInstructions
-    T.getContents >>= (storeHistory . Entry)
+    curtime <- Time.getZonedTime
+    text <- T.getContents
+    storeHistory Entry
+        { entryText = text
+        , entryDateTime = curtime
+        }
 
 storeHistory :: Entry -> IO ()
 storeHistory entry = do
