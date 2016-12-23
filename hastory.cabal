@@ -41,9 +41,16 @@ executable hastory
 test-suite hastory-test
     type: exitcode-stdio-1.0
     main-is: Spec.hs
+    other-modules:
+        HastorySpec
+        Hastory.Gen
     build-depends:
         base >=4.9 && <=5,
-        hastory -any
+        hastory -any,
+        introduction-test >= 0.0 && < 0.1,
+        genvalidity-hspec >= 0.2 && < 0.3,
+        genvalidity-hspec-aeson >= 0.0 && < 0.1,
+        hspec >= 2.2 && < 2.3
     default-language: Haskell2010
     default-extensions: NoImplicitPrelude
     hs-source-dirs: test/
