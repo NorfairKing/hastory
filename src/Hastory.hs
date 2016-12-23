@@ -1,26 +1,25 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell   #-}
+{-# LANGUAGE TemplateHaskell #-}
+
 module Hastory where
 
-import           Introduction
+import Introduction
 
-import qualified Data.Aeson           as JSON
+import qualified Data.Aeson as JSON
 import qualified Data.ByteString.Lazy as LB
-import qualified Data.Text.IO         as T
-import qualified Data.Time.LocalTime  as Time
+import qualified Data.Text.IO as T
+import qualified Data.Time.LocalTime as Time
 
-import           Hastory.OptParse
-import           Hastory.Types
+import Hastory.OptParse
+import Hastory.Types
 
 hastory :: IO ()
 hastory = do
     (DispatchGather, Settings) <- getInstructions
     curtime <- Time.getZonedTime
+    curdir <- getCurrentDir
     text <- T.getContents
-    storeHistory Entry
-        { entryText = text
-        , entryDateTime = curtime
-        }
+    storeHistory Entry {entryText = text, entryDateTime = curtime, entryWorkingDir = curdir}
 
 storeHistory :: Entry -> IO ()
 storeHistory entry = do

@@ -4,5 +4,16 @@ import           TestIntroduction
 
 import           Hastory.Types
 
+instance GenValidity Entry where
+    genUnchecked = Entry
+        <$> arbitrary
+        <*> genUnchecked
+        <*> arbitrary
+
+    genValid = Entry
+        <$> genValid
+        <*> genValid
+        <*> arbitrary
+
 instance Arbitrary Entry where
-    arbitrary = Entry <$> arbitrary <*> arbitrary
+    arbitrary = genValid

@@ -1,13 +1,16 @@
-module HastorySpec (spec) where
+module HastorySpec
+    ( spec
+    ) where
 
-import           TestIntroduction
+import TestIntroduction
 
-import           Hastory
-import           Hastory.Gen
-import           Hastory.Types
+import Hastory.Gen ()
+import Hastory.Types
 
 spec :: Spec
 spec = do
     describe "Entry" $ do
-        jsonSpecOnArbitrary (Proxy :: Proxy Entry)
-
+        eqSpec (Proxy :: Proxy Entry)
+        jsonSpec (Proxy :: Proxy Entry)
+        arbitrarySpec (Proxy :: Proxy Entry)
+        genValiditySpec (Proxy :: Proxy Entry)
