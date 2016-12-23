@@ -1,13 +1,13 @@
 module Hastory.OptParse.Types where
 
-import Introduction
+import           Introduction
 
-import Options.Applicative
+import           Options.Applicative
 
 type Arguments = (Command, Flags)
 type Instructions = (Dispatch, Settings)
 data Command
-    = Command
+    = CommandGather
     deriving (Show, Eq)
 
 data Flags
@@ -19,7 +19,7 @@ data Configuration
     deriving (Show, Eq)
 
 data Dispatch
-    = Dispatch
+    = DispatchGather
     deriving (Show, Eq)
 
 data Settings

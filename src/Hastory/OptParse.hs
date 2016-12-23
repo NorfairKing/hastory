@@ -3,11 +3,11 @@ module Hastory.OptParse
     , module Hastory.OptParse.Types
     ) where
 
-import Introduction
+import           Introduction
 
-import Options.Applicative
+import           Options.Applicative
 
-import Hastory.OptParse.Types
+import           Hastory.OptParse.Types
 
 getInstructions :: IO Instructions
 getInstructions = do
@@ -16,7 +16,7 @@ getInstructions = do
     combineToInstructions cmd flags config
 
 combineToInstructions :: Command -> Flags -> Configuration -> IO Instructions
-combineToInstructions Command Flags Configuration = pure (Dispatch, Settings)
+combineToInstructions CommandGather Flags Configuration = pure (DispatchGather, Settings)
 
 getConfiguration :: Command -> Flags -> IO Configuration
 getConfiguration _ _ = pure Configuration
@@ -48,15 +48,15 @@ parseArgs = (,) <$> parseCommand <*> parseFlags
 
 parseCommand :: Parser Command
 parseCommand = hsubparser $ mconcat
-    [ command "command" parseCommandCommand
+    [ command "gather" parseCommandGather
     ]
 
-parseCommandCommand :: ParserInfo Command
-parseCommandCommand = info parser modifier
+parseCommandGather :: ParserInfo Command
+parseCommandGather = info parser modifier
   where
-    parser = pure Command
+    parser = pure CommandGather
     modifier = fullDesc
-            <> progDesc "Command example."
+            <> progDesc "Read a single command on the standard input."
 
 parseFlags :: Parser Flags
 parseFlags = pure Flags
