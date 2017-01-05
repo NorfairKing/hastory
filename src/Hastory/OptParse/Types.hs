@@ -8,6 +8,7 @@ type Arguments = (Command, Flags)
 type Instructions = (Dispatch, Settings)
 data Command
     = CommandGather
+    | CommandQuery
     deriving (Show, Eq)
 
 data Flags
@@ -20,6 +21,7 @@ data Configuration
 
 data Dispatch
     = DispatchGather
+    | DispatchQuery
     deriving (Show, Eq)
 
 data Settings

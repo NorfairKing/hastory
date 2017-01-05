@@ -3,11 +3,11 @@ module Hastory.OptParse
     , module Hastory.OptParse.Types
     ) where
 
-import           Introduction
+import Introduction
 
-import           Options.Applicative
+import Options.Applicative
 
-import           Hastory.OptParse.Types
+import Hastory.OptParse.Types
 
 getInstructions :: IO Instructions
 getInstructions = do
@@ -16,7 +16,12 @@ getInstructions = do
     combineToInstructions cmd flags config
 
 combineToInstructions :: Command -> Flags -> Configuration -> IO Instructions
-combineToInstructions CommandGather Flags Configuration = pure (DispatchGather, Settings)
+combineToInstructions cmd Flags Configuration = pure (d, Settings)
+  where
+    d =
+        case cmd of
+            CommandGather -> DispatchGather
+            CommandQuery -> DispatchQuery
 
 getConfiguration :: Command -> Flags -> IO Configuration
 getConfiguration _ _ = pure Configuration
@@ -30,13 +35,15 @@ getArguments = do
 runArgumentsParser :: [[Char]] -> ParserResult Arguments
 runArgumentsParser = execParserPure prefs argParser
   where
-    prefs = ParserPrefs
-      { prefMultiSuffix = "HASTORY"
-      , prefDisambiguate = True
-      , prefShowHelpOnError = True
-      , prefBacktrack = True
-      , prefColumns = 80
-      }
+    prefs =
+        ParserPrefs
+        { prefMultiSuffix = "HASTORY"
+        , prefDisambiguate = True
+        , prefShowHelpOnError = True
+        , prefBacktrack = True
+        , prefColumns = 80
+        }
+
 argParser :: ParserInfo Arguments
 argParser = info (helper <*> parseArgs) help
   where
@@ -47,16 +54,20 @@ parseArgs :: Parser Arguments
 parseArgs = (,) <$> parseCommand <*> parseFlags
 
 parseCommand :: Parser Command
-parseCommand = hsubparser $ mconcat
-    [ command "gather" parseCommandGather
-    ]
+parseCommand = hsubparser $ mconcat [command "gather" parseCommandGather, command "query" parseCommandQuery]
 
 parseCommandGather :: ParserInfo Command
 parseCommandGather = info parser modifier
   where
     parser = pure CommandGather
-    modifier = fullDesc
-            <> progDesc "Read a single command on the standard input."
+    modifier =
+        fullDesc <> progDesc "Read a single command on the standard input."
+
+parseCommandQuery :: ParserInfo Command
+parseCommandQuery = info parser modifier
+  where
+    parser = pure CommandQuery
+    modifier = fullDesc <> progDesc "Query the gathered data."
 
 parseFlags :: Parser Flags
 parseFlags = pure Flags
