@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeApplications #-}
+
 module HastorySpec
     ( spec
     ) where
@@ -10,7 +12,7 @@ import Hastory.Types
 spec :: Spec
 spec = do
     describe "Entry" $ do
-        eqSpec (Proxy :: Proxy Entry)
-        jsonSpecOnValid (Proxy :: Proxy Entry)
-        arbitrarySpec (Proxy :: Proxy Entry)
-        genValidSpec (Proxy :: Proxy Entry)
+        eqSpec @Entry
+        jsonSpecOnValid @Entry
+        arbitrarySpec @Entry
+        genValiditySpec @Entry

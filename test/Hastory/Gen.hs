@@ -10,5 +10,7 @@ instance GenUnchecked Entry where
 instance GenValid Entry where
     genValid = Entry <$> genValid <*> genValid <*> arbitrary
 
+instance GenInvalid Entry
+
 instance Arbitrary Entry where
     arbitrary = genValid
