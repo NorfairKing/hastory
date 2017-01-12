@@ -21,7 +21,7 @@ combineToInstructions cmd Flags Configuration = pure (d, Settings)
     d =
         case cmd of
             CommandGather -> DispatchGather
-            CommandQuery -> DispatchQuery
+            CommandGenChangeWrapperScript -> DispatchGenChangeWrapperScript
             CommandChangeDir i -> DispatchChangeDir i
             CommandListRecentDirs -> DispatchListRecentDirs
 
@@ -60,9 +60,11 @@ parseCommand =
     hsubparser $
     mconcat
         [ command "gather" parseCommandGather
-        , command "query" parseCommandQuery
         , command "change-directory" parseCommandChangeDir
         , command "list-recent-directories" parseCommandListRecentDirs
+        , command
+              "generate-change-directory-wrapper-script"
+              parseGenChangeDirectoryWrapperScript
         ]
 
 parseCommandGather :: ParserInfo Command
@@ -70,10 +72,6 @@ parseCommandGather =
     info
         (pure CommandGather)
         (fullDesc <> progDesc "Read a single command on the standard input.")
-
-parseCommandQuery :: ParserInfo Command
-parseCommandQuery =
-    info (pure CommandQuery) (fullDesc <> progDesc "Query the gathered data.")
 
 parseCommandChangeDir :: ParserInfo Command
 parseCommandChangeDir =
@@ -94,6 +92,12 @@ parseCommandListRecentDirs =
         (pure CommandListRecentDirs)
         (progDesc
              "List the directories that were the working directory most often (recently )")
+
+parseGenChangeDirectoryWrapperScript :: ParserInfo Command
+parseGenChangeDirectoryWrapperScript =
+    info
+        (pure CommandGenChangeWrapperScript)
+        (progDesc "Generate the wrapper script to use 'change-directory'")
 
 parseFlags :: Parser Flags
 parseFlags = pure Flags

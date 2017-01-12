@@ -27,9 +27,9 @@ hastory = do
 
 dispatch :: Dispatch -> IO ()
 dispatch DispatchGather = gather
-dispatch DispatchQuery = query
 dispatch (DispatchChangeDir ix) = change ix
 dispatch DispatchListRecentDirs = listRecentDirs
+dispatch DispatchGenChangeWrapperScript = genChangeWrapperScript
 
 gather :: IO ()
 gather = do
@@ -58,17 +58,6 @@ getHistory = do
     let encodedEntries = LB8.lines contents
     let entries = catMaybes $ map JSON.decode encodedEntries
     pure entries
-
-query :: IO ()
-query = do
-    counts <- getDirCountMap
-    let tups = sortOn snd $ HM.toList counts
-    forM_ tups $ \(p, c) -> putStrLn $ unwords [show c, p]
-
-getDirCountMap :: IO (HashMap FilePath Double)
-getDirCountMap = do
-    entries <- getHistory
-    pure $ docounts (toFilePath . entryWorkingDir) entries
 
 docounts
     :: (Eq a, Eq b, Hashable a, Hashable b)
@@ -114,3 +103,19 @@ listRecentDirs = do
     recentDirOpts <- getRecentDirOpts
     forM_ (zip [0 ..] recentDirOpts) $ \(ix, p) ->
         putStrLn $ unwords [show ix, p]
+
+genChangeWrapperScript :: IO ()
+genChangeWrapperScript =
+    putStrLn $
+    unlines
+        [ "hastory_change_directory_ () {"
+        , "  local args=\"$@\""
+        , "  if [[ \"$args\" == \"\" ]]"
+        , "  then"
+        , "    hastory list-recent-directories"
+        , "  else"
+        , "    local dir=$(hastory change-directory \"$args\")"
+        , "    cd dir"
+        , "  fi"
+        , "}"
+        ]

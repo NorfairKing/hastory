@@ -10,9 +10,9 @@ type Instructions = (Dispatch, Settings)
 
 data Command
     = CommandGather
-    | CommandQuery
     | CommandListRecentDirs
     | CommandChangeDir Int
+    | CommandGenChangeWrapperScript
     deriving (Show, Eq)
 
 data Flags =
@@ -28,6 +28,7 @@ data Dispatch
     | DispatchQuery
     | DispatchListRecentDirs
     | DispatchChangeDir Int
+    | DispatchGenChangeWrapperScript
     deriving (Show, Eq)
 
 data Settings =
