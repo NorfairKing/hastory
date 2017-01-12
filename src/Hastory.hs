@@ -14,6 +14,7 @@ import qualified Data.HashMap.Lazy as HM
 import Data.Hashable (Hashable)
 import Data.List (unwords)
 import qualified Data.Text.IO as T
+import qualified Data.Time.Clock as Time
 import qualified Data.Time.LocalTime as Time
 
 import Hastory.OptParse
@@ -27,6 +28,7 @@ hastory = do
 dispatch :: Dispatch -> IO ()
 dispatch DispatchGather = gather
 dispatch DispatchQuery = query
+dispatch DispatchChange = change
 
 gather :: IO ()
 gather = do
@@ -48,23 +50,53 @@ histfile = do
     home <- getHomeDir
     pure $ home </> $(mkRelDir ".hastory") </> $(mkRelFile "commandhistory.log")
 
-query :: IO ()
-query = do
+getHistory :: IO [Entry]
+getHistory = do
     hFile <- histfile
     contents <- readFile hFile
     let encodedEntries = LB8.lines contents
     let entries = catMaybes $ map JSON.decode encodedEntries
-    let tups =
-            sortOn snd $
-            HM.toList $ docounts $ map (toFilePath . entryWorkingDir) entries
+    pure entries
+
+query :: IO ()
+query = do
+    counts <- getDirCountMap
+    let tups = sortOn snd $ HM.toList counts
     forM_ tups $ \(p, c) -> putStrLn $ unwords [show c, p]
 
+getDirCountMap :: IO (HashMap FilePath Double)
+getDirCountMap = do
+    entries <- getHistory
+    pure $ docounts (toFilePath . entryWorkingDir) entries
+
 docounts
-    :: (Eq a, Hashable a)
-    => [a] -> HashMap a Int
-docounts es = foldl go HM.empty es
+    :: (Eq a, Eq b, Hashable a, Hashable b)
+    => (a -> b) -> [a] -> HashMap b Double
+docounts f = doCountsWith f (const 1)
+
+doCountsWith
+    :: (Eq a, Eq b, Hashable a, Hashable b)
+    => (a -> b) -> (a -> Double) -> [a] -> HashMap b Double
+doCountsWith conv func es = foldl go HM.empty es
   where
-    go = flip $ HM.alter a
+    go hm k = HM.alter a (conv k) hm
       where
-        a Nothing = Just 1
-        a (Just d) = Just $ d + 1
+        a Nothing = Just 0
+        a (Just d) = Just $ d + func k
+
+change :: IO ()
+change = do
+    rawEnts <- getHistory
+    home <- getHomeDir
+    let entries = filter ((/= home) . entryWorkingDir) rawEnts
+    now <- Time.getZonedTime
+    let dateFunc entry = 1 / d
+          where
+            d =
+                realToFrac $
+                Time.diffUTCTime
+                    (Time.zonedTimeToUTC now)
+                    (Time.zonedTimeToUTC $ entryDateTime entry)
+    let counts = doCountsWith (toFilePath . entryWorkingDir) dateFunc entries
+    let tups = map fst $ take 10 $ reverse $ sortOn snd $ HM.toList counts
+    forM_ (zip [0 ..] tups) $ \(ix, p) -> putStrLn $ unwords [show ix, show p]

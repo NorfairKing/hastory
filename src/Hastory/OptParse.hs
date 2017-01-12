@@ -22,6 +22,7 @@ combineToInstructions cmd Flags Configuration = pure (d, Settings)
         case cmd of
             CommandGather -> DispatchGather
             CommandQuery -> DispatchQuery
+            CommandChange -> DispatchChange
 
 getConfiguration :: Command -> Flags -> IO Configuration
 getConfiguration _ _ = pure Configuration
@@ -54,20 +55,25 @@ parseArgs :: Parser Arguments
 parseArgs = (,) <$> parseCommand <*> parseFlags
 
 parseCommand :: Parser Command
-parseCommand = hsubparser $ mconcat [command "gather" parseCommandGather, command "query" parseCommandQuery]
+parseCommand =
+    hsubparser $
+    mconcat
+        [ command "gather" parseCommandGather
+        , command "query" parseCommandQuery
+        , command "change" parseCommandChange
+        ]
 
 parseCommandGather :: ParserInfo Command
-parseCommandGather = info parser modifier
-  where
-    parser = pure CommandGather
-    modifier =
-        fullDesc <> progDesc "Read a single command on the standard input."
+parseCommandGather = info (pure CommandGather) (fullDesc <> progDesc "Read a single command on the standard input.")
 
 parseCommandQuery :: ParserInfo Command
-parseCommandQuery = info parser modifier
-  where
-    parser = pure CommandQuery
-    modifier = fullDesc <> progDesc "Query the gathered data."
+parseCommandQuery = info (pure CommandQuery) (fullDesc <> progDesc "Query the gathered data.")
+
+parseCommandChange :: ParserInfo Command
+parseCommandChange =
+    info
+        (pure CommandChange)
+        (progDesc "Output a directory to change to based on the gathered data.")
 
 parseFlags :: Parser Flags
 parseFlags = pure Flags
