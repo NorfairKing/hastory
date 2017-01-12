@@ -28,7 +28,8 @@ hastory = do
 dispatch :: Dispatch -> IO ()
 dispatch DispatchGather = gather
 dispatch DispatchQuery = query
-dispatch DispatchChange = change
+dispatch (DispatchChangeDir ix) = change ix
+dispatch DispatchListRecentDirs = listRecentDirs
 
 gather :: IO ()
 gather = do
@@ -84,8 +85,8 @@ doCountsWith conv func es = foldl go HM.empty es
         a Nothing = Just 0
         a (Just d) = Just $ d + func k
 
-change :: IO ()
-change = do
+getRecentDirOpts :: IO [FilePath]
+getRecentDirOpts = do
     rawEnts <- getHistory
     home <- getHomeDir
     let entries = filter ((/= home) . entryWorkingDir) rawEnts
@@ -98,5 +99,18 @@ change = do
                     (Time.zonedTimeToUTC now)
                     (Time.zonedTimeToUTC $ entryDateTime entry)
     let counts = doCountsWith (toFilePath . entryWorkingDir) dateFunc entries
-    let tups = map fst $ take 10 $ reverse $ sortOn snd $ HM.toList counts
-    forM_ (zip [0 ..] tups) $ \(ix, p) -> putStrLn $ unwords [show ix, show p]
+    let tups = reverse $ sortOn snd $ HM.toList counts
+    pure $ take 10 $ map fst tups
+
+change :: Int -> IO ()
+change ix = do
+    recentDirOpts <- getRecentDirOpts
+    case recentDirOpts `atMay` ix of
+        Nothing -> die "Invalid index choice."
+        Just d -> putStrLn d
+
+listRecentDirs :: IO ()
+listRecentDirs = do
+    recentDirOpts <- getRecentDirOpts
+    forM_ (zip [0 ..] recentDirOpts) $ \(ix, p) ->
+        putStrLn $ unwords [show ix, p]

@@ -22,7 +22,8 @@ combineToInstructions cmd Flags Configuration = pure (d, Settings)
         case cmd of
             CommandGather -> DispatchGather
             CommandQuery -> DispatchQuery
-            CommandChange -> DispatchChange
+            CommandChangeDir i -> DispatchChangeDir i
+            CommandListRecentDirs -> DispatchListRecentDirs
 
 getConfiguration :: Command -> Flags -> IO Configuration
 getConfiguration _ _ = pure Configuration
@@ -60,20 +61,39 @@ parseCommand =
     mconcat
         [ command "gather" parseCommandGather
         , command "query" parseCommandQuery
-        , command "change" parseCommandChange
+        , command "change-directory" parseCommandChangeDir
+        , command "list-recent-directories" parseCommandListRecentDirs
         ]
 
 parseCommandGather :: ParserInfo Command
-parseCommandGather = info (pure CommandGather) (fullDesc <> progDesc "Read a single command on the standard input.")
+parseCommandGather =
+    info
+        (pure CommandGather)
+        (fullDesc <> progDesc "Read a single command on the standard input.")
 
 parseCommandQuery :: ParserInfo Command
-parseCommandQuery = info (pure CommandQuery) (fullDesc <> progDesc "Query the gathered data.")
+parseCommandQuery =
+    info (pure CommandQuery) (fullDesc <> progDesc "Query the gathered data.")
 
-parseCommandChange :: ParserInfo Command
-parseCommandChange =
+parseCommandChangeDir :: ParserInfo Command
+parseCommandChangeDir =
     info
-        (pure CommandChange)
+        (CommandChangeDir <$>
+         argument
+             auto
+             (mconcat
+                  [ help
+                        "The index of the directory to change to, see 'list-recent-directories'"
+                  , metavar "INT"
+                  ]))
         (progDesc "Output a directory to change to based on the gathered data.")
+
+parseCommandListRecentDirs :: ParserInfo Command
+parseCommandListRecentDirs =
+    info
+        (pure CommandListRecentDirs)
+        (progDesc
+             "List the directories that were the working directory most often (recently )")
 
 parseFlags :: Parser Flags
 parseFlags = pure Flags

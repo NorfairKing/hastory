@@ -11,7 +11,8 @@ type Instructions = (Dispatch, Settings)
 data Command
     = CommandGather
     | CommandQuery
-    | CommandChange
+    | CommandListRecentDirs
+    | CommandChangeDir Int
     deriving (Show, Eq)
 
 data Flags =
@@ -25,7 +26,8 @@ data Configuration =
 data Dispatch
     = DispatchGather
     | DispatchQuery
-    | DispatchChange
+    | DispatchListRecentDirs
+    | DispatchChangeDir Int
     deriving (Show, Eq)
 
 data Settings =
