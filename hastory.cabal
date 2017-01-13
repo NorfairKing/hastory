@@ -15,9 +15,10 @@ library
         Hastory
         Hastory.ChangeDir
         Hastory.Gather
+        Hastory.GenChangeWrapper
+        Hastory.GenGatherWrapper
         Hastory.Internal
         Hastory.ListDir
-        Hastory.GenChangeWrapper
         Hastory.OptParse
         Hastory.OptParse.Types
         Hastory.Recent

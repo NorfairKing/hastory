@@ -8,6 +8,7 @@ type Instructions = (Dispatch, Settings)
 
 data Command
     = CommandGather
+    | CommandGenGatherWrapperScript
     | CommandListRecentDirs
     | CommandChangeDir Int
     | CommandGenChangeWrapperScript
@@ -23,6 +24,7 @@ data Configuration =
 
 data Dispatch
     = DispatchGather
+    | DispatchGenGatherWrapperScript
     | DispatchListRecentDirs
     | DispatchChangeDir Int
     | DispatchGenChangeWrapperScript

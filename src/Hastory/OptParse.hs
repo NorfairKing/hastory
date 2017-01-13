@@ -21,9 +21,10 @@ combineToInstructions cmd Flags Configuration = pure (d, Settings)
     d =
         case cmd of
             CommandGather -> DispatchGather
-            CommandGenChangeWrapperScript -> DispatchGenChangeWrapperScript
-            CommandChangeDir i -> DispatchChangeDir i
+            CommandGenGatherWrapperScript -> DispatchGenGatherWrapperScript
             CommandListRecentDirs -> DispatchListRecentDirs
+            CommandChangeDir i -> DispatchChangeDir i
+            CommandGenChangeWrapperScript -> DispatchGenChangeWrapperScript
 
 getConfiguration :: Command -> Flags -> IO Configuration
 getConfiguration _ _ = pure Configuration
@@ -57,6 +58,7 @@ parseCommand =
     hsubparser $
     mconcat
         [ command "gather" parseCommandGather
+        , command "generate-gather-wrapper-script" parseGenGatherWrapperScript
         , command "change-directory" parseCommandChangeDir
         , command "list-recent-directories" parseCommandListRecentDirs
         , command
@@ -69,6 +71,12 @@ parseCommandGather =
     info
         (pure CommandGather)
         (fullDesc <> progDesc "Read a single command on the standard input.")
+
+parseGenGatherWrapperScript :: ParserInfo Command
+parseGenGatherWrapperScript =
+    info
+        (pure CommandGenGatherWrapperScript)
+        (progDesc "Generate the wrapper script to use 'gather'")
 
 parseCommandChangeDir :: ParserInfo Command
 parseCommandChangeDir =
