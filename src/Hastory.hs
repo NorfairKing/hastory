@@ -17,8 +17,10 @@ import qualified Data.Text.IO as T
 import qualified Data.Time.Clock as Time
 import qualified Data.Time.LocalTime as Time
 
+import Hastory.Gather
 import Hastory.OptParse
 import Hastory.Types
+import Hastory.Internal
 
 hastory :: IO ()
 hastory = do
@@ -30,34 +32,6 @@ dispatch DispatchGather = gather
 dispatch (DispatchChangeDir ix) = change ix
 dispatch DispatchListRecentDirs = listRecentDirs
 dispatch DispatchGenChangeWrapperScript = genChangeWrapperScript
-
-gather :: IO ()
-gather = do
-    curtime <- Time.getZonedTime
-    curdir <- getCurrentDir
-    text <- T.getContents
-    storeHistory
-        Entry
-        {entryText = text, entryDateTime = curtime, entryWorkingDir = curdir}
-
-storeHistory :: Entry -> IO ()
-storeHistory entry = do
-    hFile <- histfile
-    ensureDir $ parent hFile
-    LB.appendFile (toFilePath hFile) $ JSON.encode entry <> "\n"
-
-histfile :: IO (Path Abs File)
-histfile = do
-    home <- getHomeDir
-    pure $ home </> $(mkRelDir ".hastory") </> $(mkRelFile "commandhistory.log")
-
-getHistory :: IO [Entry]
-getHistory = do
-    hFile <- histfile
-    contents <- readFile hFile
-    let encodedEntries = LB8.lines contents
-    let entries = catMaybes $ map JSON.decode encodedEntries
-    pure entries
 
 docounts
     :: (Eq a, Eq b, Hashable a, Hashable b)

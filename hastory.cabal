@@ -13,9 +13,11 @@ author: Tom Sydney Kerckhove
 library
     exposed-modules:
         Hastory
-        Hastory.Types
+        Hastory.Gather
+        Hastory.Internal
         Hastory.OptParse
         Hastory.OptParse.Types
+        Hastory.Types
     build-depends:
         base >=4.9 && <=5,
         introduction >= 0.0 && < 0.1,
