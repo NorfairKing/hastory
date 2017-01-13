@@ -17,10 +17,12 @@ import qualified Data.Text.IO as T
 import qualified Data.Time.Clock as Time
 import qualified Data.Time.LocalTime as Time
 
+import Hastory.ChangeDir
+import Hastory.Recent
 import Hastory.Gather
+import Hastory.Internal
 import Hastory.OptParse
 import Hastory.Types
-import Hastory.Internal
 
 hastory :: IO ()
 hastory = do
@@ -32,45 +34,6 @@ dispatch DispatchGather = gather
 dispatch (DispatchChangeDir ix) = change ix
 dispatch DispatchListRecentDirs = listRecentDirs
 dispatch DispatchGenChangeWrapperScript = genChangeWrapperScript
-
-docounts
-    :: (Eq a, Eq b, Hashable a, Hashable b)
-    => (a -> b) -> [a] -> HashMap b Double
-docounts f = doCountsWith f (const 1)
-
-doCountsWith
-    :: (Eq a, Eq b, Hashable a, Hashable b)
-    => (a -> b) -> (a -> Double) -> [a] -> HashMap b Double
-doCountsWith conv func es = foldl go HM.empty es
-  where
-    go hm k = HM.alter a (conv k) hm
-      where
-        a Nothing = Just 0
-        a (Just d) = Just $ d + func k
-
-getRecentDirOpts :: IO [FilePath]
-getRecentDirOpts = do
-    rawEnts <- getHistory
-    home <- getHomeDir
-    let entries = filter ((/= home) . entryWorkingDir) rawEnts
-    now <- Time.getZonedTime
-    let dateFunc entry = 1 / d
-          where
-            d =
-                realToFrac $
-                Time.diffUTCTime
-                    (Time.zonedTimeToUTC now)
-                    (Time.zonedTimeToUTC $ entryDateTime entry)
-    let counts = doCountsWith (toFilePath . entryWorkingDir) dateFunc entries
-    let tups = reverse $ sortOn snd $ HM.toList counts
-    pure $ take 10 $ map fst tups
-
-change :: Int -> IO ()
-change ix = do
-    recentDirOpts <- getRecentDirOpts
-    case recentDirOpts `atMay` ix of
-        Nothing -> die "Invalid index choice."
-        Just d -> putStrLn d
 
 listRecentDirs :: IO ()
 listRecentDirs = do

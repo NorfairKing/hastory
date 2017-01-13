@@ -14,6 +14,8 @@ library
     exposed-modules:
         Hastory
         Hastory.Gather
+        Hastory.ChangeDir
+        Hastory.Recent
         Hastory.Internal
         Hastory.OptParse
         Hastory.OptParse.Types
