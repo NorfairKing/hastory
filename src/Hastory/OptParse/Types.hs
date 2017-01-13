@@ -2,8 +2,6 @@ module Hastory.OptParse.Types where
 
 import Introduction
 
-import Options.Applicative
-
 type Arguments = (Command, Flags)
 
 type Instructions = (Dispatch, Settings)

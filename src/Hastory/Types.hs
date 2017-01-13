@@ -10,8 +10,7 @@ import Data.Aeson
 import Data.Hashable (Hashable(hashWithSalt))
 import Data.Hashable.Time ()
 import Data.Text (Text)
-import Data.Time
-       (ZonedTime, zonedTimeToUTC, UTCTime(UTCTime), toModifiedJulianDay)
+import Data.Time (ZonedTime, zonedTimeToUTC)
 
 data Entry = Entry
     { entryText :: Text

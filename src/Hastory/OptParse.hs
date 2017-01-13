@@ -35,22 +35,19 @@ getArguments = do
     handleParseResult result
 
 runArgumentsParser :: [[Char]] -> ParserResult Arguments
-runArgumentsParser = execParserPure prefs argParser
-  where
-    prefs =
-        ParserPrefs
-        { prefMultiSuffix = "HASTORY"
-        , prefDisambiguate = True
-        , prefShowHelpOnError = True
-        , prefBacktrack = True
-        , prefColumns = 80
-        }
+runArgumentsParser =
+    execParserPure
+        (ParserPrefs
+         { prefMultiSuffix = "HASTORY"
+         , prefDisambiguate = True
+         , prefShowHelpOnError = True
+         , prefBacktrack = True
+         , prefColumns = 80
+         })
+        argParser
 
 argParser :: ParserInfo Arguments
-argParser = info (helper <*> parseArgs) help
-  where
-    help = fullDesc <> progDesc description
-    description = "Hastory"
+argParser = info (helper <*> parseArgs) (fullDesc <> progDesc "Hastory")
 
 parseArgs :: Parser Arguments
 parseArgs = (,) <$> parseCommand <*> parseFlags

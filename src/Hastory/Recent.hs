@@ -5,29 +5,17 @@ module Hastory.Recent where
 
 import Introduction
 
-import qualified Data.Aeson as JSON
-import qualified Data.ByteString as SB
-import qualified Data.ByteString.Lazy as LB
-import qualified Data.ByteString.Lazy.Char8 as LB8
 import Data.HashMap.Lazy (HashMap)
 import qualified Data.HashMap.Lazy as HM
 import Data.Hashable (Hashable)
-import Data.List (unwords)
-import qualified Data.Text.IO as T
 import qualified Data.Time.Clock as Time
 import qualified Data.Time.LocalTime as Time
 
 import Hastory.Internal
-import Hastory.OptParse
 import Hastory.Types
 
-docounts
-    :: (Eq a, Eq b, Hashable a, Hashable b)
-    => (a -> b) -> [a] -> HashMap b Double
-docounts f = doCountsWith f (const 1)
-
 doCountsWith
-    :: (Eq a, Eq b, Hashable a, Hashable b)
+    :: (Eq b, Hashable b)
     => (a -> b) -> (a -> Double) -> [a] -> HashMap b Double
 doCountsWith conv func es = foldl go HM.empty es
   where
