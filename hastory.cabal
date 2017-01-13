@@ -13,12 +13,14 @@ author: Tom Sydney Kerckhove
 library
     exposed-modules:
         Hastory
-        Hastory.Gather
         Hastory.ChangeDir
-        Hastory.Recent
+        Hastory.Gather
         Hastory.Internal
+        Hastory.ListDir
+        Hastory.GenChangeWrapper
         Hastory.OptParse
         Hastory.OptParse.Types
+        Hastory.Recent
         Hastory.Types
     build-depends:
         base >=4.9 && <=5,

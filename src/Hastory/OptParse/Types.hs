@@ -25,7 +25,6 @@ data Configuration =
 
 data Dispatch
     = DispatchGather
-    | DispatchQuery
     | DispatchListRecentDirs
     | DispatchChangeDir Int
     | DispatchGenChangeWrapperScript
