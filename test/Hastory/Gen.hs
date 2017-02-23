@@ -2,15 +2,15 @@
 
 module Hastory.Gen where
 
-import TestIntroduction
+import TestImport
 
 import Hastory.Types
 
 instance GenUnchecked Entry where
-    genUnchecked = Entry <$> arbitrary <*> genUnchecked <*> arbitrary
+    genUnchecked = Entry <$> genUnchecked <*> genUnchecked <*> genUnchecked
 
 instance GenValid Entry where
-    genValid = Entry <$> genValid <*> genValid <*> arbitrary
+    genValid = Entry <$> genValid <*> genValid <*> genValid
 
 instance GenInvalid Entry
 

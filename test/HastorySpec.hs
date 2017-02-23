@@ -4,7 +4,7 @@ module HastorySpec
     ( spec
     ) where
 
-import TestIntroduction
+import TestImport
 
 import Hastory.Gen ()
 import Hastory.Types

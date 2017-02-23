@@ -62,13 +62,24 @@ test-suite hastory-test
     other-modules:
         HastorySpec
         Hastory.Gen
+        TestImport
     build-depends:
         base >=4.9 && <=5,
         hastory -any,
-        introduction-test >= 0.0 && < 0.1,
+        genvalidity >= 0.3 && < 0.4,
         genvalidity-hspec >= 0.3 && < 0.4,
+        genvalidity-path >= 0.1 && < 0.2,
+        genvalidity-text >= 0.3.1 && < 0.4,
+        genvalidity-time >= 0.0 && < 0.1,
         genvalidity-hspec-aeson >= 0.0 && < 0.1,
-        hspec >= 2.2 && < 2.3
+        hspec >= 2.2 && < 2.3,
+        validity,
+        validity-path,
+        validity-text,
+        path,
+        path-io,
+        iostring,
+        QuickCheck >= 2.8 && < 2.9
     default-language: Haskell2010
     default-extensions: NoImplicitPrelude
     hs-source-dirs: test/
