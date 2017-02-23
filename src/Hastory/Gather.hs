@@ -11,6 +11,7 @@ import qualified Data.ByteString.Lazy as LB
 import qualified Data.Text.IO as T
 import qualified Data.Time.LocalTime as Time
 import Network.HostName (getHostName)
+import System.Posix.User (getEffectiveUserName)
 
 import Hastory.Internal
 import Hastory.Types
@@ -21,12 +22,14 @@ gather = do
     curdir <- getCurrentDir
     text <- T.getContents
     hostname <- getHostName
+    user <- getEffectiveUserName
     storeHistory
         Entry
         { entryText = text
         , entryDateTime = curtime
         , entryWorkingDir = curdir
         , entryHostName = hostname
+        , entryUser = user
         }
 
 storeHistory :: Entry -> IO ()

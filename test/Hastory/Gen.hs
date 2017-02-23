@@ -7,10 +7,12 @@ import TestImport
 import Hastory.Types
 
 instance GenUnchecked Entry where
-    genUnchecked = Entry <$> genUnchecked <*> genUnchecked <*> genUnchecked <*> genUnchecked
+    genUnchecked =
+        Entry <$> genUnchecked <*> genUnchecked <*> genUnchecked <*>
+        genUnchecked <*> genUnchecked
 
 instance GenValid Entry where
-    genValid = Entry <$> genValid <*> genValid <*> genValid <*> genValid
+    genValid = Entry <$> genValid <*> genValid <*> genValid <*> genValid <*> genValid
 
 instance GenInvalid Entry
 
