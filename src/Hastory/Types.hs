@@ -16,13 +16,15 @@ data Entry = Entry
     { entryText :: Text
     , entryWorkingDir :: Path Abs Dir
     , entryDateTime :: ZonedTime
+    , entryHostName :: String
     } deriving (Show, Generic)
 
 instance Hashable Entry where
     hashWithSalt salt Entry {..} =
         salt `hashWithSalt` entryText `hashWithSalt`
         (toFilePath entryWorkingDir) `hashWithSalt`
-        entryDateTime
+        entryDateTime `hashWithSalt`
+        entryHostName
 
 instance Eq Entry where
     e1 == e2 =
@@ -35,8 +37,8 @@ instance Validity Entry where
 
 instance ToJSON Entry where
     toJSON Entry {..} =
-        object ["t" .= entryText, "w" .= entryWorkingDir, "d" .= entryDateTime]
+        object ["t" .= entryText, "w" .= entryWorkingDir, "d" .= entryDateTime, "h" .= entryHostName]
 
 instance FromJSON Entry where
-    parseJSON (Object o) = Entry <$> o .: "t" <*> o .: "w" <*> o .: "d"
+    parseJSON (Object o) = Entry <$> o .: "t" <*> o .: "w" <*> o .: "d" <*> o .: "h"
     parseJSON _ = mempty

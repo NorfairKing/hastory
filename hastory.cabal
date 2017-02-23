@@ -41,7 +41,8 @@ library
         unordered-containers >= 0.2 && < 0.3,
         validity >= 0.3 && < 0.4,
         validity-path >= 0.1 && < 0.2,
-        validity-text >= 0.1.2 && < 0.2
+        validity-text >= 0.1.2 && < 0.2,
+        hostname >= 1.0 && < 1.1
     default-language: Haskell2010
     default-extensions: NoImplicitPrelude
     hs-source-dirs: src/

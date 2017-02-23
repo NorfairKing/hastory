@@ -21,9 +21,9 @@ import Data.GenValidity.Text as X ()
 import Data.GenValidity.Time as X ()
 
 import Test.Hspec as X
-import Test.Validity.Aeson as X
 import Test.QuickCheck as X
 import Test.Validity as X
+import Test.Validity.Aeson as X
 
 import Path as X
 import Path.IO as X
