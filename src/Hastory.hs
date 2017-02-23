@@ -3,7 +3,7 @@
 
 module Hastory where
 
-import Introduction
+import Import
 
 import Hastory.ChangeDir (change)
 import Hastory.Gather (gather)

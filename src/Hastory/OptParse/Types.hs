@@ -1,6 +1,6 @@
 module Hastory.OptParse.Types where
 
-import Introduction
+import Import
 
 type Arguments = (Command, Flags)
 

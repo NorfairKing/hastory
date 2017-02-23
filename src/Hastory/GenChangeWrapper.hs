@@ -1,6 +1,6 @@
 module Hastory.GenChangeWrapper where
 
-import Introduction
+import Import
 
 genChangeWrapperScript :: IO ()
 genChangeWrapperScript =

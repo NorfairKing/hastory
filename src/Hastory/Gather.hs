@@ -4,7 +4,7 @@
 
 module Hastory.Gather where
 
-import Introduction
+import Import
 
 import qualified Data.Aeson as JSON
 import qualified Data.ByteString.Lazy as LB

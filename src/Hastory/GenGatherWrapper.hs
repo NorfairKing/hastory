@@ -1,6 +1,6 @@
 module Hastory.GenGatherWrapper where
 
-import Introduction
+import Import
 
 genGatherWrapperScript :: IO ()
 genGatherWrapperScript =

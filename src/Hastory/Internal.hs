@@ -3,7 +3,7 @@
 
 module Hastory.Internal where
 
-import Introduction
+import Import
 
 import qualified Data.Aeson as JSON
 import qualified Data.ByteString.Lazy.Char8 as LB8

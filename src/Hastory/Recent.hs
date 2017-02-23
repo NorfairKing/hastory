@@ -3,7 +3,7 @@
 
 module Hastory.Recent where
 
-import Introduction
+import Import
 
 import Data.HashMap.Lazy (HashMap)
 import qualified Data.HashMap.Lazy as HM

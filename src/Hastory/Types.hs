@@ -4,7 +4,7 @@
 
 module Hastory.Types where
 
-import Introduction
+import Import
 
 import Data.Aeson
 import Data.Hashable (Hashable(hashWithSalt))

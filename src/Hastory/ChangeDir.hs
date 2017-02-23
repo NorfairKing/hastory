@@ -3,7 +3,7 @@
 
 module Hastory.ChangeDir where
 
-import Introduction
+import Import
 
 import Hastory.Recent
 

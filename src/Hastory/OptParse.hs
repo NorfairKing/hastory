@@ -3,7 +3,8 @@ module Hastory.OptParse
     , module Hastory.OptParse.Types
     ) where
 
-import Introduction
+import Import
+import System.Environment (getArgs)
 
 import Options.Applicative
 
