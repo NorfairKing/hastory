@@ -10,10 +10,15 @@ import qualified Data.ByteString.Lazy.Char8 as LB8
 
 import Hastory.Types
 
-histfile :: IO (Path Abs File)
-histfile = do
+hastoryDir :: IO (Path Abs Dir)
+hastoryDir = do
     home <- getHomeDir
-    pure $ home </> $(mkRelDir ".hastory") </> $(mkRelFile "commandhistory.log")
+    pure $ home </> $(mkRelDir ".hastory")
+
+
+histfile :: IO (Path Abs File)
+histfile =
+    fmap (</> $(mkRelFile "commandhistory.log")) hastoryDir
 
 getHistory :: IO [Entry]
 getHistory = do

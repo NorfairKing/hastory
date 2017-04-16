@@ -27,6 +27,7 @@ library
         Import
     build-depends:
         aeson >= 0.11 && < 1.1,
+        aeson-pretty >= 0.8 && < 0.9,
         base >=4.9 && <=5,
         bytestring >= 0.10 && < 0.11,
         hashable >= 1.2 && < 1.3,
