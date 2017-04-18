@@ -5,7 +5,6 @@ extra-deps:
 - validity-path-0.1.0.0
 - validity-time-0.0.0.0
 - validity-text-0.1.2.0
-- iostring-0.0.0.0
 - genvalidity-0.3.1.0
 - genvalidity-path-0.1.0.0
 - genvalidity-text-0.3.1.0
