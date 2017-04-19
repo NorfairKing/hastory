@@ -13,7 +13,7 @@ genChangeWrapperScript =
         , "    hastory list-recent-directories"
         , "  else"
         , "    local dir=$(hastory change-directory \"$args\")"
-        , "    cd dir"
+        , "    cd \"$dir\""
         , "  fi"
         , "}"
         ]
