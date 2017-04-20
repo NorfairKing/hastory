@@ -39,7 +39,9 @@ getRecentDirOpts = do
                            (Time.zonedTimeToUTC cacheTimestamp) >
                        cacheInvalidationDuration
                         then recompute
-                        else pure cacheRecentDirs
+                        else do
+                            cacheRecentDirOpts cacheRecentDirs
+                            pure cacheRecentDirs
   where
     recompute = do
         recentDirs <- computeRecentDirOpts
