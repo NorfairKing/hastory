@@ -30,6 +30,8 @@ PROMPT_COMMAND+=$(hastory generate-gather-wrapper-script)
 
 When you restart your shell (for example by restarting your terminal), you should see history accumulating in `.hastory/commandhistory.log`.
 
+Note: Feel free to make sure that `hastory generate-gather-wrapper-script` is actually code that you actually want to run.
+
 ## Frequency-based directory changes
 
 > The ease of performing a task should be proportional to its frequency.
@@ -52,3 +54,5 @@ Now you may want to alias that long command `hastory_change_directory_` to somet
 ``` shell
 alias f=hastory_change_directory_
 ```
+
+Note: Feel free to make sure that `hastory generate-change-directory-wrapper-script` is code that you actually want to run.
