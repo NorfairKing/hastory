@@ -48,8 +48,24 @@ source <(hastory generate-change-directory-wrapper-script)
 ```
 
 Now you can run `hastory_change_directory_` to list the directories that you might want to jump to.
+The output should look something like this:
+
+``` shell
+/home/user $ hastory_change_directory_
+0  /home/user/work/
+1  /home/user/a/very/deep/directory/tree/that/i/use/often
+2  /home/user/archive
+3  /home/user/backup
+```
+
 If the directory that you want to jump to is in the list with index `i`, you can jump to it with `hastory_change_directory_ i`.
-Now you may want to alias that long command `hastory_change_directory_` to something shorter like `f`, as follows:
+
+``` shell
+/home/user $ `hastory_change_directory_ 1
+/home/user/a/very/deep/directory/tree/that/i/use/often $ 
+```
+
+Now you probably want to alias that long command `hastory_change_directory_` to something shorter like `f`, as follows:
 
 ``` shell
 alias f=hastory_change_directory_
