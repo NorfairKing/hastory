@@ -28,9 +28,9 @@ This means that the only thing you need to do is to put the following in a scrip
 PROMPT_COMMAND+=$(hastory generate-gather-wrapper-script)
 ```
 
-When you restart your shell (for example by restarting your terminal), you should see history accumulating in `.hastory/commandhistory.log`.
+When you restart your shell (for example by restarting your terminal), you should see history accumulating in `~/.hastory/commandhistory.log`.
 
-Note: Feel free to make sure that `hastory generate-gather-wrapper-script` is actually code that you actually want to run.
+Note: Feel free to make sure that `hastory generate-gather-wrapper-script` is code that you actually want to run.
 
 ## Frequency-based directory changes
 
