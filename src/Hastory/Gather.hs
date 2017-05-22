@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
@@ -14,16 +15,22 @@ import Network.HostName (getHostName)
 import System.Posix.User (getEffectiveUserName)
 
 import Hastory.Internal
+import Hastory.OptParse.Types
 import Hastory.Types
 
-gather :: IO ()
+gather :: (MonadIO m, MonadReader Settings m) => m ()
 gather = do
+    entry <- liftIO getEntry
+    storeHistory entry
+
+getEntry :: IO Entry
+getEntry = do
     curtime <- Time.getZonedTime
     curdir <- getCurrentDir
     text <- T.getContents
     hostname <- getHostName
     user <- getEffectiveUserName
-    storeHistory
+    pure
         Entry
         { entryText = text
         , entryDateTime = curtime
@@ -32,8 +39,9 @@ gather = do
         , entryUser = user
         }
 
-storeHistory :: Entry -> IO ()
+storeHistory :: (MonadIO m, MonadReader Settings m) => Entry -> m ()
 storeHistory entry = do
     hFile <- histfile
-    ensureDir $ parent hFile
-    LB.appendFile (toFilePath hFile) $ JSON.encode entry <> "\n"
+    liftIO $ do
+        ensureDir $ parent hFile
+        LB.appendFile (toFilePath hFile) $ JSON.encode entry <> "\n"

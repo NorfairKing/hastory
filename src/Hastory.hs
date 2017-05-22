@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TemplateHaskell #-}
 
 module Hastory where
@@ -14,12 +15,12 @@ import Hastory.OptParse
 
 hastory :: IO ()
 hastory = do
-    (d, Settings) <- getInstructions
-    dispatch d
+    (d, sets) <- getInstructions
+    runReaderT (dispatch d) sets
 
-dispatch :: Dispatch -> IO ()
+dispatch :: (MonadIO m ,MonadReader Settings m) => Dispatch -> m ()
 dispatch DispatchGather = gather
-dispatch DispatchGenGatherWrapperScript = genGatherWrapperScript
+dispatch DispatchGenGatherWrapperScript = liftIO genGatherWrapperScript
 dispatch (DispatchChangeDir ix) = change ix
 dispatch DispatchListRecentDirs = listRecentDirs
-dispatch DispatchGenChangeWrapperScript = genChangeWrapperScript
+dispatch DispatchGenChangeWrapperScript = liftIO genChangeWrapperScript

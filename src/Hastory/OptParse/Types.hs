@@ -14,9 +14,9 @@ data Command
     | CommandGenChangeWrapperScript
     deriving (Show, Eq)
 
-data Flags =
-    Flags
-    deriving (Show, Eq)
+data Flags = Flags
+    { flagCacheDir :: Maybe FilePath
+    } deriving (Show, Eq)
 
 data Configuration =
     Configuration
@@ -30,6 +30,6 @@ data Dispatch
     | DispatchGenChangeWrapperScript
     deriving (Show, Eq)
 
-data Settings =
-    Settings
-    deriving (Show, Eq)
+data Settings = Settings
+    { setCacheDir :: Path Abs Dir
+    } deriving (Show, Eq)

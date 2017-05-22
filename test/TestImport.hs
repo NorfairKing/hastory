@@ -28,4 +28,3 @@ import Test.Validity.Aeson as X
 import Path as X
 import Path.IO as X
 
-import Data.IOString as X

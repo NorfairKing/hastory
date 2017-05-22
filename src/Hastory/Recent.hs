@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE RecordWildCards #-}
@@ -21,19 +22,20 @@ import qualified Data.Time.LocalTime as Time
 import Data.Time.LocalTime (ZonedTime)
 
 import Hastory.Internal
+import Hastory.OptParse.Types
 import Hastory.Types
 
-getRecentDirOpts :: IO [FilePath]
+getRecentDirOpts :: (MonadIO m, MonadReader Settings m) => m [FilePath]
 getRecentDirOpts = do
     cacheFile <- recentDirsCacheFile
-    mcontents <- forgivingAbsence $ LB.readFile $ toFilePath cacheFile
+    mcontents <- liftIO $ forgivingAbsence $ LB.readFile $ toFilePath cacheFile
     case mcontents of
         Nothing -> recompute
         Just contents ->
             case JSON.eitherDecode contents of
                 Left _ -> recompute -- If the file is corrupt, just don't care.
                 Right RecentDirOptsCache {..} -> do
-                    now <- Time.getZonedTime
+                    now <- liftIO Time.getZonedTime
                     if Time.diffUTCTime
                            (Time.zonedTimeToUTC now)
                            (Time.zonedTimeToUTC cacheTimestamp) >
@@ -51,12 +53,12 @@ getRecentDirOpts = do
 cacheInvalidationDuration :: NominalDiffTime
 cacheInvalidationDuration = 10 -- seconds
 
-computeRecentDirOpts :: IO [FilePath]
+computeRecentDirOpts :: (MonadIO m, MonadReader Settings m) => m [FilePath]
 computeRecentDirOpts = do
     rawEnts <- getHistory
-    home <- getHomeDir
+    home <- liftIO getHomeDir
     let entries = filter ((/= home) . entryWorkingDir) rawEnts
-    now <- Time.getZonedTime
+    now <- liftIO Time.getZonedTime
     let dateFunc entry = 1 / d
           where
             d =
@@ -81,14 +83,14 @@ computeRecentDirOpts = do
             a Nothing = Just 0
             a (Just d) = Just $ d + func k
 
-cacheRecentDirOpts :: [FilePath] -> IO ()
+cacheRecentDirOpts :: (MonadIO m, MonadReader Settings m) => [FilePath] -> m ()
 cacheRecentDirOpts fs = do
-    now <- Time.getZonedTime
+    now <- liftIO Time.getZonedTime
     let cache = RecentDirOptsCache {cacheTimestamp = now, cacheRecentDirs = fs}
     cacheFile <- recentDirsCacheFile
-    LB.writeFile (toFilePath cacheFile) $ JSON.encodePretty cache
+    liftIO $ LB.writeFile (toFilePath cacheFile) $ JSON.encodePretty cache
 
-recentDirsCacheFile :: IO (Path Abs File)
+recentDirsCacheFile :: MonadReader Settings m => m (Path Abs File)
 recentDirsCacheFile =
     fmap (</> $(mkRelFile "recent-dirs-cache.json")) hastoryDir
 

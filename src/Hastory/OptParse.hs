@@ -1,3 +1,5 @@
+{-# LANGUAGE RecordWildCards #-}
+
 module Hastory.OptParse
     ( module Hastory.OptParse
     , module Hastory.OptParse.Types
@@ -17,7 +19,7 @@ getInstructions = do
     combineToInstructions cmd flags config
 
 combineToInstructions :: Command -> Flags -> Configuration -> IO Instructions
-combineToInstructions cmd Flags Configuration = pure (d, Settings)
+combineToInstructions cmd Flags {..} Configuration = (,) d <$> sets
   where
     d =
         case cmd of
@@ -26,6 +28,13 @@ combineToInstructions cmd Flags Configuration = pure (d, Settings)
             CommandListRecentDirs -> DispatchListRecentDirs
             CommandChangeDir i -> DispatchChangeDir i
             CommandGenChangeWrapperScript -> DispatchGenChangeWrapperScript
+    sets = do
+        home <- getHomeDir
+        cacheDir <-
+            case flagCacheDir of
+                Nothing -> resolveDir home ".hastory"
+                Just fcd -> resolveDir' fcd
+        pure Settings {setCacheDir = cacheDir}
 
 getConfiguration :: Command -> Flags -> IO Configuration
 getConfiguration _ _ = pure Configuration
@@ -106,4 +115,4 @@ parseGenChangeDirectoryWrapperScript =
         (progDesc "Generate the wrapper script to use 'change-directory'")
 
 parseFlags :: Parser Flags
-parseFlags = pure Flags
+parseFlags = Flags <$> option (Just <$> str) (mconcat [long "cache-dir", metavar "DIR", help "the cache directory for hastory"])
