@@ -9,6 +9,7 @@ import Import
 
 import qualified Data.Aeson as JSON
 import qualified Data.ByteString.Lazy as LB
+import Data.Text (Text)
 import qualified Data.Text.IO as T
 import qualified Data.Time.LocalTime as Time
 import Network.HostName (getHostName)
@@ -20,14 +21,18 @@ import Hastory.Types
 
 gather :: (MonadIO m, MonadReader Settings m) => m ()
 gather = do
-    entry <- liftIO getEntry
+    text <- liftIO T.getContents
+    gatherFrom text
+
+gatherFrom :: (MonadIO m, MonadReader Settings m) => Text -> m ()
+gatherFrom text = do
+    entry <- liftIO $ getEntryWith text
     storeHistory entry
 
-getEntry :: IO Entry
-getEntry = do
+getEntryWith :: Text -> IO Entry
+getEntryWith text = do
     curtime <- Time.getZonedTime
     curdir <- getCurrentDir
-    text <- T.getContents
     hostname <- getHostName
     user <- getEffectiveUserName
     pure

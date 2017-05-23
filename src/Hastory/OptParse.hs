@@ -115,4 +115,13 @@ parseGenChangeDirectoryWrapperScript =
         (progDesc "Generate the wrapper script to use 'change-directory'")
 
 parseFlags :: Parser Flags
-parseFlags = Flags <$> option (Just <$> str) (mconcat [long "cache-dir", metavar "DIR", help "the cache directory for hastory"])
+parseFlags =
+    Flags <$>
+    option
+        (Just <$> str)
+        (mconcat
+             [ long "cache-dir"
+             , metavar "DIR"
+            , value Nothing
+             , help "the cache directory for hastory"
+             ])

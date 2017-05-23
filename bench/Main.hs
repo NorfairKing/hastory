@@ -1,6 +1,11 @@
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell #-}
+
 module Main where
 
 import Control.Exception
+import Control.Monad.Reader
+import Path
 import System.Environment
 import System.Exit
 import System.IO.Error
@@ -9,6 +14,8 @@ import System.IO.Silently
 import Criterion.Main as Criterion
 
 import Hastory
+import Hastory.Gather
+import Hastory.OptParse.Types
 
 main :: IO ()
 main =
@@ -21,6 +28,11 @@ main =
                case ec of
                    ExitSuccess -> ()
                    ExitFailure _ -> ())
+        , bench "gather" $
+          whnfIO $
+          runReaderT
+              (gatherFrom "ls -lr")
+              Settings {setCacheDir = $(mkAbsDir "/tmp/hastory-cache")}
         ]
 
 runHastory :: [String] -> IO ()
