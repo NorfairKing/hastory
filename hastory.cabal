@@ -101,3 +101,4 @@ benchmark hastory-bench
       base
     , hastory
     , criterion  >= 1.1  && < 1.2
+    , silently >= 1.2 && < 1.3
