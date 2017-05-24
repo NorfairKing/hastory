@@ -18,18 +18,18 @@ library
         base >=4.9 && <=5,
         hastory -any,
         genvalidity >= 0.3 && < 0.4,
-        genvalidity-hspec >= 0.3 && < 0.4,
+        genvalidity-hspec >= 0.4 && < 0.5,
         genvalidity-path >= 0.1 && < 0.2,
         genvalidity-text >= 0.3.1 && < 0.4,
         genvalidity-time >= 0.0.0.2 && < 0.1,
         genvalidity-hspec-aeson >= 0.0 && < 0.1,
-        hspec >= 2.2 && < 2.3,
+        hspec >= 2.2 && < 2.5,
         validity,
         validity-path,
         validity-text,
         path,
         path-io,
-        QuickCheck >= 2.8 && < 2.9
+        QuickCheck >= 2.8 && < 2.10
     default-language: Haskell2010
     default-extensions: NoImplicitPrelude
     hs-source-dirs: src/
@@ -56,7 +56,7 @@ test-suite hastory-test
         validity-text,
         path,
         path-io,
-        QuickCheck >= 2.8 && < 2.9
+        QuickCheck
     default-language: Haskell2010
     default-extensions: NoImplicitPrelude
     hs-source-dirs: test/
@@ -75,6 +75,7 @@ benchmark hastory-bench
     base,
     hastory,
     hastory-test-utils,
+    exceptions,
     criterion  >= 1.1  && < 1.2,
     silently >= 1.2 && < 1.3,
     QuickCheck,

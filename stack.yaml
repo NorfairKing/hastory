@@ -2,7 +2,7 @@ packages:
 - 'hastory'
 - 'hastory-test-utils'
 extra-deps:
-- validity-0.3.2.0
+- validity-0.3.3.0
 - validity-path-0.1.0.0
 - validity-time-0.0.0.0
 - validity-text-0.1.2.0
@@ -10,6 +10,7 @@ extra-deps:
 - genvalidity-path-0.1.0.2
 - genvalidity-text-0.3.1.1
 - genvalidity-time-0.0.0.2
+- genvalidity-property-0.0.0.0
 - genvalidity-hspec-0.4.0.0
 - genvalidity-hspec-aeson-0.0.1.1
 resolver: lts-8.15

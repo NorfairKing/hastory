@@ -6,8 +6,9 @@ module Main where
 
 import TestImport
 
-import Control.Exception
+import Control.Monad.Catch
 import Control.Monad.Reader
+import Control.Monad.State
 import System.Environment
 import System.IO.Silently
 
@@ -71,9 +72,42 @@ listRecentDirsBenchmark i =
 prepareEntries :: (MonadIO m, MonadReader Settings m) => Int -> m ()
 prepareEntries i = do
     clearCacheDir
+    absDirs <- liftIO getSomeAbsDirs
     replicateM_ i $ do
-        entry <- liftIO $ generate genValid
+        entry <-
+            liftIO $
+            generate $ do
+                t <- genValid
+                d <- elements absDirs
+                zt <- genValid
+                s <- genValid
+                u <- genValid
+                pure
+                    Entry
+                    { entryText = t
+                    , entryWorkingDir = d
+                    , entryDateTime = zt
+                    , entryHostName = s
+                    , entryUser = u
+                    }
         storeHistory entry
+
+getSomeAbsDirs :: (MonadIO m, MonadThrow m) => m [Path Abs Dir]
+getSomeAbsDirs = do
+    home <- getHomeDir
+    flip evalStateT 0 $
+        walkDirAccum
+            (Just
+                 (\_ _ _ -> do
+                      nr <- get
+                      pure $
+                          if (nr :: Int) >= 500
+                              then WalkFinish
+                              else WalkExclude []))
+            (\_ ds _ -> do
+                 modify (+ (length ds))
+                 pure ds)
+            home
 
 clearCacheDir :: (MonadIO m, MonadReader Settings m) => m ()
 clearCacheDir = do
