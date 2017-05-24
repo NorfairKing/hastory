@@ -25,29 +25,33 @@ import Hastory.Internal
 import Hastory.OptParse.Types
 import Hastory.Types
 
-getRecentDirOpts :: (MonadIO m, MonadReader Settings m) => m [FilePath]
-getRecentDirOpts = do
-    cacheFile <- recentDirsCacheFile
-    mcontents <- liftIO $ forgivingAbsence $ LB.readFile $ toFilePath cacheFile
-    case mcontents of
-        Nothing -> recompute
-        Just contents ->
-            case JSON.eitherDecode contents of
-                Left _ -> recompute -- If the file is corrupt, just don't care.
-                Right RecentDirOptsCache {..} -> do
-                    now <- liftIO Time.getZonedTime
-                    if Time.diffUTCTime
-                           (Time.zonedTimeToUTC now)
-                           (Time.zonedTimeToUTC cacheTimestamp) >
-                       cacheInvalidationDuration
-                        then recompute
-                        else do
-                            cacheRecentDirOpts cacheRecentDirs
-                            pure cacheRecentDirs
+getRecentDirOpts :: (MonadIO m, MonadReader Settings m) => Bool -> m [FilePath]
+getRecentDirOpts bypassCache = do
+    if bypassCache
+        then recompute
+        else do
+            cacheFile <- recentDirsCacheFile
+            mcontents <-
+                liftIO $ forgivingAbsence $ LB.readFile $ toFilePath cacheFile
+            case mcontents of
+                Nothing -> recompute
+                Just contents ->
+                    case JSON.eitherDecode contents of
+                        Left _ -> recompute -- If the file is corrupt, just don't care.
+                        Right RecentDirOptsCache {..} -> do
+                            now <- liftIO Time.getZonedTime
+                            if Time.diffUTCTime
+                                   (Time.zonedTimeToUTC now)
+                                   (Time.zonedTimeToUTC cacheTimestamp) >
+                               cacheInvalidationDuration
+                                then recompute
+                                else do
+                                    cacheRecentDirOpts cacheRecentDirs
+                                    pure cacheRecentDirs
   where
     recompute = do
         recentDirs <- computeRecentDirOpts
-        cacheRecentDirOpts recentDirs
+        unless bypassCache $ cacheRecentDirOpts recentDirs
         pure recentDirs
 
 cacheInvalidationDuration :: NominalDiffTime

@@ -25,7 +25,10 @@ combineToInstructions cmd Flags {..} Configuration = (,) d <$> sets
         case cmd of
             CommandGather -> DispatchGather
             CommandGenGatherWrapperScript -> DispatchGenGatherWrapperScript
-            CommandListRecentDirs -> DispatchListRecentDirs
+            CommandListRecentDirs ListRecentDirArgs {..} ->
+                DispatchListRecentDirs
+                    ListRecentDirSets
+                    {lrdSetBypassCache = fromMaybe False lrdArgBypassCache}
             CommandChangeDir i -> DispatchChangeDir i
             CommandGenChangeWrapperScript -> DispatchGenChangeWrapperScript
     sets = do
@@ -104,7 +107,21 @@ parseCommandChangeDir =
 parseCommandListRecentDirs :: ParserInfo Command
 parseCommandListRecentDirs =
     info
-        (pure CommandListRecentDirs)
+        (CommandListRecentDirs <$>
+         (ListRecentDirArgs <$>
+          (flag'
+               (Just True)
+               (mconcat
+                    [ long "bypass-cache"
+                    , help "Always recompute the recent directory options"
+                    ]) <|>
+           flag'
+               (Just False)
+               (mconcat
+                    [ long "no-bypass-cache"
+                    , help "Use the recent directory cache when available."
+                    ]) <|>
+           pure Nothing)))
         (progDesc
              "List the directories that were the working directory most often (recently )")
 
@@ -122,6 +139,6 @@ parseFlags =
         (mconcat
              [ long "cache-dir"
              , metavar "DIR"
-            , value Nothing
+             , value Nothing
              , help "the cache directory for hastory"
              ])

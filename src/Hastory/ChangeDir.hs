@@ -11,7 +11,7 @@ import Hastory.Recent
 
 change :: (MonadIO m, MonadReader Settings m) => Int -> m ()
 change ix = do
-    recentDirOpts <- getRecentDirOpts
+    recentDirOpts <- getRecentDirOpts False
     liftIO $
         case recentDirOpts `atMay` ix of
             Nothing -> die "Invalid index choice."

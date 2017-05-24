@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TemplateHaskell #-}
 
@@ -9,9 +10,10 @@ import Import
 import Hastory.OptParse.Types
 import Hastory.Recent
 
-listRecentDirs :: (MonadIO m, MonadReader Settings m) => m ()
-listRecentDirs = do
-    recentDirOpts <- getRecentDirOpts
+listRecentDirs ::
+       (MonadIO m, MonadReader Settings m) => ListRecentDirSets -> m ()
+listRecentDirs ListRecentDirSets {..} = do
+    recentDirOpts <- getRecentDirOpts lrdSetBypassCache
     let tups = zip [0 ..] recentDirOpts
         maxlen = maximum $ map (length . show . fst) tups
         formatTup :: Int -> String -> String

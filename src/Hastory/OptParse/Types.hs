@@ -9,10 +9,14 @@ type Instructions = (Dispatch, Settings)
 data Command
     = CommandGather
     | CommandGenGatherWrapperScript
-    | CommandListRecentDirs
+    | CommandListRecentDirs ListRecentDirArgs
     | CommandChangeDir Int
     | CommandGenChangeWrapperScript
     deriving (Show, Eq)
+
+data ListRecentDirArgs = ListRecentDirArgs
+    { lrdArgBypassCache :: Maybe Bool
+    } deriving (Show, Eq)
 
 data Flags = Flags
     { flagCacheDir :: Maybe FilePath
@@ -25,10 +29,14 @@ data Configuration =
 data Dispatch
     = DispatchGather
     | DispatchGenGatherWrapperScript
-    | DispatchListRecentDirs
+    | DispatchListRecentDirs ListRecentDirSets
     | DispatchChangeDir Int
     | DispatchGenChangeWrapperScript
     deriving (Show, Eq)
+
+data ListRecentDirSets = ListRecentDirSets
+    { lrdSetBypassCache :: Bool
+    } deriving (Show, Eq)
 
 data Settings = Settings
     { setCacheDir :: Path Abs Dir

@@ -22,7 +22,7 @@ histfile = fmap (</> $(mkRelFile "commandhistory.log")) hastoryDir
 getHistory :: (MonadIO m, MonadReader Settings m) => m [Entry]
 getHistory = do
     hFile <- histfile
-    contents <- liftIO $ LB.readFile $ toFilePath hFile
-    let encodedEntries = LB8.lines contents
-    let entries = catMaybes $ map JSON.decode encodedEntries
+    contents <- liftIO $ forgivingAbsence $ LB.readFile $ toFilePath hFile
+    let encodedEntries = LB8.lines <$> contents
+    let entries = catMaybes $ map JSON.decode $ fromMaybe [] encodedEntries
     pure entries

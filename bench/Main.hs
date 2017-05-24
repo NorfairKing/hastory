@@ -33,6 +33,14 @@ main =
           runReaderT
               (gatherFrom "ls -lr")
               Settings {setCacheDir = $(mkAbsDir "/tmp/hastory-cache")}
+        , bench "list-recent-directories" $
+          whnfIO $
+          runHastory
+              [ "list-recent-directories"
+              , "--bypass-cache"
+              , "--cache-dir"
+              , "/tmp/hastory-cache"
+              ]
         ]
 
 runHastory :: [String] -> IO ()
