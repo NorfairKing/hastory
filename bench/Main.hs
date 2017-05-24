@@ -34,18 +34,21 @@ main =
                   case ec of
                       ExitSuccess -> ()
                       ExitFailure _ -> ())
-           , bench "gather" $
-             whnfIO $ runReaderT (gatherFrom "ls -lr") benchSets
+           , bgroup "gather" $ map gatherBenchmark [10, 1000, 100000]
            , bgroup
-                 "list-recent-directories"
-                 [ listRecentDirsBenchmark 0
-                 , listRecentDirsBenchmark 1000
-                 , listRecentDirsBenchmark 1000000
-                 ]
+                 "list-recent-directories" $ map listRecentDirsBenchmark [10, 1000, 100000]
            ]
 
 benchSets :: Settings
 benchSets = Settings {setCacheDir = $(mkAbsDir "/tmp/hastory-cache")}
+
+gatherBenchmark :: Int -> Benchmark
+gatherBenchmark i =
+    env
+        (runReaderT (prepareEntries i) benchSets)
+        (\ ~() ->
+             bench ("gather-" ++ show i) $
+             whnfIO $ runReaderT (gatherFrom "ls -lr") benchSets)
 
 listRecentDirsBenchmark :: Int -> Benchmark
 listRecentDirsBenchmark i =
