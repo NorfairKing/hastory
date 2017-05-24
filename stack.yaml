@@ -1,5 +1,6 @@
 packages:
-- '.'
+- 'hastory'
+- 'hastory-test-utils'
 extra-deps:
 - validity-0.3.2.0
 - validity-path-0.1.0.0
