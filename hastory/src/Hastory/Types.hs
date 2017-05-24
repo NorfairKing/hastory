@@ -12,6 +12,8 @@ import Data.Hashable.Time ()
 import Data.Text (Text)
 import Data.Time (ZonedTime, zonedTimeToUTC)
 
+import Control.DeepSeq
+
 data Entry = Entry
     { entryText :: Text
     , entryWorkingDir :: Path Abs Dir
@@ -19,6 +21,8 @@ data Entry = Entry
     , entryHostName :: String
     , entryUser :: String
     } deriving (Show, Generic)
+
+instance NFData Entry
 
 instance Hashable Entry where
     hashWithSalt salt Entry {..} =
