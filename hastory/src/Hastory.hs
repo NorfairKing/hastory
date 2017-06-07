@@ -18,9 +18,10 @@ hastory = do
     (d, sets) <- getInstructions
     runReaderT (dispatch d) sets
 
-dispatch :: (MonadIO m ,MonadReader Settings m) => Dispatch -> m ()
+dispatch ::
+       (MonadIO m, MonadThrow m, MonadReader Settings m) => Dispatch -> m ()
 dispatch DispatchGather = gather
 dispatch DispatchGenGatherWrapperScript = liftIO genGatherWrapperScript
 dispatch (DispatchChangeDir ix) = change ix
-dispatch (DispatchListRecentDirs lrds)= listRecentDirs lrds
+dispatch (DispatchListRecentDirs lrds) = listRecentDirs lrds
 dispatch DispatchGenChangeWrapperScript = liftIO genChangeWrapperScript

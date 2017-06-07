@@ -11,7 +11,7 @@ import Hastory.OptParse.Types
 import Hastory.Recent
 
 listRecentDirs ::
-       (MonadIO m, MonadReader Settings m) => ListRecentDirSets -> m ()
+       (MonadIO m, MonadThrow m ,MonadReader Settings m) => ListRecentDirSets -> m ()
 listRecentDirs ListRecentDirSets {..} = do
     recentDirOpts <- getRecentDirOpts lrdSetBypassCache
     let tups = zip [0 ..] recentDirOpts

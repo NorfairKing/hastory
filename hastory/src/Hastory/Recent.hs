@@ -25,7 +25,8 @@ import Hastory.Internal
 import Hastory.OptParse.Types
 import Hastory.Types
 
-getRecentDirOpts :: (MonadIO m, MonadReader Settings m) => Bool -> m [FilePath]
+getRecentDirOpts ::
+       (MonadIO m, MonadThrow m, MonadReader Settings m) => Bool -> m [FilePath]
 getRecentDirOpts bypassCache = do
     if bypassCache
         then recompute
@@ -57,9 +58,10 @@ getRecentDirOpts bypassCache = do
 cacheInvalidationDuration :: NominalDiffTime
 cacheInvalidationDuration = 10 -- seconds
 
-computeRecentDirOpts :: (MonadIO m, MonadReader Settings m) => m [FilePath]
+computeRecentDirOpts ::
+       (MonadIO m, MonadThrow m, MonadReader Settings m) => m [FilePath]
 computeRecentDirOpts = do
-    rawEnts <- getHistory
+    rawEnts <- getLastNDaysOfHistory 7
     home <- liftIO getHomeDir
     let entries = filter ((/= home) . entryWorkingDir) rawEnts
     now <- liftIO Time.getZonedTime

@@ -19,12 +19,12 @@ import Hastory.Internal
 import Hastory.OptParse.Types
 import Hastory.Types
 
-gather :: (MonadIO m, MonadReader Settings m) => m ()
+gather :: (MonadIO m, MonadThrow m, MonadReader Settings m) => m ()
 gather = do
     text <- liftIO T.getContents
     gatherFrom text
 
-gatherFrom :: (MonadIO m, MonadReader Settings m) => Text -> m ()
+gatherFrom :: (MonadIO m, MonadThrow m, MonadReader Settings m) => Text -> m ()
 gatherFrom text = do
     entry <- liftIO $ getEntryWith text
     storeHistory entry
@@ -44,9 +44,10 @@ getEntryWith text = do
         , entryUser = user
         }
 
-storeHistory :: (MonadIO m, MonadReader Settings m) => Entry -> m ()
+storeHistory ::
+       (MonadIO m, MonadThrow m, MonadReader Settings m) => Entry -> m ()
 storeHistory entry = do
-    hFile <- histfile
+    hFile <- histFileFor $ entryDateTime entry
     liftIO $ do
         ensureDir $ parent hFile
         LB.appendFile (toFilePath hFile) $ JSON.encode entry <> "\n"
