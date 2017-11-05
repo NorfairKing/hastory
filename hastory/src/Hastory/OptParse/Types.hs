@@ -14,11 +14,11 @@ data Command
     | CommandGenChangeWrapperScript
     deriving (Show, Eq)
 
-data ListRecentDirArgs = ListRecentDirArgs
+newtype ListRecentDirArgs = ListRecentDirArgs
     { lrdArgBypassCache :: Maybe Bool
     } deriving (Show, Eq)
 
-data Flags = Flags
+newtype Flags = Flags
     { flagCacheDir :: Maybe FilePath
     } deriving (Show, Eq)
 
@@ -34,10 +34,10 @@ data Dispatch
     | DispatchGenChangeWrapperScript
     deriving (Show, Eq)
 
-data ListRecentDirSets = ListRecentDirSets
+newtype ListRecentDirSets = ListRecentDirSets
     { lrdSetBypassCache :: Bool
     } deriving (Show, Eq)
 
-data Settings = Settings
+newtype Settings = Settings
     { setCacheDir :: Path Abs Dir
     } deriving (Show, Eq)

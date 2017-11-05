@@ -48,16 +48,17 @@ getArguments = do
     let result = runArgumentsParser args
     handleParseResult result
 
-runArgumentsParser :: [[Char]] -> ParserResult Arguments
+runArgumentsParser :: [String] -> ParserResult Arguments
 runArgumentsParser =
     execParserPure
-        (ParserPrefs
-         { prefMultiSuffix = "HASTORY"
-         , prefDisambiguate = True
-         , prefShowHelpOnError = True
-         , prefBacktrack = True
-         , prefColumns = 80
-         })
+        ParserPrefs
+        { prefMultiSuffix = "HASTORY"
+        , prefDisambiguate = True
+        , prefShowHelpOnError = True
+        , prefShowHelpOnEmpty = True
+        , prefBacktrack = True
+        , prefColumns = 80
+        }
         argParser
 
 argParser :: ParserInfo Arguments

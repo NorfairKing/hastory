@@ -26,8 +26,7 @@ instance NFData Entry
 
 instance Hashable Entry where
     hashWithSalt salt Entry {..} =
-        salt `hashWithSalt` entryText `hashWithSalt`
-        (toFilePath entryWorkingDir) `hashWithSalt`
+        salt `hashWithSalt` entryText `hashWithSalt` toFilePath entryWorkingDir `hashWithSalt`
         entryDateTime `hashWithSalt`
         entryHostName `hashWithSalt`
         entryUser

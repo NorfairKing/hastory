@@ -10,7 +10,7 @@ import Hastory.Gen ()
 import Hastory.Types
 
 spec :: Spec
-spec = do
+spec =
     describe "Entry" $ do
         eqSpec @Entry
         jsonSpecOnValid @Entry

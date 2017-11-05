@@ -27,7 +27,7 @@ import Hastory.Types
 
 getRecentDirOpts ::
        (MonadIO m, MonadThrow m, MonadReader Settings m) => Bool -> m [FilePath]
-getRecentDirOpts bypassCache = do
+getRecentDirOpts bypassCache =
     if bypassCache
         then recompute
         else do
@@ -82,7 +82,7 @@ computeRecentDirOpts = do
         -> (a -> Double)
         -> [a]
         -> HashMap b Double
-    doCountsWith conv func es = foldl go HM.empty es
+    doCountsWith conv func = foldl go HM.empty
       where
         go hm k = HM.alter a (conv k) hm
           where

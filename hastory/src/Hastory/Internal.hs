@@ -11,8 +11,6 @@ import qualified Data.ByteString.Lazy as LB
 import qualified Data.ByteString.Lazy.Char8 as LB8
 
 import Data.Time
-import Data.Time.Clock
-import Data.Time.Format
 
 import Hastory.OptParse.Types
 import Hastory.Types
@@ -52,11 +50,11 @@ getHistoryFrom :: (MonadIO m, MonadThrow m) => Path Abs File -> m [Entry]
 getHistoryFrom hFile = do
     contents <- liftIO $ forgivingAbsence $ LB.readFile $ toFilePath hFile
     let encodedEntries = LB8.lines <$> contents
-    let entries = catMaybes $ map JSON.decode $ fromMaybe [] encodedEntries
+    let entries = mapMaybe JSON.decode $ fromMaybe [] encodedEntries
     pure entries
 
 getLastNDaysOfHistory ::
-       (MonadIO m,MonadThrow m, MonadReader Settings m) => Int -> m [Entry]
+       (MonadIO m, MonadThrow m, MonadReader Settings m) => Int -> m [Entry]
 getLastNDaysOfHistory n = do
     zt <- liftIO getZonedTime
     hFiles <- histFilesForLastDays n zt

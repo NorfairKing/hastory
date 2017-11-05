@@ -8,7 +8,7 @@ import Data.Maybe as X
 import Data.Monoid as X
 import GHC.Generics as X (Generic)
 import Prelude as X
-       hiding (writeFile, readFile, putStrLn, putStr, appendFile)
+       hiding (appendFile, putStr, putStrLn, readFile, writeFile)
 import System.Exit as X
 
 import Data.Validity as X
@@ -27,4 +27,3 @@ import Test.Validity.Aeson as X
 
 import Path as X
 import Path.IO as X
-

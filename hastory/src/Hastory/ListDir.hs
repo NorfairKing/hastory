@@ -1,7 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE TemplateHaskell #-}
 
 module Hastory.ListDir where
 
@@ -11,7 +10,9 @@ import Hastory.OptParse.Types
 import Hastory.Recent
 
 listRecentDirs ::
-       (MonadIO m, MonadThrow m ,MonadReader Settings m) => ListRecentDirSets -> m ()
+       (MonadIO m, MonadThrow m, MonadReader Settings m)
+    => ListRecentDirSets
+    -> m ()
 listRecentDirs ListRecentDirSets {..} = do
     recentDirOpts <- getRecentDirOpts lrdSetBypassCache
     let tups = zip [0 ..] recentDirOpts

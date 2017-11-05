@@ -49,16 +49,14 @@ benchSets = Settings {setCacheDir = $(mkAbsDir "/tmp/hastory-cache")}
 
 gatherBenchmark :: Int -> Benchmark
 gatherBenchmark i =
-    env
-        (runReaderT (prepareEntries i) benchSets)
+    env (runReaderT (prepareEntries i) benchSets)
         (\ ~() ->
              bench ("gather-" ++ show i) $
              whnfIO $ runReaderT (gatherFrom "ls -lr") benchSets)
 
 listRecentDirsBenchmark :: Int -> Benchmark
 listRecentDirsBenchmark i =
-    env
-        (runReaderT (prepareEntries i) benchSets)
+    env (runReaderT (prepareEntries i) benchSets)
         (\ ~() ->
              bench ("list-recent-directories-" ++ show i) $
              whnfIO $
@@ -105,7 +103,7 @@ getSomeAbsDirs = do
                               then WalkFinish
                               else WalkExclude []))
             (\_ ds _ -> do
-                 modify (+ (length ds))
+                 modify (+ length ds)
                  pure ds)
             home
 
