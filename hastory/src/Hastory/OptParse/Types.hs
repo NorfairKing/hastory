@@ -12,6 +12,7 @@ data Command
     | CommandListRecentDirs ListRecentDirArgs
     | CommandChangeDir Int
     | CommandGenChangeWrapperScript
+    | CommandSuggestAlias
     deriving (Show, Eq)
 
 newtype ListRecentDirArgs = ListRecentDirArgs
@@ -32,6 +33,7 @@ data Dispatch
     | DispatchListRecentDirs ListRecentDirSets
     | DispatchChangeDir Int
     | DispatchGenChangeWrapperScript
+    | DispatchSuggestAlias
     deriving (Show, Eq)
 
 newtype ListRecentDirSets = ListRecentDirSets
