@@ -5,15 +5,14 @@ module Hastory.SuggestAlias where
 import Import
 
 import Control.Arrow (second)
-import Data.HashMap.Lazy (HashMap)
 import qualified Data.HashMap.Lazy as HM
-import Data.Hashable (Hashable)
 import qualified Data.Text as T
 import Data.Text (Text)
 
 import Hastory.Internal
 import Hastory.OptParse.Types
 import Hastory.Types
+import Hastory.Utils (doCountsWith)
 
 suggest :: (MonadIO m, MonadThrow m, MonadReader Settings m) => m ()
 suggest = do
@@ -32,16 +31,3 @@ suggestions = do
     let counts = doCountsWith entryText (const 1.0) entries
     let tups = reverse $ sortOn snd $ HM.toList counts
     return $ take 10 $ map (second round) tups
-  where
-    doCountsWith ::
-           (Eq b, Hashable b)
-        => (a -> b)
-        -> (a -> Double)
-        -> [a]
-        -> HashMap b Double
-    doCountsWith conv func = foldl go HM.empty
-      where
-        go hm k = HM.alter a (conv k) hm
-          where
-            a Nothing = Just 0
-            a (Just d) = Just $ d + func k
