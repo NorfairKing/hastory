@@ -18,5 +18,5 @@ doCountsWith conv func = foldl go HM.empty
   where
     go hm k = HM.alter a (conv k) hm
       where
-        a Nothing = Just 0
+        a Nothing = Just 1
         a (Just d) = Just $ d + func k

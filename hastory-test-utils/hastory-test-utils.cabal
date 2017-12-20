@@ -54,7 +54,9 @@ test-suite hastory-test
         validity-text -any,
         path -any,
         path-io -any,
-        QuickCheck -any
+        QuickCheck -any,
+        safe -any,
+        text -any
     default-language: Haskell2010
     default-extensions: NoImplicitPrelude
     hs-source-dirs: test/

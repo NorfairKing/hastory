@@ -4,7 +4,7 @@ module Hastory.SuggestAlias where
 
 import Import
 
-import Control.Arrow (second)
+import Control.Arrow ((***))
 import qualified Data.HashMap.Lazy as HM
 import qualified Data.Text as T
 import Data.Text (Text)
@@ -17,7 +17,7 @@ import Hastory.Utils (doCountsWith)
 suggest :: (MonadIO m, MonadThrow m, MonadReader Settings m) => m ()
 suggest = do
     rawEnts <- getLastNDaysOfHistory 7
-    let tups = suggestions rawEnts
+    let tups = take 10 $ suggestions rawEnts
     let maxlen = maximum $ map (length . show . snd) tups
         formatTup (t, x) =
             show x ++
@@ -25,8 +25,19 @@ suggest = do
     liftIO $ forM_ tups $ putStrLn . formatTup
 
 suggestions :: [Entry] -> [(Text, Integer)]
-suggestions rawEnts = take 10 $ map (second round) tups
-    where
-        entries = filter (not . T.isPrefixOf (T.pack "cd ") . entryText) rawEnts
-        counts = doCountsWith entryText (const 1.0) entries
-        tups = reverse $ sortOn snd $ HM.toList counts
+suggestions rawEnts = map (T.unwords *** round) tups
+  where
+    entries = filter (not . isCDEntry) rawEnts
+    prefixes = [w | e <- entries, w <- commandPrefixes e]
+    tups = aggregateSuggestions prefixes
+
+isCDEntry :: Entry -> Bool
+isCDEntry = T.isPrefixOf (T.pack "cd ") . entryText
+
+-- tailSafe drops the empty string
+commandPrefixes :: Entry -> [[Text]]
+commandPrefixes = tailSafe . inits . T.words . entryText
+
+aggregateSuggestions :: [[Text]] -> [([Text], Double)]
+aggregateSuggestions =
+    reverse . sortOn snd . HM.toList . doCountsWith id (const 1.0)
