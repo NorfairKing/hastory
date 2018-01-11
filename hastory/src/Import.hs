@@ -15,6 +15,7 @@ import Control.Monad as X
 import Data.Validity as X
 import Data.Validity.Path as X ()
 import Data.Validity.Text as X ()
+import Data.Validity.Time.LocalTime as X ()
 
 import Path as X
 import Path.IO as X

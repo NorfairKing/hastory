@@ -6,6 +6,8 @@ import Import
 
 import Control.Arrow ((***))
 import qualified Data.HashMap.Lazy as HM
+import Data.Hashable (Hashable)
+import Data.Ord (Down(..), comparing)
 import qualified Data.Text as T
 import Data.Text (Text)
 
@@ -38,6 +40,6 @@ isCDEntry = T.isPrefixOf (T.pack "cd ") . entryText
 commandPrefixes :: Entry -> [[Text]]
 commandPrefixes = tailSafe . inits . T.words . entryText
 
-aggregateSuggestions :: [[Text]] -> [([Text], Double)]
+aggregateSuggestions :: (Eq a, Hashable a) => [a] -> [(a, Double)]
 aggregateSuggestions =
-    reverse . sortOn snd . HM.toList . doCountsWith id (const 1.0)
+    sortBy (comparing $ Down . snd) . HM.toList . doCountsWith id (const 1.0)
