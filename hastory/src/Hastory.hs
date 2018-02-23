@@ -10,6 +10,7 @@ import Hastory.GenChangeWrapper (genChangeWrapperScript)
 import Hastory.GenGatherWrapper (genGatherWrapperScript)
 import Hastory.ListDir (listRecentDirs)
 import Hastory.OptParse
+import Hastory.SuggestAlias (suggest)
 
 hastory :: IO ()
 hastory = do
@@ -23,3 +24,4 @@ dispatch DispatchGenGatherWrapperScript = liftIO genGatherWrapperScript
 dispatch (DispatchChangeDir ix) = change ix
 dispatch (DispatchListRecentDirs lrds) = listRecentDirs lrds
 dispatch DispatchGenChangeWrapperScript = liftIO genChangeWrapperScript
+dispatch DispatchSuggestAlias = suggest

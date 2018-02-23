@@ -13,9 +13,7 @@ import Import
 import Data.Aeson as JSON
 import Data.Aeson.Encode.Pretty as JSON
 import qualified Data.ByteString.Lazy as LB
-import Data.HashMap.Lazy (HashMap)
 import qualified Data.HashMap.Lazy as HM
-import Data.Hashable (Hashable)
 import qualified Data.Time.Clock as Time
 import Data.Time.Clock (NominalDiffTime)
 import qualified Data.Time.LocalTime as Time
@@ -24,6 +22,7 @@ import Data.Time.LocalTime (ZonedTime)
 import Hastory.Internal
 import Hastory.OptParse.Types
 import Hastory.Types
+import Hastory.Utils (doCountsWith)
 
 getRecentDirOpts ::
        (MonadIO m, MonadThrow m, MonadReader Settings m) => Bool -> m [FilePath]
@@ -75,19 +74,6 @@ computeRecentDirOpts = do
     let counts = doCountsWith (toFilePath . entryWorkingDir) dateFunc entries
     let tups = reverse $ sortOn snd $ HM.toList counts
     pure $ take 10 $ map fst tups
-  where
-    doCountsWith ::
-           (Eq b, Hashable b)
-        => (a -> b)
-        -> (a -> Double)
-        -> [a]
-        -> HashMap b Double
-    doCountsWith conv func = foldl go HM.empty
-      where
-        go hm k = HM.alter a (conv k) hm
-          where
-            a Nothing = Just 0
-            a (Just d) = Just $ d + func k
 
 cacheRecentDirOpts :: (MonadIO m, MonadReader Settings m) => [FilePath] -> m ()
 cacheRecentDirOpts fs = do

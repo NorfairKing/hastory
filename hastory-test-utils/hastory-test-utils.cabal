@@ -17,12 +17,12 @@ library
     build-depends:
         base >=4.9 && <=5,
         hastory -any,
-        genvalidity >=0.3 && <0.4,
-        genvalidity-hspec >=0.4 && <0.5,
-        genvalidity-path >=0.1 && <0.2,
-        genvalidity-text >=0.3.1 && <0.4,
-        genvalidity-time >=0.0.0.2 && <0.1,
-        genvalidity-hspec-aeson >=0.0 && <0.1,
+        genvalidity >=0.4 && <0.5,
+        genvalidity-hspec >=0.5 && <0.6,
+        genvalidity-path >=0.2 && <0.3,
+        genvalidity-text >=0.4 && <0.5,
+        genvalidity-time >=0.1 && <0.2,
+        genvalidity-hspec-aeson >=0.1 && <0.2,
         hspec >=2.2 && <2.5,
         validity -any,
         validity-path -any,
@@ -54,7 +54,9 @@ test-suite hastory-test
         validity-text -any,
         path -any,
         path-io -any,
-        QuickCheck -any
+        QuickCheck -any,
+        safe -any,
+        text -any
     default-language: Haskell2010
     default-extensions: NoImplicitPrelude
     hs-source-dirs: test/

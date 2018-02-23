@@ -31,6 +31,7 @@ combineToInstructions cmd Flags {..} Configuration = (,) d <$> sets
                     {lrdSetBypassCache = fromMaybe False lrdArgBypassCache}
             CommandChangeDir i -> DispatchChangeDir i
             CommandGenChangeWrapperScript -> DispatchGenChangeWrapperScript
+            CommandSuggestAlias -> DispatchSuggestAlias
     sets = do
         home <- getHomeDir
         cacheDir <-
@@ -78,6 +79,7 @@ parseCommand =
         , command
               "generate-change-directory-wrapper-script"
               parseGenChangeDirectoryWrapperScript
+        , command "suggest-alias" parseSuggestAlias
         ]
 
 parseCommandGather :: ParserInfo Command
@@ -131,6 +133,13 @@ parseGenChangeDirectoryWrapperScript =
     info
         (pure CommandGenChangeWrapperScript)
         (progDesc "Generate the wrapper script to use 'change-directory'")
+
+parseSuggestAlias :: ParserInfo Command
+parseSuggestAlias =
+    info
+        (pure CommandSuggestAlias)
+        (progDesc
+             "Suggest commands for which the user may want to make aliases.")
 
 parseFlags :: Parser Flags
 parseFlags =
