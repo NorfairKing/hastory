@@ -1,0 +1,53 @@
+-- This file has been generated from package.yaml by hpack version 0.20.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 81ed36cf6f0b36d802f2beff030bba8bd9d0ca772f3a44ba7a47b3808aa82d5e
+
+name:           hastory-data
+version:        0.0.0.0
+category:       Command Line
+homepage:       https://github.com/NorfairKing/hastory
+author:         Tom Sydney Kerckhove
+maintainer:     syd.kerckhove@gmail.com
+copyright:      Copyright: (c) 2016-2018 Tom Sydney Kerckhove
+license:        AllRightsReserved
+license-file:   LICENSE
+build-type:     Simple
+cabal-version:  >= 1.10
+
+library
+  hs-source-dirs:
+      src/
+  default-extensions: NoImplicitPrelude
+  ghc-options: -Wall -Wincomplete-uni-patterns -Wincomplete-record-updates -Wimplicit-prelude -Wredundant-constraints
+  build-depends:
+      aeson
+    , base >=4.9 && <=5
+    , bytestring
+    , deepseq
+    , exceptions
+    , hashable
+    , hashable-time
+    , hostname
+    , mtl
+    , path
+    , path-io
+    , safe
+    , text
+    , time
+    , unix
+    , unordered-containers
+    , validity
+    , validity-path
+    , validity-text
+    , validity-time
+  exposed-modules:
+      Data.Hastory
+      Data.Hastory.Gather
+      Data.Hastory.Types
+      Data.Hastory.Utils
+  other-modules:
+      Import
+      Paths_hastory_data
+  default-language: Haskell2010
