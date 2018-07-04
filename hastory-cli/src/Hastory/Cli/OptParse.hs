@@ -14,11 +14,13 @@ import Options.Applicative
 
 import Hastory.Cli.OptParse.Types
 
+import Debug.Trace
+
 getInstructions :: IO Instructions
 getInstructions = do
     Arguments cmd flags <- getArguments
     config <- getConfiguration cmd flags
-    combineToInstructions cmd flags config
+    trace("cmd: " ++ show cmd ++ ", flags: " ++ show flags ++ ", config: " ++ show config) $ combineToInstructions cmd flags config
 
 combineToInstructions :: Command -> Flags -> Configuration -> IO Instructions
 combineToInstructions cmd Flags {..} Configuration = Instructions d <$> sets

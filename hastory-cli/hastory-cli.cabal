@@ -45,6 +45,7 @@ library
     , validity-path
     , validity-text
     , validity-time
+    , strict
   exposed-modules:
       Hastory.Cli
       Hastory.Cli.Commands.ChangeDir

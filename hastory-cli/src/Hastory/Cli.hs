@@ -14,10 +14,12 @@ import Hastory.Cli.Commands.ListDir (listRecentDirs)
 import Hastory.Cli.Commands.SuggestAlias (suggest)
 import Hastory.Cli.OptParse
 
+import Debug.Trace
+
 hastoryCli :: IO ()
 hastoryCli = do
     Instructions d sets <- getInstructions
-    runReaderT (dispatch d) sets
+    trace("d: " ++ show d ++ ", sets: " ++ show sets) $ runReaderT (dispatch d) sets
 
 dispatch ::
        (MonadIO m, MonadThrow m, MonadReader Settings m) => Dispatch -> m ()
