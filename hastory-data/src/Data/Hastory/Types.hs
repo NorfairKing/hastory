@@ -16,7 +16,7 @@ import Data.Time (ZonedTime, zonedTimeToUTC)
 import Control.DeepSeq
 
 data Entry = Entry
-    { entryText :: Text
+    { entryText :: !Text
     , entryWorkingDir :: Path Abs Dir
     , entryDateTime :: ZonedTime
     , entryHostName :: String
