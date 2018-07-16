@@ -33,7 +33,7 @@ PROMPT_COMMAND="hastory_gather_"
 On the other hand, hastory works for zsh if you add this line to .zshrc.
 
 ``` shell
-PROMPT+='$(hastory_gather_)'
+precmd() { hastory_gather_ }
 ```
 
 When you restart your shell (for example by restarting your terminal), you should see history accumulating in `~/.hastory/command-history/$(date +%F).log`.
