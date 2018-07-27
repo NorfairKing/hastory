@@ -27,13 +27,13 @@ This means that the only thing you need to do is to add a one-liner to the scrip
 For bash, it suffices to add the following to .bashrc.
 
 ``` shell
-PS1+='$(hastory_gather_)'
+PROMPT_COMMAND="hastory_gather_"
 ```
 
 On the other hand, hastory works for zsh if you add this line to .zshrc.
 
 ``` shell
-PROMPT+='$(hastory_gather_)'
+precmd() { hastory_gather_ }
 ```
 
 When you restart your shell (for example by restarting your terminal), you should see history accumulating in `~/.hastory/command-history/$(date +%F).log`.
