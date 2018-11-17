@@ -1,0 +1,29 @@
+- entry:
+    header: Alias Suggestions
+    state-history:
+    - new-state: TODO
+      timestamp: 2018-11-17 18:28:45.048446873000+0000
+  forest:
+  - header: Better define what it means for an alias to be 'a good idea'
+    contents: ! 'For example, ''l'' is probably not a great thing to alias because
+
+      it is most likely already an alias.'
+    state-history:
+    - new-state: TODO
+      timestamp: 2018-11-17 18:28:45.048446873000+0000
+  - header: Add a flag that says how many options i want to see
+    state-history:
+    - new-state: TODO
+      timestamp: 2018-11-17 18:29:18.403654613000+0000
+- header: Some command that lists all commands in order of usage
+  state-history:
+  - new-state: TODO
+    timestamp: 2018-11-17 18:29:37.320873976000+0000
+- header: Stats
+  state-history:
+  - new-state: TODO
+    timestamp: 2018-11-17 18:28:44.201328428000+0000
+- header: Hastory server to store logs from multiple sources
+  state-history:
+  - new-state: TODO
+    timestamp: 2018-11-17 18:28:43.829842454000+0000
