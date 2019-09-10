@@ -1,3 +1,7 @@
+- header: Use sqlite instead of json
+  state-history:
+  - new-state: TODO
+    timestamp: 2019-09-10 13:52:01.274802781000+0000
 - entry:
     header: Alias Suggestions
     state-history:

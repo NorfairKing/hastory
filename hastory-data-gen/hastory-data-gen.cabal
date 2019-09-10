@@ -1,8 +1,10 @@
--- This file has been generated from package.yaml by hpack version 0.20.0.
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.1.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f0b1c697635a298642b27d35ac1cb0e0dcbed3a698c0af22fedccc85cfdf567c
+-- hash: 6d90986257f4760e0df4a1f6304e55c149bdbb3479e43c84921d6db4701c9cb0
 
 name:           hastory-data-gen
 version:        0.0.0.0
@@ -14,7 +16,6 @@ copyright:      Copyright: (c) 2017-2018 Tom Sydney Kerckhove
 license:        AllRightsReserved
 license-file:   LICENSE
 build-type:     Simple
-cabal-version:  >= 1.10
 
 library
   hs-source-dirs:
