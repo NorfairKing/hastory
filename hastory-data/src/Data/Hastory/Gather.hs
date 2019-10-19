@@ -7,16 +7,17 @@ module Data.Hastory.Gather
 
 import Import
 
-import Data.Text (Text)
-import qualified Data.Time.LocalTime as Time
+import Data.Hastory.Types
+
+import Data.Text (Text, pack)
 import Network.HostName (getHostName)
 import System.Posix.User (getEffectiveUserName)
 
-import Data.Hastory.Types
+import qualified Data.Time as Time
 
 gatherEntryWith :: Text -> IO Entry
 gatherEntryWith text = do
-    curtime <- Time.getZonedTime
+    curtime <- Time.getCurrentTime
     curdir <- getCurrentDir
     hostname <- getHostName
     user <- getEffectiveUserName
@@ -25,6 +26,6 @@ gatherEntryWith text = do
             { entryText = text
             , entryDateTime = curtime
             , entryWorkingDir = curdir
-            , entryHostName = hostname
-            , entryUser = user
+            , entryHostName = (pack hostname)
+            , entryUser = (pack user)
             }

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 6f6a419e78221362b38b497f09da0ead2bac7b1432e0846af414b6a276c1c51c
+-- hash: 7bd04178427e6e8b2c46e3811231e7168a95575e352e5de37398dccd9327b891
 
 name:           hastory-data
 version:        0.0.0.0
@@ -23,9 +23,7 @@ library
   default-extensions: NoImplicitPrelude
   ghc-options: -Wall -Wincomplete-uni-patterns -Wincomplete-record-updates -Wimplicit-prelude -Wredundant-constraints
   build-depends:
-      aeson
-    , base >=4.9 && <=5
-    , bytestring
+      base >=4.9 && <=5
     , deepseq
     , exceptions
     , hashable
@@ -34,6 +32,9 @@ library
     , mtl
     , path
     , path-io
+    , persistent
+    , persistent-sqlite
+    , persistent-template
     , safe
     , text
     , time
@@ -49,6 +50,7 @@ library
       Data.Hastory.Types
       Data.Hastory.Utils
   other-modules:
+      Data.Hastory.Types.Path
       Import
       Paths_hastory_data
   default-language: Haskell2010

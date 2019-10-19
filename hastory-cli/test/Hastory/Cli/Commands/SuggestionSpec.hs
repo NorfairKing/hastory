@@ -19,7 +19,6 @@ spec :: Spec
 spec = do
     describe "Entry" $ do
         eqSpec @Entry
-        jsonSpecOnValid @Entry
         arbitrarySpec @Entry
         genValiditySpec @Entry
     describe "commandPrefixes" $ do

@@ -10,23 +10,23 @@ module Hastory.Cli.Commands.Recent
 
 import Import
 
-import Data.Aeson as JSON
-import Data.Aeson.Encode.Pretty as JSON
-import qualified Data.ByteString.Lazy as LB
-import qualified Data.HashMap.Lazy as HM
-import qualified Data.Time.Clock as Time
-import Data.Time.Clock (NominalDiffTime)
-import qualified Data.Time.LocalTime as Time
-import Data.Time.LocalTime (ZonedTime)
-
 import Data.Hastory
-
 import Hastory.Cli.Internal
 import Hastory.Cli.OptParse.Types
 import Hastory.Cli.Utils (doCountsWith)
 
+import Data.Aeson as JSON
+import Data.Aeson.Encode.Pretty as JSON
+import Data.Time.Clock (NominalDiffTime)
+import Data.Time.LocalTime (ZonedTime)
+
+import qualified Data.ByteString.Lazy as LB
+import qualified Data.HashMap.Lazy as HM
+import qualified Data.Time.Clock as Time
+import qualified Data.Time.LocalTime as Time
+
 getRecentDirOpts ::
-       (MonadIO m,  MonadReader Settings m) => Bool -> m [FilePath]
+       (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => Bool -> m [FilePath]
 getRecentDirOpts bypassCache =
     if bypassCache
         then recompute
@@ -59,19 +59,17 @@ cacheInvalidationDuration :: NominalDiffTime
 cacheInvalidationDuration = 10 -- seconds
 
 computeRecentDirOpts ::
-       (MonadIO m,  MonadReader Settings m) => m [FilePath]
+       (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => m [FilePath]
 computeRecentDirOpts = do
     rawEnts <- getLastNDaysOfHistory 7
     home <- liftIO getHomeDir
     let entries = filter ((/= home) . entryWorkingDir) rawEnts
-    now <- liftIO Time.getZonedTime
+    now <- liftIO Time.getCurrentTime
     let dateFunc entry = 1 / d
           where
             d =
                 realToFrac $
-                Time.diffUTCTime
-                    (Time.zonedTimeToUTC now)
-                    (Time.zonedTimeToUTC $ entryDateTime entry)
+                Time.diffUTCTime now (entryDateTime entry)
     let counts = doCountsWith (toFilePath . entryWorkingDir) dateFunc entries
     let tups = reverse $ sortOn snd $ HM.toList counts
     pure $ take 10 $ map fst tups

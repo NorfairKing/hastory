@@ -4,20 +4,20 @@ module Hastory.Cli.Commands.SuggestAlias where
 
 import Import
 
-import Control.Arrow ((***))
-import qualified Data.HashMap.Lazy as HM
-import Data.Hashable (Hashable)
-import Data.Ord (Down(..), comparing)
-import qualified Data.Text as T
-import Data.Text (Text)
-
 import Data.Hastory
-
 import Hastory.Cli.Internal
 import Hastory.Cli.OptParse.Types
 import Hastory.Cli.Utils (doCountsWith)
 
-suggest :: (MonadIO m, MonadReader Settings m) => m ()
+import Control.Arrow ((***))
+import Data.Hashable (Hashable)
+import Data.Ord (Down(..), comparing)
+import Data.Text (Text)
+
+import qualified Data.HashMap.Lazy as HM
+import qualified Data.Text as T
+
+suggest :: (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => m ()
 suggest = do
     rawEnts <- getLastNDaysOfHistory 7
     let tups = take 10 $ suggestions rawEnts
