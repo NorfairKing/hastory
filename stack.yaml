@@ -2,4 +2,5 @@ packages:
 - hastory-cli
 - hastory-data
 - hastory-data-gen
+- hastory-server
 resolver: lts-11.6
