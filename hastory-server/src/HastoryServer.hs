@@ -2,17 +2,17 @@
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE RecordWildCards     #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeApplications    #-}
 {-# LANGUAGE TypeOperators       #-}
 
+-- | TODO: Introduce mtl with logging
+-- | TODO: Drop unnecessary dependencies in cabalfiles
 module HastoryServer where
 
 import           Control.Monad.IO.Class   (liftIO)
 import           Data.Proxy               (Proxy (..))
 import           Data.Semigroup           ((<>))
-import           Data.String              (IsString, fromString)
 import qualified Data.Text                as T
-import           GHC.TypeLits
+import           Hastory.API
 import qualified Network.HTTP.Types       as HTTP
 import qualified Network.Wai              as Wai
 import qualified Network.Wai.Handler.Warp as Warp
@@ -22,29 +22,19 @@ import           Servant
 import           System.Posix.Files       (fileExist)
 import           System.Random            (newStdGen, randomRs)
 
-newtype Token = Token T.Text
-
-instance FromHttpApiData Token where
-  parseHeader = fmap Token . parseHeader
-  parseUrlPiece = fmap Token . parseUrlPiece
-
-type HastoryAPI = "commands" :> "append" :> Header TokenHeaderKey Token :> ReqBody '[JSON] String :> Post '[JSON] ()
-
+-- | TODO: Document
 data Options = Options
   { _oPort               :: Int
   , _oDataOutputFilePath :: FilePath
   , _oLogFile            :: Maybe String
   } deriving (Show, Eq)
 
+-- | TODO: Document
 newtype ServerSettings = ServerSettings
   { _ssToken :: T.Text
   } deriving (Show, Eq)
 
-type TokenHeaderKey = "X-Token"
-
-tokenHeaderKey :: IsString s => s
-tokenHeaderKey = fromString $ symbolVal (Proxy @TokenHeaderKey)
-
+-- | TODO: Document
 optParser :: A.ParserInfo Options
 optParser =
   A.info (
@@ -54,6 +44,7 @@ optParser =
       <*> A.option A.auto (A.value (Just "server.logs") <> A.long "log-output" <> A.short 'l')
   ) mempty
 
+-- | TODO: Document
 server :: Options -> ServerSettings -> Server HastoryAPI
 server Options {..} ServerSettings {..} = appendCommand
   where
@@ -67,9 +58,11 @@ server Options {..} ServerSettings {..} = appendCommand
     appendCommand Nothing _ =
       throwError $ err403 { errBody = tokenHeaderKey <> " header should exist." }
 
+-- | TODO: Document
 myApi :: Proxy HastoryAPI
 myApi = Proxy
 
+-- | TODO: Document
 app :: Options -> ServerSettings -> Application
 app options serverSettings = serve myApi (server options serverSettings)
 
@@ -78,6 +71,7 @@ mkWarpLogger :: FilePath -> Wai.Request -> HTTP.Status -> Maybe Integer -> IO ()
 mkWarpLogger logPath req _ _ =
   appendFile logPath $ show req <> "\n"
 
+-- | TODO: Document
 mkWarpSettings :: Options -> Warp.Settings
 mkWarpSettings Options {..} =
     Warp.setTimeout 20 $
@@ -85,12 +79,15 @@ mkWarpSettings Options {..} =
     maybe id (Warp.setLogger . mkWarpLogger) _oLogFile
     Warp.defaultSettings
 
+-- | TODO: Document
 tokenLength :: Int
 tokenLength = 20
 
+-- | TODO: Document
 generateToken :: IO T.Text
 generateToken = T.pack . take tokenLength . randomRs ('a', 'z') <$> newStdGen
 
+-- | TODO: Document
 reportDataFileStatus :: Options -> IO ()
 reportDataFileStatus Options {..} = do
   dataFileExists <- fileExist _oDataOutputFilePath
@@ -98,6 +95,7 @@ reportDataFileStatus Options {..} = do
     then putStrLn "Data file exists. Appending commands to it."
     else putStrLn "Data file doesn't exist. Creating a new one."
 
+-- | TODO: Document
 hastoryServer :: IO ()
 hastoryServer = do
   options@Options {..} <- A.execParser optParser

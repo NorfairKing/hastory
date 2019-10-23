@@ -1,6 +1,7 @@
 module Hastory.Cli.OptParse.Types where
 
-import Import
+import qualified Data.Text as T
+import           Import
 
 data Arguments =
     Arguments Command
@@ -25,8 +26,9 @@ newtype ListRecentDirArgs = ListRecentDirArgs
     { lrdArgBypassCache :: Maybe Bool
     } deriving (Show, Eq)
 
-newtype Flags = Flags
-    { flagCacheDir :: Maybe FilePath
+data Flags = Flags
+    { flagCacheDir      :: Maybe FilePath
+    , flagStorageServer :: Maybe T.Text
     } deriving (Show, Eq)
 
 data Configuration =
@@ -46,6 +48,7 @@ newtype ListRecentDirSets = ListRecentDirSets
     { lrdSetBypassCache :: Bool
     } deriving (Show, Eq)
 
-newtype Settings = Settings
-    { setCacheDir :: Path Abs Dir
+data Settings = Settings
+    { setCacheDir   :: Path Abs Dir
+    , storageServer :: Maybe T.Text
     } deriving (Show, Eq)

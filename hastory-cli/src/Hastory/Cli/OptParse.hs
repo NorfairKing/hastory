@@ -7,12 +7,13 @@ module Hastory.Cli.OptParse
     , Settings(..)
     ) where
 
-import Import
-import System.Environment (getArgs)
+import           Import
+import           System.Environment         (getArgs)
 
-import Options.Applicative
+import qualified Data.Text                  as T
+import           Options.Applicative
 
-import Hastory.Cli.OptParse.Types
+import           Hastory.Cli.OptParse.Types
 
 getInstructions :: IO Instructions
 getInstructions = do
@@ -38,9 +39,9 @@ combineToInstructions cmd Flags {..} Configuration = Instructions d <$> sets
         home <- getHomeDir
         cacheDir <-
             case flagCacheDir of
-                Nothing -> resolveDir home ".hastory"
+                Nothing  -> resolveDir home ".hastory"
                 Just fcd -> resolveDir' fcd
-        pure Settings {setCacheDir = cacheDir}
+        pure Settings {setCacheDir = cacheDir, storageServer = flagStorageServer}
 
 getConfiguration :: Command -> Flags -> IO Configuration
 getConfiguration _ _ = pure Configuration
@@ -153,4 +154,12 @@ parseFlags =
              , metavar "DIR"
              , value Nothing
              , help "the cache directory for hastory"
+             ]) <*>
+    option
+        (Just . T.pack <$> str)
+        (mconcat
+             [ long "storage-server-url"
+             , metavar "DIR"
+             , value Nothing
+             , help "URL of the central storage server"
              ])

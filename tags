@@ -1,31 +1,33 @@
 Arbitrary Entry	./hastory-test-utils/src/Hastory/Gen.hs	16
-Arguments	./hastory/src/Hastory/OptParse/Types.hs	5
-Command	./hastory/src/Hastory/OptParse/Types.hs	9
-CommandChangeDir	./hastory/src/Hastory/OptParse/Types.hs	13
-CommandGather	./hastory/src/Hastory/OptParse/Types.hs	10
-CommandGenChangeWrapperScript	./hastory/src/Hastory/OptParse/Types.hs	14
-CommandGenGatherWrapperScript	./hastory/src/Hastory/OptParse/Types.hs	11
-CommandListRecentDirs	./hastory/src/Hastory/OptParse/Types.hs	12
-Configuration	./hastory/src/Hastory/OptParse/Types.hs	25
-Configuration	./hastory/src/Hastory/OptParse/Types.hs	26
-Dispatch	./hastory/src/Hastory/OptParse/Types.hs	29
-DispatchChangeDir	./hastory/src/Hastory/OptParse/Types.hs	33
-DispatchGather	./hastory/src/Hastory/OptParse/Types.hs	30
-DispatchGenChangeWrapperScript	./hastory/src/Hastory/OptParse/Types.hs	34
-DispatchGenGatherWrapperScript	./hastory/src/Hastory/OptParse/Types.hs	31
-DispatchListRecentDirs	./hastory/src/Hastory/OptParse/Types.hs	32
-Entry	./hastory/src/Hastory/Types.hs	17
-Entry	./hastory/src/Hastory/Types.hs	17
-Eq Entry	./hastory/src/Hastory/Types.hs	35
-Flags	./hastory/src/Hastory/OptParse/Types.hs	21
-Flags	./hastory/src/Hastory/OptParse/Types.hs	21
-FromJSON Entry	./hastory/src/Hastory/Types.hs	59
+Arguments	./hastory/src/Hastory/OptParse/Types.hs	6
+Command	./hastory/src/Hastory/OptParse/Types.hs	10
+CommandChangeDir	./hastory/src/Hastory/OptParse/Types.hs	14
+CommandGather	./hastory/src/Hastory/OptParse/Types.hs	11
+CommandGenChangeWrapperScript	./hastory/src/Hastory/OptParse/Types.hs	15
+CommandGenGatherWrapperScript	./hastory/src/Hastory/OptParse/Types.hs	12
+CommandListRecentDirs	./hastory/src/Hastory/OptParse/Types.hs	13
+Configuration	./hastory/src/Hastory/OptParse/Types.hs	27
+Configuration	./hastory/src/Hastory/OptParse/Types.hs	28
+Dispatch	./hastory/src/Hastory/OptParse/Types.hs	31
+DispatchChangeDir	./hastory/src/Hastory/OptParse/Types.hs	35
+DispatchGather	./hastory/src/Hastory/OptParse/Types.hs	32
+DispatchGenChangeWrapperScript	./hastory/src/Hastory/OptParse/Types.hs	36
+DispatchGenGatherWrapperScript	./hastory/src/Hastory/OptParse/Types.hs	33
+DispatchListRecentDirs	./hastory/src/Hastory/OptParse/Types.hs	34
+Entry	./hastory-core/src/Hastory/Types.hs	17
+Entry	./hastory-core/src/Hastory/Types.hs	17
+Eq Entry	./hastory-core/src/Hastory/Types.hs	35
+Flags	./hastory/src/Hastory/OptParse/Types.hs	22
+Flags	./hastory/src/Hastory/OptParse/Types.hs	22
+FromHttpApiData Token	./hastory-core/src/Hastory/API.hs	9
+FromJSON Entry	./hastory-core/src/Hastory/Types.hs	59
 FromJSON RecentDirOptsCache	./hastory/src/Hastory/Recent.hs	110
 GenInvalid Entry	./hastory-test-utils/src/Hastory/Gen.hs	14
 GenUnchecked Entry	./hastory-test-utils/src/Hastory/Gen.hs	9
 GenValid Entry	./hastory-test-utils/src/Hastory/Gen.hs	11
-Hashable Entry	./hastory/src/Hastory/Types.hs	27
+Hashable Entry	./hastory-core/src/Hastory/Types.hs	27
 Hastory	./hastory/src/Hastory.hs	5
+Hastory.API	./hastory-core/src/Hastory/API.hs	3
 Hastory.ChangeDir	./hastory/src/Hastory/ChangeDir.hs	5
 Hastory.Gather	./hastory/src/Hastory/Gather.hs	6
 Hastory.Gen	./hastory-test-utils/src/Hastory/Gen.hs	3
@@ -36,36 +38,41 @@ Hastory.ListDir	./hastory/src/Hastory/ListDir.hs	6
 Hastory.OptParse	./hastory/src/Hastory/OptParse.hs	3
 Hastory.OptParse.Types	./hastory/src/Hastory/OptParse/Types.hs	1
 Hastory.Recent	./hastory/src/Hastory/Recent.hs	7
-Hastory.Types	./hastory/src/Hastory/Types.hs	5
-HastoryServer	./hastory-server/src/HastoryServer.hs	6
+Hastory.Types	./hastory-core/src/Hastory/Types.hs	5
+HastoryAPI	./hastory-core/src/Hastory/API.hs	14
+HastoryServer	./hastory-server/src/HastoryServer.hs	10
 HastorySpec	./hastory-test-utils/test/HastorySpec.hs	3
 Import	./hastory/src/Import.hs	1
-Instructions	./hastory/src/Hastory/OptParse/Types.hs	7
-ListRecentDirArgs	./hastory/src/Hastory/OptParse/Types.hs	17
-ListRecentDirArgs	./hastory/src/Hastory/OptParse/Types.hs	17
-ListRecentDirSets	./hastory/src/Hastory/OptParse/Types.hs	37
-ListRecentDirSets	./hastory/src/Hastory/OptParse/Types.hs	37
+Instructions	./hastory/src/Hastory/OptParse/Types.hs	8
+ListRecentDirArgs	./hastory/src/Hastory/OptParse/Types.hs	18
+ListRecentDirArgs	./hastory/src/Hastory/OptParse/Types.hs	18
+ListRecentDirSets	./hastory/src/Hastory/OptParse/Types.hs	39
+ListRecentDirSets	./hastory/src/Hastory/OptParse/Types.hs	39
 Main	./hastory-server/app/Main.hs	1
 Main	./hastory-test-utils/bench/Main.hs	5
 Main	./hastory/app/Main.hs	1
-MyApi	./hastory-server/src/HastoryServer.hs	16
-NFData Entry	./hastory/src/Hastory/Types.hs	25
-Options	./hastory-server/src/HastoryServer.hs	18
-Options	./hastory-server/src/HastoryServer.hs	18
+NFData Entry	./hastory-core/src/Hastory/Types.hs	25
+Options	./hastory-server/src/HastoryServer.hs	30
+Options	./hastory-server/src/HastoryServer.hs	30
 RecentDirOptsCache	./hastory/src/Hastory/Recent.hs	103
 RecentDirOptsCache	./hastory/src/Hastory/Recent.hs	103
-Settings	./hastory/src/Hastory/OptParse/Types.hs	41
-Settings	./hastory/src/Hastory/OptParse/Types.hs	41
+ServerSettings	./hastory-server/src/HastoryServer.hs	37
+Settings	./hastory/src/Hastory/OptParse/Types.hs	43
+Settings	./hastory/src/Hastory/OptParse/Types.hs	43
 TestImport	./hastory-test-utils/src/TestImport.hs	1
-ToJSON Entry	./hastory/src/Hastory/Types.hs	49
+ToJSON Entry	./hastory-core/src/Hastory/Types.hs	49
 ToJSON RecentDirOptsCache	./hastory/src/Hastory/Recent.hs	108
-Validity Entry	./hastory/src/Hastory/Types.hs	46
-_oDataDirectory	./hastory-server/src/HastoryServer.hs	20
-_oPort	./hastory-server/src/HastoryServer.hs	19
+Token	./hastory-core/src/Hastory/API.hs	6
+TokenHeaderKey	./hastory-server/src/HastoryServer.hs	42
+Validity Entry	./hastory-core/src/Hastory/Types.hs	46
+_oDataOutputFilePath	./hastory-server/src/HastoryServer.hs	32
+_oLogFile	./hastory-server/src/HastoryServer.hs	33
+_oPort	./hastory-server/src/HastoryServer.hs	31
+_ssToken	./hastory-server/src/HastoryServer.hs	38
 addZonedTime	./hastory/src/Hastory/Internal.hs	43
-app	./hastory-server/src/HastoryServer.hs	42
+app	./hastory-server/src/HastoryServer.hs	77
 arbitrary	./hastory-test-utils/src/Hastory/Gen.hs	17
-argParser	./hastory/src/Hastory/OptParse.hs	63
+argParser	./hastory/src/Hastory/OptParse.hs	64
 benchSets	./hastory-test-utils/bench/Main.hs	47
 cacheInvalidationDuration	./hastory/src/Hastory/Recent.hs	58
 cacheRecentDirOpts	./hastory/src/Hastory/Recent.hs	92
@@ -73,66 +80,76 @@ cacheRecentDirs	./hastory/src/Hastory/Recent.hs	105
 cacheTimestamp	./hastory/src/Hastory/Recent.hs	104
 change	./hastory/src/Hastory/ChangeDir.hs	12
 clearCacheDir	./hastory-test-utils/bench/Main.hs	112
-combineToInstructions	./hastory/src/Hastory/OptParse.hs	21
+combineToInstructions	./hastory/src/Hastory/OptParse.hs	22
 computeRecentDirOpts	./hastory/src/Hastory/Recent.hs	61
 dispatch	./hastory/src/Hastory.hs	21
-e1	./hastory/src/Hastory/Types.hs	36
-entryDateTime	./hastory/src/Hastory/Types.hs	20
-entryHostName	./hastory/src/Hastory/Types.hs	21
-entryText	./hastory/src/Hastory/Types.hs	18
-entryUser	./hastory/src/Hastory/Types.hs	22
-entryWorkingDir	./hastory/src/Hastory/Types.hs	19
-failOnLeft	./hastory-server/src/HastoryServer.hs	45
-flagCacheDir	./hastory/src/Hastory/OptParse/Types.hs	22
+e1	./hastory-core/src/Hastory/Types.hs	36
+entryDateTime	./hastory-core/src/Hastory/Types.hs	20
+entryHostName	./hastory-core/src/Hastory/Types.hs	21
+entryText	./hastory-core/src/Hastory/Types.hs	18
+entryUser	./hastory-core/src/Hastory/Types.hs	22
+entryWorkingDir	./hastory-core/src/Hastory/Types.hs	19
+flagCacheDir	./hastory/src/Hastory/OptParse/Types.hs	23
+flagStorageServer	./hastory/src/Hastory/OptParse/Types.hs	24
 gather	./hastory/src/Hastory/Gather.hs	22
 gatherBenchmark	./hastory-test-utils/bench/Main.hs	50
 gatherFrom	./hastory/src/Hastory/Gather.hs	27
 genChangeWrapperScript	./hastory/src/Hastory/GenChangeWrapper.hs	5
 genGatherWrapperScript	./hastory/src/Hastory/GenGatherWrapper.hs	5
 genValid	./hastory-test-utils/src/Hastory/Gen.hs	12
-getArguments	./hastory/src/Hastory/OptParse.hs	45
-getConfiguration	./hastory/src/Hastory/OptParse.hs	42
+generateToken	./hastory-server/src/HastoryServer.hs	98
+getArguments	./hastory/src/Hastory/OptParse.hs	46
+getConfiguration	./hastory/src/Hastory/OptParse.hs	43
 getEntryWith	./hastory/src/Hastory/Gather.hs	32
 getHistory	./hastory/src/Hastory/Internal.hs	65
 getHistoryFrom	./hastory/src/Hastory/Internal.hs	51
-getInstructions	./hastory/src/Hastory/OptParse.hs	15
+getInstructions	./hastory/src/Hastory/OptParse.hs	16
 getLastNDaysOfHistory	./hastory/src/Hastory/Internal.hs	58
 getRecentDirOpts	./hastory/src/Hastory/Recent.hs	28
 getSomeAbsDirs	./hastory-test-utils/bench/Main.hs	95
-hashWithSalt	./hastory/src/Hastory/Types.hs	28
+hashWithSalt	./hastory-core/src/Hastory/Types.hs	28
 hastory	./hastory/src/Hastory.hs	16
 hastoryDir	./hastory/src/Hastory/Internal.hs	20
-hastoryServer	./hastory-server/src/HastoryServer.hs	49
+hastoryServer	./hastory-server/src/HastoryServer.hs	110
 histDir	./hastory/src/Hastory/Internal.hs	23
 histFileFor	./hastory/src/Hastory/Internal.hs	26
 histFilesForLastDays	./hastory/src/Hastory/Internal.hs	33
-isValid	./hastory/src/Hastory/Types.hs	47
+isValid	./hastory-core/src/Hastory/Types.hs	47
 listRecentDirs	./hastory/src/Hastory/ListDir.hs	13
 listRecentDirsBenchmark	./hastory-test-utils/bench/Main.hs	58
-lrdArgBypassCache	./hastory/src/Hastory/OptParse/Types.hs	18
-lrdSetBypassCache	./hastory/src/Hastory/OptParse/Types.hs	38
+lrdArgBypassCache	./hastory/src/Hastory/OptParse/Types.hs	19
+lrdSetBypassCache	./hastory/src/Hastory/OptParse/Types.hs	40
 main	./hastory-server/Setup.hs	2
 main	./hastory-server/app/Main.hs	6
 main	./hastory-test-utils/bench/Main.hs	26
 main	./hastory/Setup.hs	2
-main	./hastory/app/Main.hs	5
-myApi	./hastory-server/src/HastoryServer.hs	39
-optParser	./hastory-server/src/HastoryServer.hs	23
-parseArgs	./hastory/src/Hastory/OptParse.hs	66
-parseCommand	./hastory/src/Hastory/OptParse.hs	69
-parseCommandChangeDir	./hastory/src/Hastory/OptParse.hs	94
-parseCommandGather	./hastory/src/Hastory/OptParse.hs	82
-parseCommandListRecentDirs	./hastory/src/Hastory/OptParse.hs	107
-parseFlags	./hastory/src/Hastory/OptParse.hs	134
-parseGenChangeDirectoryWrapperScript	./hastory/src/Hastory/OptParse.hs	128
-parseGenGatherWrapperScript	./hastory/src/Hastory/OptParse.hs	88
-parseJSON	./hastory/src/Hastory/Types.hs	60
+main	./hastory/app/Main.hs	6
+mkWarpLogger	./hastory-server/src/HastoryServer.hs	81
+mkWarpSettings	./hastory-server/src/HastoryServer.hs	86
+myApi	./hastory-server/src/HastoryServer.hs	73
+optParser	./hastory-server/src/HastoryServer.hs	49
+parseArgs	./hastory/src/Hastory/OptParse.hs	67
+parseCommand	./hastory/src/Hastory/OptParse.hs	70
+parseCommandChangeDir	./hastory/src/Hastory/OptParse.hs	95
+parseCommandGather	./hastory/src/Hastory/OptParse.hs	83
+parseCommandListRecentDirs	./hastory/src/Hastory/OptParse.hs	108
+parseFlags	./hastory/src/Hastory/OptParse.hs	135
+parseGenChangeDirectoryWrapperScript	./hastory/src/Hastory/OptParse.hs	129
+parseGenGatherWrapperScript	./hastory/src/Hastory/OptParse.hs	89
+parseHeader	./hastory-core/src/Hastory/API.hs	10
+parseJSON	./hastory-core/src/Hastory/Types.hs	60
+parseUrlPiece	./hastory-core/src/Hastory/API.hs	11
 prepareEntries	./hastory-test-utils/bench/Main.hs	72
 recentDirsCacheFile	./hastory/src/Hastory/Recent.hs	99
-runArgumentsParser	./hastory/src/Hastory/OptParse.hs	51
+reportDataFileStatus	./hastory-server/src/HastoryServer.hs	102
+runArgumentsParser	./hastory/src/Hastory/OptParse.hs	52
 runHastory	./hastory-test-utils/bench/Main.hs	117
-server	./hastory-server/src/HastoryServer.hs	31
-setCacheDir	./hastory/src/Hastory/OptParse/Types.hs	42
+sendEntryToStorageServer	./hastory/src/Hastory/Gather.hs	47
+server	./hastory-server/src/HastoryServer.hs	59
+setCacheDir	./hastory/src/Hastory/OptParse/Types.hs	44
 spec	./hastory-test-utils/test/HastorySpec.hs	12
-storeHistory	./hastory/src/Hastory/Gather.hs	47
-toJSON	./hastory/src/Hastory/Types.hs	50
+storageServer	./hastory/src/Hastory/OptParse/Types.hs	45
+storeHistory	./hastory/src/Hastory/Gather.hs	50
+toJSON	./hastory-core/src/Hastory/Types.hs	50
+tokenHeaderKey	./hastory-server/src/HastoryServer.hs	45
+tokenLength	./hastory-server/src/HastoryServer.hs	94
