@@ -1,0 +1,138 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.1.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: b7bf4b6640ef4e848d4840188f31b4a0f39db54681efc9cfbb9ed42778e253fd
+
+name:           hastory-cli
+version:        0.0.0.0
+category:       Command Line
+homepage:       https://github.com/NorfairKing/hastory
+author:         Tom Sydney Kerckhove
+maintainer:     syd.kerckhove@gmail.com
+copyright:      Copyright: (c) 2016-2018 Tom Sydney Kerckhove
+license:        AllRightsReserved
+license-file:   LICENSE
+build-type:     Simple
+
+library
+  hs-source-dirs:
+      src/
+  default-extensions: NoImplicitPrelude
+  ghc-options: -Wall -Wincomplete-uni-patterns -Wincomplete-record-updates -Wimplicit-prelude -Wredundant-constraints
+  build-depends:
+      aeson
+    , aeson-pretty
+    , base >=4.9 && <=5
+    , bytestring
+    , deepseq
+    , exceptions
+    , hashable
+    , hashable-time
+    , hastory-data
+    , hostname
+    , monad-logger
+    , mtl
+    , optparse-applicative
+    , path
+    , path-io
+    , persistent-sqlite
+    , resourcet
+    , safe
+    , text
+    , time
+    , unix
+    , unliftio-core
+    , unordered-containers
+    , validity
+    , validity-path
+    , validity-text
+    , validity-time
+  exposed-modules:
+      Hastory.Cli
+      Hastory.Cli.Commands.ChangeDir
+      Hastory.Cli.Commands.Gather
+      Hastory.Cli.Commands.GenChangeWrapper
+      Hastory.Cli.Commands.GenGatherWrapper
+      Hastory.Cli.Commands.ListDir
+      Hastory.Cli.Commands.Recent
+      Hastory.Cli.Commands.SuggestAlias
+      Hastory.Cli.Internal
+      Hastory.Cli.OptParse
+      Hastory.Cli.OptParse.Types
+      Hastory.Cli.Utils
+  other-modules:
+      Import
+      Paths_hastory_cli
+  default-language: Haskell2010
+
+executable hastory
+  main-is: Main.hs
+  hs-source-dirs:
+      app/
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.9 && <=5
+    , hastory-cli
+  other-modules:
+      Paths_hastory_cli
+  default-language: Haskell2010
+
+test-suite hastory-cli-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  hs-source-dirs:
+      test/
+  default-extensions: NoImplicitPrelude
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
+  build-depends:
+      QuickCheck
+    , base >=4.9 && <=5
+    , genvalidity
+    , genvalidity-hspec
+    , genvalidity-hspec-aeson
+    , genvalidity-path
+    , genvalidity-text
+    , genvalidity-time
+    , hastory-cli
+    , hastory-data
+    , hastory-data-gen
+    , hspec
+    , path
+    , path-io
+    , safe
+    , text
+    , validity
+    , validity-path
+    , validity-text
+  other-modules:
+      Hastory.Cli.Commands.SuggestionSpec
+      TestImport
+      Paths_hastory_cli
+  default-language: Haskell2010
+
+benchmark hastory-cli-bench
+  type: exitcode-stdio-1.0
+  main-is: Main.hs
+  hs-source-dirs:
+      bench
+  ghc-options: -threaded -rtsopts -with-rtsopts=-T -Wall
+  build-depends:
+      QuickCheck
+    , base
+    , criterion
+    , exceptions
+    , genvalidity
+    , hastory-cli
+    , hastory-data
+    , hastory-data-gen
+    , mtl
+    , path
+    , path-io
+    , silently
+  other-modules:
+      Import
+      Paths_hastory_cli
+  default-language: Haskell2010

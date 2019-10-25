@@ -1,0 +1,130 @@
+name: hastory-cli
+version: '0.0.0.0'
+category: Command Line
+author: Tom Sydney Kerckhove
+maintainer: syd.kerckhove@gmail.com
+copyright: ! 'Copyright: (c) 2016-2018 Tom Sydney Kerckhove'
+license: AllRightsReserved
+homepage: https://github.com/NorfairKing/hastory
+dependencies:
+- base >=4.9 && <=5
+
+library:
+  source-dirs: src/
+  default-extensions:
+  - NoImplicitPrelude
+  ghc-options:
+  - -Wall
+  - -Wincomplete-uni-patterns
+  - -Wincomplete-record-updates
+  - -Wimplicit-prelude
+  - -Wredundant-constraints
+
+  exposed-modules:
+  - Hastory.Cli
+  - Hastory.Cli.Commands.ChangeDir
+  - Hastory.Cli.Commands.Gather
+  - Hastory.Cli.Commands.GenChangeWrapper
+  - Hastory.Cli.Commands.GenGatherWrapper
+  - Hastory.Cli.Commands.ListDir
+  - Hastory.Cli.Commands.Recent
+  - Hastory.Cli.Commands.SuggestAlias
+  - Hastory.Cli.Internal
+  - Hastory.Cli.OptParse
+  - Hastory.Cli.OptParse.Types
+  - Hastory.Cli.Utils
+
+  dependencies:
+  - aeson
+  - aeson-pretty
+  - bytestring
+  - deepseq
+  - exceptions
+  - hashable
+  - hashable-time
+  - hastory-data
+  - hostname
+  - monad-logger
+  - mtl
+  - optparse-applicative
+  - path
+  - path-io
+  - persistent-sqlite
+  - resourcet
+  - safe
+  - text
+  - time
+  - unix
+  - unliftio-core
+  - unordered-containers
+  - validity
+  - validity-path
+  - validity-text
+  - validity-time
+
+executables:
+  hastory:
+    main: Main.hs
+    source-dirs: app/
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - hastory-cli
+
+tests:
+  hastory-cli-test:
+    main: Spec.hs
+    source-dirs: test/
+    default-extensions:
+    - NoImplicitPrelude
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -Wall
+    dependencies:
+    - base >=4.9 && <=5
+    - hastory-cli
+    - hastory-data
+    - hastory-data-gen
+    - genvalidity
+    - genvalidity-hspec
+    - genvalidity-hspec-aeson
+    - genvalidity-path
+    - genvalidity-text
+    - genvalidity-time
+    - hspec
+    - path
+    - path-io
+    - validity
+    - validity-path
+    - validity-text
+    - QuickCheck
+    - safe
+    - text
+
+benchmarks:
+  hastory-cli-bench:
+    main: Main.hs
+    source-dirs: bench
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-T
+    - -Wall
+    dependencies:
+    - base
+    - QuickCheck
+    - criterion
+    - exceptions
+    - genvalidity
+    - hastory-cli
+    - hastory-data
+    - hastory-data-gen
+    - mtl
+    - path
+    - path-io
+    - silently
+
