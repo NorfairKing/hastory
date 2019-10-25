@@ -29,8 +29,6 @@ library:
   - Data.Hastory.Utils
 
   dependencies:
-  - aeson
-  - bytestring
   - deepseq
   - exceptions
   - hashable
@@ -39,6 +37,9 @@ library:
   - mtl
   - path
   - path-io
+  - persistent
+  - persistent-sqlite
+  - persistent-template
   - safe
   - text
   - time

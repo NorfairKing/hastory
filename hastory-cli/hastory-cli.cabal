@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 4165258d15a3b67eef09a53f7ba384d1a01bda194585a992a33c3dd7a09b75c6
+-- hash: b7bf4b6640ef4e848d4840188f31b4a0f39db54681efc9cfbb9ed42778e253fd
 
 name:           hastory-cli
 version:        0.0.0.0
@@ -33,14 +33,18 @@ library
     , hashable-time
     , hastory-data
     , hostname
+    , monad-logger
     , mtl
     , optparse-applicative
     , path
     , path-io
+    , persistent-sqlite
+    , resourcet
     , safe
     , text
     , time
     , unix
+    , unliftio-core
     , unordered-containers
     , validity
     , validity-path

@@ -44,14 +44,18 @@ library:
   - hashable-time
   - hastory-data
   - hostname
+  - monad-logger
   - mtl
   - optparse-applicative
   - path
   - path-io
+  - persistent-sqlite
+  - resourcet
   - safe
   - text
   - time
   - unix
+  - unliftio-core
   - unordered-containers
   - validity
   - validity-path

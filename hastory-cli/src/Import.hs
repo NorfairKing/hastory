@@ -1,5 +1,6 @@
 module Import
     ( module X
+    , MonadUnliftIO
     ) where
 
 import Data.List as X
@@ -22,3 +23,5 @@ import Path.IO as X
 
 import Control.Monad.Catch as X
 import Control.Monad.Reader as X
+
+import Control.Monad.IO.Unlift (MonadUnliftIO)

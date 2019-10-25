@@ -36,7 +36,7 @@ On the other hand, hastory works for zsh if you add this line to .zshrc.
 precmd() { hastory_gather_ }
 ```
 
-When you restart your shell (for example by restarting your terminal), you should see history accumulating in `~/.hastory/command-history/$(date +%F).log`.
+When you restart your shell (for example by restarting your terminal), you should see history accumulating in `~/.hastory/command-history/hastory.db`.
 
 Note: Feel free to make sure that `hastory generate-gather-wrapper-script` is code that you actually want to run.
 
@@ -85,6 +85,6 @@ Note: Feel free to make sure that `hastory generate-change-directory-wrapper-scr
 
 In order to perform the above described features, hastory must keep a log of some things.
 The logs are all stored in ``~/.hastory``.
-The raw logs are stored in ``~/.hastory/command-history/$(date +%F).log``.
+The raw logs are stored in ``~/.hastory/command-history/hastory.db``.
 These files contain records of the commands you executed, when and in which directory they were executed as well as some extra information.
 The most list of most useful directories is cached in ``~/.hastory/recent-dirs-cache.json``.

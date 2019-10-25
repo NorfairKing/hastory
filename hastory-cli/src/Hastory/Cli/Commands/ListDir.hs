@@ -6,11 +6,11 @@ module Hastory.Cli.Commands.ListDir where
 
 import Import
 
-import Hastory.Cli.OptParse.Types
 import Hastory.Cli.Commands.Recent
+import Hastory.Cli.OptParse.Types
 
 listRecentDirs ::
-       (MonadIO m,  MonadReader Settings m)
+       (MonadReader Settings m, MonadThrow m, MonadUnliftIO m)
     => ListRecentDirSets
     -> m ()
 listRecentDirs ListRecentDirSets {..} = do

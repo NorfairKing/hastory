@@ -8,7 +8,7 @@ import Import
 import Hastory.Cli.Commands.Recent
 import Hastory.Cli.OptParse.Types
 
-change :: (MonadIO m, MonadReader Settings m) => Int -> m ()
+change :: (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => Int -> m ()
 change ix = do
     recentDirOpts <- getRecentDirOpts False
     liftIO $
