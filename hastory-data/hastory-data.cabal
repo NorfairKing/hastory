@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.31.1.
+-- This file has been generated from package.yaml by hpack version 0.31.2.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 7bd04178427e6e8b2c46e3811231e7168a95575e352e5de37398dccd9327b891
+-- hash: 5c84c268e124b5393c12f6187387955f50c47d8c4903768d2620d25c3c5287f4
 
 name:           hastory-data
 version:        0.0.0.0
@@ -36,6 +36,8 @@ library
     , persistent-sqlite
     , persistent-template
     , safe
+    , servant
+    , servant-server
     , text
     , time
     , unix
@@ -49,6 +51,7 @@ library
       Data.Hastory.Gather
       Data.Hastory.Types
       Data.Hastory.Utils
+      Data.Hastory.API
   other-modules:
       Data.Hastory.Types.Path
       Import

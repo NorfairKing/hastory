@@ -9,10 +9,10 @@
 module HastoryServer where
 
 import           Control.Monad.IO.Class   (liftIO)
+import           Data.Hastory.API
 import           Data.Proxy               (Proxy (..))
 import           Data.Semigroup           ((<>))
 import qualified Data.Text                as T
-import           Hastory.API
 import qualified Network.HTTP.Types       as HTTP
 import qualified Network.Wai              as Wai
 import qualified Network.Wai.Handler.Warp as Warp

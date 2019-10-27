@@ -4,7 +4,7 @@
 {-# LANGUAGE TypeApplications    #-}
 {-# LANGUAGE TypeOperators       #-}
 
-module Hastory.API where
+module Data.Hastory.API where
 
 import           Data.String  (IsString, fromString)
 import qualified Data.Text    as T
