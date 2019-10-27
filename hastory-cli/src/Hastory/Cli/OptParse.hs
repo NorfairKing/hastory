@@ -7,13 +7,14 @@ module Hastory.Cli.OptParse
     , Settings(..)
     ) where
 
-import           Import
-import           System.Environment         (getArgs)
+import Import
+import System.Environment (getArgs)
 
-import qualified Data.Text                  as T
-import           Options.Applicative
+import qualified Data.Text as T
+import Options.Applicative
 
-import           Hastory.Cli.OptParse.Types
+import Data.Hastory.API (HastoryClient, Token (..), mkHastoryClient)
+import Hastory.Cli.OptParse.Types
 
 getInstructions :: IO Instructions
 getInstructions = do
@@ -41,7 +42,11 @@ combineToInstructions cmd Flags {..} Configuration = Instructions d <$> sets
             case flagCacheDir of
                 Nothing  -> resolveDir home ".hastory"
                 Just fcd -> resolveDir' fcd
-        pure Settings {setCacheDir = cacheDir, storageServer = flagStorageServer}
+        mbRemoteStorageClient <- mkRemoteStorageClient flagStorageServer (Token <$> flagStorageToken)
+        pure Settings {setCacheDir = cacheDir, remoteStorageClient = mbRemoteStorageClient}
+
+mkRemoteStorageClient :: Maybe T.Text -> Maybe Token -> IO (Maybe HastoryClient)
+mkRemoteStorageClient = (sequence .) . liftA2 mkHastoryClient
 
 getConfiguration :: Command -> Flags -> IO Configuration
 getConfiguration _ _ = pure Configuration
@@ -159,7 +164,15 @@ parseFlags =
         (Just . T.pack <$> str)
         (mconcat
              [ long "storage-server-url"
-             , metavar "DIR"
+             , metavar "URL"
              , value Nothing
              , help "URL of the central storage server"
+             ]) <*>
+    option
+        (Just . T.pack <$> str)
+        (mconcat
+             [ long "storage-server-token"
+             , metavar "TOKEN"
+             , value Nothing
+             , help "Token for the central storage server"
              ])

@@ -15,13 +15,15 @@ import Import
 import Data.Hastory.Types.Path ()
 
 import Control.DeepSeq
+import Data.Aeson
 import Data.Function
-import Data.Hashable (Hashable(hashWithSalt))
+import Data.Hashable (Hashable (hashWithSalt))
 import Data.Hashable.Time ()
 import Data.Text (Text)
 import Data.Time (UTCTime)
 import Data.Validity.Time.Clock ()
-import Database.Persist.TH (persistLowerCase, share, mkPersist, sqlSettings, mkMigrate)
+import Database.Persist.TH (mkMigrate, mkPersist, persistLowerCase, share,
+                            sqlSettings)
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 Entry
@@ -44,3 +46,6 @@ instance Hashable Entry where
 
 instance Validity Entry where
     isValid Entry {..} = isValid entryText && isValid entryWorkingDir
+
+instance ToJSON Entry
+instance FromJSON Entry

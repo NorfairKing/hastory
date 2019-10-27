@@ -1,7 +1,8 @@
 module Hastory.Cli.OptParse.Types where
 
+import Data.Hastory.API (HastoryClient)
 import qualified Data.Text as T
-import           Import
+import Import
 
 data Arguments =
     Arguments Command
@@ -11,7 +12,7 @@ data Arguments =
 data Instructions =
     Instructions Dispatch
                  Settings
-    deriving (Show, Eq)
+    deriving (Show)
 
 data Command
     = CommandGather
@@ -29,6 +30,7 @@ newtype ListRecentDirArgs = ListRecentDirArgs
 data Flags = Flags
     { flagCacheDir      :: Maybe FilePath
     , flagStorageServer :: Maybe T.Text
+    , flagStorageToken  :: Maybe T.Text
     } deriving (Show, Eq)
 
 data Configuration =
@@ -49,6 +51,6 @@ newtype ListRecentDirSets = ListRecentDirSets
     } deriving (Show, Eq)
 
 data Settings = Settings
-    { setCacheDir   :: Path Abs Dir
-    , storageServer :: Maybe T.Text
-    } deriving (Show, Eq)
+    { setCacheDir         :: Path Abs Dir
+    , remoteStorageClient :: Maybe HastoryClient
+    } deriving (Show)

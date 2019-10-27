@@ -1,22 +1,21 @@
 {-# LANGUAGE FlexibleContexts  #-}
-{-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Hastory.Gather where
 
-import           Import
+import Import
 
-import qualified Data.Aeson             as JSON
-import qualified Data.ByteString.Lazy   as LB
-import           Data.Text              (Text)
-import qualified Data.Text.IO           as T
-import qualified Data.Time.LocalTime    as Time
-import           Network.HostName       (getHostName)
-import           System.Posix.User      (getEffectiveUserName)
+import qualified Data.Aeson as JSON
+import qualified Data.ByteString.Lazy as LB
+import Data.Text (Text)
+import qualified Data.Text.IO as T
+import qualified Data.Time.LocalTime as Time
+import Network.HostName (getHostName)
+import System.Posix.User (getEffectiveUserName)
 
-import           Hastory.Internal
-import           Hastory.OptParse.Types
-import           Hastory.Types
+import Hastory.Internal
+import Hastory.OptParse.Types
+import Hastory.Types
 
 gather :: (MonadIO m, MonadThrow m, MonadReader Settings m) => m ()
 gather = do
@@ -44,18 +43,11 @@ getEntryWith text = do
         , entryUser = user
         }
 
-sendEntryToStorageServer :: (MonadIO m, MonadThrow m, MonadReader Settings m) => Entry -> m ()
-sendEntryToStorageServer entry =
-  asks storageServer >>= \case
-    Nothing -> pure ()
-    Just url ->
-      liftIO $ print $ "Storing in server: " <> url
-
 storeHistory ::
        (MonadIO m, MonadThrow m, MonadReader Settings m) => Entry -> m ()
 storeHistory entry = do
+    putStrLn "wow storing"
     hFile <- histFileFor $ entryDateTime entry
-    sendEntryToStorageServer entry
     liftIO $ do
         ensureDir $ parent hFile
         LB.appendFile (toFilePath hFile) $ JSON.encode entry <> "\n"

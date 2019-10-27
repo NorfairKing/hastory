@@ -27,13 +27,16 @@ library:
   - Data.Hastory.Gather
   - Data.Hastory.Types
   - Data.Hastory.Utils
+  - Data.Hastory.API
 
   dependencies:
+  - aeson
   - deepseq
   - exceptions
   - hashable
   - hashable-time
   - hostname
+  - http-client
   - mtl
   - path
   - path-io
@@ -41,6 +44,10 @@ library:
   - persistent-sqlite
   - persistent-template
   - safe
+  - servant
+  - servant-client
+  - servant-client-core
+  - servant-server
   - text
   - time
   - unix

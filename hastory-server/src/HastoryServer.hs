@@ -8,19 +8,20 @@
 -- | TODO: Drop unnecessary dependencies in cabalfiles
 module HastoryServer where
 
-import           Control.Monad.IO.Class   (liftIO)
-import           Data.Hastory.API
-import           Data.Proxy               (Proxy (..))
-import           Data.Semigroup           ((<>))
-import qualified Data.Text                as T
-import qualified Network.HTTP.Types       as HTTP
-import qualified Network.Wai              as Wai
+import Control.Monad.IO.Class (liftIO)
+import Data.Hastory.API
+import Data.Hastory.Types (Entry (..))
+import Data.Proxy (Proxy (..))
+import Data.Semigroup ((<>))
+import qualified Data.Text as T
+import qualified Network.HTTP.Types as HTTP
+import qualified Network.Wai as Wai
 import qualified Network.Wai.Handler.Warp as Warp
-import qualified Options.Applicative      as A
-import           Prelude
-import           Servant
-import           System.Posix.Files       (fileExist)
-import           System.Random            (newStdGen, randomRs)
+import qualified Options.Applicative as A
+import Prelude
+import Servant
+import System.Posix.Files (fileExist)
+import System.Random (newStdGen, randomRs)
 
 -- | TODO: Document
 data Options = Options
@@ -48,11 +49,10 @@ optParser =
 server :: Options -> ServerSettings -> Server HastoryAPI
 server Options {..} ServerSettings {..} = appendCommand
   where
-    appendCommand :: Maybe Token -> String -> Handler ()
+    appendCommand :: Maybe Token -> Entry -> Handler ()
     appendCommand (Just (Token token)) command
-      | token == _ssToken = do
-        liftIO $ putStrLn command
-        liftIO $ appendFile _oDataOutputFilePath (command <> "\n")
+      | token == _ssToken =
+        liftIO $ appendFile _oDataOutputFilePath (show command <> "\n")
       | otherwise =
         throwError $ err403 { errBody = "Invalid Token provided." }
     appendCommand Nothing _ =
@@ -88,6 +88,12 @@ generateToken :: IO T.Text
 generateToken = T.pack . take tokenLength . randomRs ('a', 'z') <$> newStdGen
 
 -- | TODO: Document
+-- | TODO: Use logging monad instead of putStrLn
+reportPort :: Options -> IO ()
+reportPort Options {..} =
+  putStrLn $ "Starting server on port " <> show _oPort
+
+-- | TODO: Document
 reportDataFileStatus :: Options -> IO ()
 reportDataFileStatus Options {..} = do
   dataFileExists <- fileExist _oDataOutputFilePath
@@ -100,6 +106,7 @@ hastoryServer :: IO ()
 hastoryServer = do
   options@Options {..} <- A.execParser optParser
 
+  reportPort options
   reportDataFileStatus options
 
   token <- generateToken

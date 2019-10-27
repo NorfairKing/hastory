@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 5c84c268e124b5393c12f6187387955f50c47d8c4903768d2620d25c3c5287f4
+-- hash: d6a1b6142223761530653f6a4d51c75b15920d0f05de5e88cd518c2e4daae5c3
 
 name:           hastory-data
 version:        0.0.0.0
@@ -18,34 +18,6 @@ license-file:   LICENSE
 build-type:     Simple
 
 library
-  hs-source-dirs:
-      src/
-  default-extensions: NoImplicitPrelude
-  ghc-options: -Wall -Wincomplete-uni-patterns -Wincomplete-record-updates -Wimplicit-prelude -Wredundant-constraints
-  build-depends:
-      base >=4.9 && <=5
-    , deepseq
-    , exceptions
-    , hashable
-    , hashable-time
-    , hostname
-    , mtl
-    , path
-    , path-io
-    , persistent
-    , persistent-sqlite
-    , persistent-template
-    , safe
-    , servant
-    , servant-server
-    , text
-    , time
-    , unix
-    , unordered-containers
-    , validity
-    , validity-path
-    , validity-text
-    , validity-time
   exposed-modules:
       Data.Hastory
       Data.Hastory.Gather
@@ -56,4 +28,36 @@ library
       Data.Hastory.Types.Path
       Import
       Paths_hastory_data
+  hs-source-dirs:
+      src/
+  default-extensions: NoImplicitPrelude
+  ghc-options: -Wall -Wincomplete-uni-patterns -Wincomplete-record-updates -Wimplicit-prelude -Wredundant-constraints
+  build-depends:
+      aeson
+    , base >=4.9 && <=5
+    , deepseq
+    , exceptions
+    , hashable
+    , hashable-time
+    , hostname
+    , http-client
+    , mtl
+    , path
+    , path-io
+    , persistent
+    , persistent-sqlite
+    , persistent-template
+    , safe
+    , servant
+    , servant-client
+    , servant-client-core
+    , servant-server
+    , text
+    , time
+    , unix
+    , unordered-containers
+    , validity
+    , validity-path
+    , validity-text
+    , validity-time
   default-language: Haskell2010
