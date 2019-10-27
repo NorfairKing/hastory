@@ -40,6 +40,7 @@ library:
   - bytestring
   - deepseq
   - exceptions
+  - extra
   - hashable
   - hashable-time
   - hastory-data

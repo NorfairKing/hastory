@@ -10,7 +10,7 @@ module HastoryServer where
 
 import Control.Monad.IO.Class (liftIO)
 import Data.Hastory.API
-import Data.Hastory.Types (Entry (..))
+import Data.Hastory.Types (EntryWithKey (..))
 import Data.Proxy (Proxy (..))
 import Data.Semigroup ((<>))
 import qualified Data.Text as T
@@ -49,7 +49,7 @@ optParser =
 server :: Options -> ServerSettings -> Server HastoryAPI
 server Options {..} ServerSettings {..} = appendCommand
   where
-    appendCommand :: Maybe Token -> Entry -> Handler ()
+    appendCommand :: Maybe Token -> EntryWithKey -> Handler ()
     appendCommand (Just (Token token)) command
       | token == _ssToken =
         liftIO $ appendFile _oDataOutputFilePath (show command <> "\n")

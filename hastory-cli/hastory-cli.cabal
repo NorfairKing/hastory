@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.31.1.
+-- This file has been generated from package.yaml by hpack version 0.31.2.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b7bf4b6640ef4e848d4840188f31b4a0f39db54681efc9cfbb9ed42778e253fd
+-- hash: b3c5074eba49aed48cde9eb90959bc0ac40af31b82d5cfc5d6ce2e4b6e667e9b
 
 name:           hastory-cli
 version:        0.0.0.0
@@ -29,6 +29,7 @@ library
     , bytestring
     , deepseq
     , exceptions
+    , extra
     , hashable
     , hashable-time
     , hastory-data

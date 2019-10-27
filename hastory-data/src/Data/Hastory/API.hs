@@ -18,7 +18,7 @@ import Servant.Client (ClientEnv (ClientEnv), ClientM, client, mkClientEnv,
                        runClientM)
 import Servant.Client.Core.Reexport
 
-import Data.Hastory.Types (Entry)
+import Data.Hastory.Types (EntryWithKey)
 
 -- * Hastory API
 
@@ -41,7 +41,7 @@ instance ToHttpApiData Token where
   toUrlPiece (Token token) = toUrlPiece token
 
 -- | TODO: Document
-type HastoryAPI = "commands" :> "append" :> Header TokenHeaderKey Token :> ReqBody '[JSON] Entry :> Post '[JSON] ()
+type HastoryAPI = "commands" :> "append" :> Header TokenHeaderKey Token :> ReqBody '[JSON] EntryWithKey :> Post '[JSON] ()
 
 api :: Proxy HastoryAPI
 api = Proxy
@@ -60,7 +60,7 @@ mkHastoryClient baseUrl token = do
   let clientEnv = mkClientEnv manager parsedBaseUrl
   pure $ HastoryClient clientEnv token
 
-appendCommand :: Maybe Token -> Entry -> ClientM ()
+appendCommand :: Maybe Token -> EntryWithKey -> ClientM ()
 appendCommand = client api
 
 runHastoryClientM :: HastoryClient -> (Token -> ClientM a) -> IO (Either ServantError a)
