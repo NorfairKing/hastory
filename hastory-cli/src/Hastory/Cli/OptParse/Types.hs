@@ -2,7 +2,7 @@ module Hastory.Cli.OptParse.Types where
 
 import Data.Hastory.API (HastoryClient)
 import qualified Data.Text as T
-import Import
+import Path (Abs, Dir, Path)
 
 data Arguments =
     Arguments Command

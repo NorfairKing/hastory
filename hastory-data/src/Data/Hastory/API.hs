@@ -1,6 +1,5 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
 {-# LANGUAGE DataKinds           #-}
-{-# LANGUAGE LambdaCase          #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications    #-}
 {-# LANGUAGE TypeOperators       #-}
@@ -16,7 +15,7 @@ import Prelude
 import Servant
 import Servant.Client (ClientEnv (ClientEnv), ClientM, client, mkClientEnv,
                        runClientM)
-import Servant.Client.Core.Reexport
+import Servant.Client.Core.Reexport (ServantError, parseBaseUrl)
 
 import Data.Hastory.Types (EntryWithKey)
 

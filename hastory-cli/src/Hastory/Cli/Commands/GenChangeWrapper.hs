@@ -1,7 +1,5 @@
 module Hastory.Cli.Commands.GenChangeWrapper where
 
-import Import
-
 genChangeWrapperScript :: IO ()
 genChangeWrapperScript =
     putStrLn $

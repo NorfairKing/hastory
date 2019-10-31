@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.31.1.
+-- This file has been generated from package.yaml by hpack version 0.31.2.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 6d90986257f4760e0df4a1f6304e55c149bdbb3479e43c84921d6db4701c9cb0
+-- hash: b72b51f4bbca137ee3afb80b236607d706b2d529254bcd8ab0422f21d7f01ca7
 
 name:           hastory-data-gen
 version:        0.0.0.0
@@ -20,7 +20,6 @@ build-type:     Simple
 library
   hs-source-dirs:
       src/
-  default-extensions: NoImplicitPrelude
   ghc-options: -Wall
   build-depends:
       QuickCheck
@@ -41,7 +40,6 @@ library
   exposed-modules:
       Data.Hastory.Gen
   other-modules:
-      Import
       Paths_hastory_data_gen
   default-language: Haskell2010
 

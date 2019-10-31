@@ -1,16 +1,14 @@
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE OverloadedStrings #-}
 
 module Data.Hastory.Gather
     ( gatherEntryWith
     ) where
 
-import Import
-
 import Data.Hastory.Types
 
 import Data.Text (Text, pack)
 import Network.HostName (getHostName)
+import Path.IO (getCurrentDir)
 import System.Posix.User (getEffectiveUserName)
 
 import qualified Data.Time as Time

@@ -7,11 +7,12 @@ module Hastory.Cli.OptParse
     , Settings(..)
     ) where
 
-import Import
-import System.Environment (getArgs)
-
+import Data.Maybe (fromMaybe)
+import Data.Semigroup ((<>))
 import qualified Data.Text as T
 import Options.Applicative
+import Path.IO (getHomeDir, resolveDir, resolveDir')
+import System.Environment (getArgs)
 
 import Data.Hastory.API (HastoryClient, Token (..), mkHastoryClient)
 import Hastory.Cli.OptParse.Types

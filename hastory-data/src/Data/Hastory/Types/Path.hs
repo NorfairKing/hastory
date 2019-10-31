@@ -1,15 +1,14 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
-{-# LANGUAGE FlexibleInstances    #-}
-{-# LANGUAGE OverloadedStrings    #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Data.Hastory.Types.Path where
 
-import Import
-
 import Data.Text (unpack)
-import Database.Persist (PersistField(..), PersistValue(..))
-import Database.Persist.Sqlite (PersistFieldSql(..), SqlType(..))
+import Database.Persist (PersistField (..), PersistValue (..))
+import Database.Persist.Sqlite (PersistFieldSql (..), SqlType (..))
+import Path (Abs, Dir, Path, parseAbsDir, toFilePath)
 
 instance PersistField (Path Abs Dir) where
   toPersistValue = toPersistValue . toFilePath

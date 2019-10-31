@@ -1,29 +1,33 @@
+{-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE TemplateHaskell   #-}
 
 module Hastory.Cli.Commands.Recent
     ( getRecentDirOpts
     ) where
-
-import Import
 
 import Data.Hastory
 import Hastory.Cli.Internal
 import Hastory.Cli.OptParse.Types
 import Hastory.Cli.Utils (doCountsWith)
 
+import Control.Monad.Catch
+import Control.Monad.IO.Unlift (MonadUnliftIO)
+import Control.Monad.Reader
 import Data.Aeson as JSON
 import Data.Aeson.Encode.Pretty as JSON
-import Data.Time.Clock (NominalDiffTime)
-import Data.Time.LocalTime (ZonedTime)
-
 import qualified Data.ByteString.Lazy as LB
 import qualified Data.HashMap.Lazy as HM
+import Data.List (sortOn)
+import Data.Time.Clock (NominalDiffTime)
 import qualified Data.Time.Clock as Time
+import Data.Time.LocalTime (ZonedTime)
 import qualified Data.Time.LocalTime as Time
+import GHC.Generics (Generic)
+import Path (Abs, File, Path, mkRelFile, toFilePath, (</>))
+import Path.IO (forgivingAbsence, getHomeDir)
 
 getRecentDirOpts ::
        (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => Bool -> m [FilePath]
@@ -86,7 +90,7 @@ recentDirsCacheFile =
     fmap (</> $(mkRelFile "recent-dirs-cache.json")) hastoryDir
 
 data RecentDirOptsCache = RecentDirOptsCache
-    { cacheTimestamp :: ZonedTime
+    { cacheTimestamp  :: ZonedTime
     , cacheRecentDirs :: [FilePath]
     } deriving (Show, Generic)
 

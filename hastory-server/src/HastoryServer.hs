@@ -47,15 +47,15 @@ optParser =
 
 -- | TODO: Document
 server :: Options -> ServerSettings -> Server HastoryAPI
-server Options {..} ServerSettings {..} = appendCommand
+server Options {..} ServerSettings {..} = sAppendCommand
   where
-    appendCommand :: Maybe Token -> EntryWithKey -> Handler ()
-    appendCommand (Just (Token token)) command
+    sAppendCommand :: Maybe Token -> EntryWithKey -> Handler ()
+    sAppendCommand (Just (Token token)) command
       | token == _ssToken =
         liftIO $ appendFile _oDataOutputFilePath (show command <> "\n")
       | otherwise =
         throwError $ err403 { errBody = "Invalid Token provided." }
-    appendCommand Nothing _ =
+    sAppendCommand Nothing _ =
       throwError $ err403 { errBody = tokenHeaderKey <> " header should exist." }
 
 -- | TODO: Document

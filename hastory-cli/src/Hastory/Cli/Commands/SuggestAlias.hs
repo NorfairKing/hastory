@@ -2,17 +2,20 @@
 
 module Hastory.Cli.Commands.SuggestAlias where
 
-import Import
-
 import Data.Hastory
 import Hastory.Cli.Internal
 import Hastory.Cli.OptParse.Types
 import Hastory.Cli.Utils (doCountsWith)
 
 import Control.Arrow ((***))
+import Control.Monad.Catch
+import Control.Monad.IO.Unlift (MonadUnliftIO)
+import Control.Monad.Reader
 import Data.Hashable (Hashable)
-import Data.Ord (Down(..), comparing)
+import Data.List (inits, sortBy)
+import Data.Ord (Down (..), comparing)
 import Data.Text (Text)
+import Safe (tailSafe)
 
 import qualified Data.HashMap.Lazy as HM
 import qualified Data.Text as T

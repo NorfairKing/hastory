@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b3c5074eba49aed48cde9eb90959bc0ac40af31b82d5cfc5d6ce2e4b6e667e9b
+-- hash: 7bcb050f7b79a14c255c92551a11cad922bf25f83e1a724b09a255c26146b7f5
 
 name:           hastory-cli
 version:        0.0.0.0
@@ -20,8 +20,7 @@ build-type:     Simple
 library
   hs-source-dirs:
       src/
-  default-extensions: NoImplicitPrelude
-  ghc-options: -Wall -Wincomplete-uni-patterns -Wincomplete-record-updates -Wimplicit-prelude -Wredundant-constraints
+  ghc-options: -Wall -Wincomplete-uni-patterns -Wincomplete-record-updates -Wredundant-constraints
   build-depends:
       aeson
     , aeson-pretty
@@ -65,7 +64,6 @@ library
       Hastory.Cli.OptParse.Types
       Hastory.Cli.Utils
   other-modules:
-      Import
       Paths_hastory_cli
   default-language: Haskell2010
 
@@ -86,7 +84,6 @@ test-suite hastory-cli-test
   main-is: Spec.hs
   hs-source-dirs:
       test/
-  default-extensions: NoImplicitPrelude
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
   build-depends:
       QuickCheck

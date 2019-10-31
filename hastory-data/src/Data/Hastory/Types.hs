@@ -10,8 +10,6 @@
 
 module Data.Hastory.Types where
 
-import Import
-
 import Data.Hastory.Types.Path ()
 
 import Control.DeepSeq
@@ -21,9 +19,14 @@ import Data.Hashable.Time ()
 import Data.Int (Int64)
 import Data.Text (Text)
 import Data.Time (UTCTime)
+import Data.Validity
+import Data.Validity.Path ()
+import Data.Validity.Text ()
 import Data.Validity.Time.Clock ()
 import Database.Persist.TH (mkMigrate, mkPersist, persistLowerCase, share,
                             sqlSettings)
+import GHC.Generics (Generic)
+import Path (Abs, Dir, Path, toFilePath)
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 Entry

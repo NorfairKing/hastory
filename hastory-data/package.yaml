@@ -13,13 +13,10 @@ dependencies:
 
 library:
   source-dirs: src/
-  default-extensions:
-  - NoImplicitPrelude
   ghc-options:
   - -Wall
   - -Wincomplete-uni-patterns
   - -Wincomplete-record-updates
-  - -Wimplicit-prelude
   - -Wredundant-constraints
 
   exposed-modules:

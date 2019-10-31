@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d6a1b6142223761530653f6a4d51c75b15920d0f05de5e88cd518c2e4daae5c3
+-- hash: 9954b58f2917fc8ff475745f85fb1bd02c14b5c4b152a12b2602d0a225289a0a
 
 name:           hastory-data
 version:        0.0.0.0
@@ -26,12 +26,10 @@ library
       Data.Hastory.API
   other-modules:
       Data.Hastory.Types.Path
-      Import
       Paths_hastory_data
   hs-source-dirs:
       src/
-  default-extensions: NoImplicitPrelude
-  ghc-options: -Wall -Wincomplete-uni-patterns -Wincomplete-record-updates -Wimplicit-prelude -Wredundant-constraints
+  ghc-options: -Wall -Wincomplete-uni-patterns -Wincomplete-record-updates -Wredundant-constraints
   build-depends:
       aeson
     , base >=4.9 && <=5

@@ -1,9 +1,13 @@
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE FlexibleContexts #-}
 
 module Hastory.Cli.Commands.ChangeDir where
 
-import Import
+import Control.Monad.Catch
+import Control.Monad.IO.Unlift (MonadUnliftIO)
+import Control.Monad.Reader
+import Safe (atMay)
+import System.Exit (die)
 
 import Hastory.Cli.Commands.Recent
 import Hastory.Cli.OptParse.Types
@@ -14,4 +18,4 @@ change ix = do
     liftIO $
         case recentDirOpts `atMay` ix of
             Nothing -> die "Invalid index choice."
-            Just d -> putStrLn d
+            Just d  -> putStrLn d

@@ -2,9 +2,12 @@
 
 module Data.Hastory.Gen where
 
-import Import
-
+import Data.GenValidity
+import Data.GenValidity.Path ()
+import Data.GenValidity.Text ()
+import Data.GenValidity.Time ()
 import Data.Hastory
+import Test.QuickCheck
 
 instance GenUnchecked Entry
 
