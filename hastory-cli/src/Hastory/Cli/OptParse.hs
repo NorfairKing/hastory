@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase      #-}
 {-# LANGUAGE RecordWildCards #-}
 
 module Hastory.Cli.OptParse
@@ -7,6 +8,7 @@ module Hastory.Cli.OptParse
     , Settings(..)
     ) where
 
+import Control.Monad.Except
 import Data.Maybe (fromMaybe)
 import Data.Semigroup ((<>))
 import qualified Data.Text as T
@@ -47,7 +49,14 @@ combineToInstructions cmd Flags {..} Configuration = Instructions d <$> sets
         pure Settings {setCacheDir = cacheDir, remoteStorageClient = mbRemoteStorageClient}
 
 mkRemoteStorageClient :: Maybe T.Text -> Maybe Token -> IO (Maybe HastoryClient)
-mkRemoteStorageClient = (sequence .) . liftA2 mkHastoryClient
+mkRemoteStorageClient url token =
+  runExceptT (sequence (mkHastoryClient <$> url <*> token)) >>= \case
+    Left _err ->
+      -- Error occurred while creating the client.
+      -- Do we want to log this?
+      pure Nothing
+    Right mb_client ->
+      pure mb_client
 
 getConfiguration :: Command -> Flags -> IO Configuration
 getConfiguration _ _ = pure Configuration
