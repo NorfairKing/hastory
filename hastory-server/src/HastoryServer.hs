@@ -98,7 +98,9 @@ reportDataFileStatus :: Options -> IO ()
 reportDataFileStatus Options {..} = do
   dataFileExists <- fileExist _oDataOutputFilePath
   if dataFileExists
-    then putStrLn "Data file exists. Appending commands to it."
+    then
+      putStrLn $
+        "Data file exists at " <> _oDataOutputFilePath <> ". Appending commands to it."
     else putStrLn "Data file doesn't exist. Creating a new one."
 
 -- | TODO: Document

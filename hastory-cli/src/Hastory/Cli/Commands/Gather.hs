@@ -47,9 +47,9 @@ sendEntryToStorageServer (key, entry) client =
         [SQL.PersistInt64 rowId] -> Just rowId
         _                        -> Nothing
 
--- | TODO: Make sendEntryToStorageServer async
 storeHistory ::
        (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => Entry -> m ()
 storeHistory entry = do
   key <- runDb (SQL.insert entry)
-  whenJustM (asks remoteStorageClient) $ runStdoutLoggingT . sendEntryToStorageServer (key, entry)
+  whenJustM (asks remoteStorageClient) $
+    runStdoutLoggingT . sendEntryToStorageServer (key, entry)
