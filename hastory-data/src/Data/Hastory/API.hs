@@ -29,17 +29,20 @@ import Data.Hastory.Types (EntryWithKey)
 
 -- * Hastory API
 
--- | TODO: Document
+-- | Header key to use while authorizing users via tokens.
+--
+-- Every hastory client are expected to provide a header like the following:
+--
+-- X-Token: abcd1234abcd1234abcd
 type TokenHeaderKey = "X-Token"
 
--- | TODO: Document
+-- | Helper for getting the token header in the runtime.
 tokenHeaderKey :: IsString s => s
 tokenHeaderKey = fromString $ symbolVal (Proxy @TokenHeaderKey)
 
--- | TODO: Document
+-- | Token for authenticating Hastory Server users.
 newtype Token = Token T.Text
 
--- | TODO: Document
 instance FromHttpApiData Token where
   parseHeader = fmap Token . parseHeader
   parseUrlPiece = fmap Token . parseUrlPiece
@@ -47,7 +50,7 @@ instance FromHttpApiData Token where
 instance ToHttpApiData Token where
   toUrlPiece (Token token) = toUrlPiece token
 
--- | TODO: Document
+-- | Main Hastory API specification.
 type HastoryAPI = "commands" :> "append" :> Header TokenHeaderKey Token :> ReqBody '[JSON] EntryWithKey :> Post '[JSON] ()
 
 api :: Proxy HastoryAPI
@@ -58,12 +61,19 @@ data HastoryClient = HastoryClient ClientEnv Token
 instance Show HastoryClient where
   show (HastoryClient (ClientEnv _ baseUrl _) _) = "HastoryClient with baseUrl " <> show baseUrl
 
+-- | By default parseBaseUrl throws exceptions and we don't like exceptions here.
+-- Therefore we convert it to an action in IO and MonadError T.Text context.
 parseBaseUrlSafe :: (MonadThrow m, MonadBaseControl IO m, MonadError T.Text m) => T.Text -> m BaseUrl
 parseBaseUrlSafe url =
   parseBaseUrl (T.unpack url)
     `catch` (\(_ :: InvalidBaseUrlException) -> throwError "Base url couldn't be parsed")
 
 -- * Hastory Client
+
+-- | Creates a hastory client type.
+--
+-- This type is needed because creating & destroying HTTP managers are expensive.
+-- Once a user gets a HastoryClient, it's being used throughout the entire life of the user.
 mkHastoryClient :: (MonadError T.Text m, MonadThrow m, MonadBaseControl IO m, MonadIO m) => T.Text -> Token -> m HastoryClient
 mkHastoryClient baseUrl token = do
   parsedBaseUrl <- parseBaseUrlSafe baseUrl
@@ -71,9 +81,19 @@ mkHastoryClient baseUrl token = do
   let clientEnv = mkClientEnv manager parsedBaseUrl
   pure $ HastoryClient clientEnv token
 
+-- | Hastory API client.
+--
+-- Adding more methods in the future:
+-- `appendCommand :<|> method2 :<|> method3 = client api`
+--
+-- See https://hackage.haskell.org/package/servant-client-0.16.0.1/docs/Servant-Client.html#v:client
 appendCommand :: Maybe Token -> EntryWithKey -> ClientM ()
 appendCommand = client api
 
+
+-- | Run a hastory API method that requires passing a token by using
+-- the existing token in HastoryClient. Since we create HastoryClient once, we save
+-- the token so that users won't have to deal with tokens afterwards.
 runHastoryClientM :: HastoryClient -> (Token -> ClientM a) -> IO (Either ServantError a)
 runHastoryClientM (HastoryClient clientEnv token) action =
   runClientM (action token) clientEnv
