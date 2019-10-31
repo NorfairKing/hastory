@@ -1,7 +1,9 @@
 module Main where
 
-import           HastoryServer
-import           Prelude
+import Control.Monad.Logger
+import Prelude
+
+import HastoryServer
 
 main :: IO ()
-main = hastoryServer
+main = runStdoutLoggingT hastoryServer

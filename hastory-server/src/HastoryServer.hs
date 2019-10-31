@@ -9,6 +9,9 @@
 module HastoryServer where
 
 import Control.Monad.IO.Class (liftIO)
+import Control.Monad.IO.Class
+import Control.Monad.Logger (MonadLogger)
+import Control.Monad.Logger.CallStack (logInfo)
 import Data.Hastory.API
 import Data.Hastory.Types (EntryWithKey (..))
 import Data.Proxy (Proxy (..))
@@ -66,7 +69,6 @@ myApi = Proxy
 app :: Options -> ServerSettings -> Application
 app options serverSettings = serve myApi (server options serverSettings)
 
--- | TODO: We probably shoudln't read request body here, but it can be helpful for logging.
 mkWarpLogger :: FilePath -> Wai.Request -> HTTP.Status -> Maybe Integer -> IO ()
 mkWarpLogger logPath req _ _ =
   appendFile logPath $ show req <> "\n"
@@ -84,34 +86,33 @@ tokenLength :: Int
 tokenLength = 20
 
 -- | TODO: Document
-generateToken :: IO T.Text
-generateToken = T.pack . take tokenLength . randomRs ('a', 'z') <$> newStdGen
+generateToken :: MonadIO m => m T.Text
+generateToken = T.pack . take tokenLength . randomRs ('a', 'z') <$> liftIO newStdGen
 
 -- | TODO: Document
--- | TODO: Use logging monad instead of putStrLn
-reportPort :: Options -> IO ()
+reportPort :: MonadLogger m => Options -> m ()
 reportPort Options {..} =
-  putStrLn $ "Starting server on port " <> show _oPort
+  logInfo $ "Starting server on port " <> T.pack (show _oPort)
 
 -- | TODO: Document
-reportDataFileStatus :: Options -> IO ()
+reportDataFileStatus :: (MonadIO m, MonadLogger m) => Options -> m ()
 reportDataFileStatus Options {..} = do
-  dataFileExists <- fileExist _oDataOutputFilePath
+  dataFileExists <- liftIO $ fileExist _oDataOutputFilePath
   if dataFileExists
     then
-      putStrLn $
-        "Data file exists at " <> _oDataOutputFilePath <> ". Appending commands to it."
-    else putStrLn "Data file doesn't exist. Creating a new one."
+      logInfo $
+        "Data file exists at " <> T.pack _oDataOutputFilePath <> ". Appending commands to it."
+    else logInfo "Data file doesn't exist. Creating a new one."
 
 -- | TODO: Document
-hastoryServer :: IO ()
+hastoryServer :: (MonadIO m, MonadLogger m) => m ()
 hastoryServer = do
-  options@Options {..} <- A.execParser optParser
+  options@Options {..} <- liftIO $ A.execParser optParser
 
   reportPort options
   reportDataFileStatus options
 
   token <- generateToken
-  putStrLn $ "Token: " <> T.unpack token
+  logInfo $ "Token: " <> token
 
-  Warp.runSettings (mkWarpSettings options) (app options (ServerSettings token))
+  liftIO $ Warp.runSettings (mkWarpSettings options) (app options (ServerSettings token))
