@@ -1,6 +1,6 @@
-{-# LANGUAGE FlexibleContexts  #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell   #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Hastory.Cli.Internal where
 
@@ -16,8 +16,17 @@ import qualified Data.Text as T
 import Data.Time
 import Database.Persist.Sqlite (SqlBackend)
 import qualified Database.Persist.Sqlite as SQL
-import Path (Abs, Dir, File, Path, mkRelDir, parent, parseRelFile, toFilePath,
-             (</>))
+import Path
+  ( Abs
+  , Dir
+  , File
+  , Path
+  , (</>)
+  , mkRelDir
+  , parent
+  , parseRelFile
+  , toFilePath
+  )
 import Path.IO (ensureDir)
 
 hastoryDir :: MonadReader Settings m => m (Path Abs Dir)
@@ -28,20 +37,25 @@ histDir = fmap (</> $(mkRelDir "command-history")) hastoryDir
 
 histDb :: (MonadThrow m, MonadReader Settings m) => m (Path Abs File)
 histDb = do
-  hd   <- histDir
+  hd <- histDir
   file <- parseRelFile "hastory.db"
   pure $ hd </> file
 
 getLastNDaysOfHistory ::
-       (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => Integer -> m [Entry]
+     (MonadReader Settings m, MonadThrow m, MonadUnliftIO m)
+  => Integer
+  -> m [Entry]
 getLastNDaysOfHistory n = do
-    currentTime <- liftIO getCurrentTime
-    let minDateTime = addUTCTime nDaysInPast currentTime
-        nDaysInPast = negate $ fromInteger (86400 * n)
-    entries <- runDb $ SQL.selectList [EntryDateTime SQL.>=. minDateTime] []
-    pure (SQL.entityVal <$> entries)
+  currentTime <- liftIO getCurrentTime
+  let minDateTime = addUTCTime nDaysInPast currentTime
+      nDaysInPast = negate $ fromInteger (86400 * n)
+  entries <- runDb $ SQL.selectList [EntryDateTime SQL.>=. minDateTime] []
+  pure (SQL.entityVal <$> entries)
 
-runDb :: (MonadThrow m, MonadReader Settings m, MonadUnliftIO m) => ReaderT SqlBackend (NoLoggingT (ResourceT m)) a -> m a
+runDb ::
+     (MonadThrow m, MonadReader Settings m, MonadUnliftIO m)
+  => ReaderT SqlBackend (NoLoggingT (ResourceT m)) a
+  -> m a
 runDb dbAction = do
   hDb <- histDb
   ensureDir $ parent hDb

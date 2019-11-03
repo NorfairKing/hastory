@@ -1,10 +1,10 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
-{-# LANGUAGE DataKinds           #-}
-{-# LANGUAGE FlexibleContexts    #-}
-{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeApplications    #-}
-{-# LANGUAGE TypeOperators       #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
 
 module Data.Hastory.API where
 
@@ -18,14 +18,18 @@ import GHC.TypeLits (symbolVal)
 import Network.HTTP.Client (defaultManagerSettings, newManager)
 import Prelude
 import Servant
-import Servant.Client (ClientEnv (ClientEnv), ClientM, client, mkClientEnv,
-                       runClientM)
+import Servant.Client
+  ( ClientEnv(ClientEnv)
+  , ClientM
+  , client
+  , mkClientEnv
+  , runClientM
+  )
 import Servant.Client.Core.Reexport (ServantError, parseBaseUrl)
 
 import Data.Hastory.Types (EntryWithKey)
 
 -- * Hastory API
-
 -- | Header key to use while authorizing users via tokens.
 --
 -- Every hastory client are expected to provide a header like the following:
@@ -38,7 +42,8 @@ tokenHeaderKey :: IsString s => s
 tokenHeaderKey = fromString $ symbolVal (Proxy @TokenHeaderKey)
 
 -- | Token for authenticating Hastory Server users.
-newtype Token = Token T.Text
+newtype Token =
+  Token T.Text
 
 instance FromHttpApiData Token where
   parseHeader = fmap Token . parseHeader
@@ -48,25 +53,29 @@ instance ToHttpApiData Token where
   toUrlPiece (Token token) = toUrlPiece token
 
 -- | Main Hastory API specification.
-type HastoryAPI = "commands" :> "append" :> Header TokenHeaderKey Token :> ReqBody '[JSON] EntryWithKey :> Post '[JSON] ()
+type HastoryAPI
+   = "commands" :> "append" :> Header TokenHeaderKey Token :> ReqBody '[ JSON] EntryWithKey :> Post '[ JSON] ()
 
 api :: Proxy HastoryAPI
 api = Proxy
 
-data HastoryClient = HastoryClient ClientEnv Token
+data HastoryClient =
+  HastoryClient ClientEnv Token
 
 instance Show HastoryClient where
-  show (HastoryClient (ClientEnv _ baseUrl _) _) = "HastoryClient with baseUrl " <> show baseUrl
+  show (HastoryClient (ClientEnv _ baseUrl _) _) =
+    "HastoryClient with baseUrl " <> show baseUrl
 
 -- * Hastory Client
-
 -- | Creates a hastory client type.
 --
 -- This type is needed because creating & destroying HTTP managers are expensive.
 -- Once a user gets a HastoryClient, it's being used throughout the entire life of the user.
-mkHastoryClient :: (MonadError T.Text m, MonadIO m) => T.Text -> Token -> m HastoryClient
+mkHastoryClient ::
+     (MonadError T.Text m, MonadIO m) => T.Text -> Token -> m HastoryClient
 mkHastoryClient baseUrl token = do
-  parsedBaseUrl <- liftEither $ first (T.pack . show) $ parseBaseUrl (T.unpack baseUrl)
+  parsedBaseUrl <-
+    liftEither $ first (T.pack . show) $ parseBaseUrl (T.unpack baseUrl)
   manager <- liftIO $ newManager defaultManagerSettings
   let clientEnv = mkClientEnv manager parsedBaseUrl
   pure $ HastoryClient clientEnv token
@@ -80,10 +89,10 @@ mkHastoryClient baseUrl token = do
 appendCommand :: Maybe Token -> EntryWithKey -> ClientM ()
 appendCommand = client api
 
-
 -- | Run a hastory API method that requires passing a token by using
 -- the existing token in HastoryClient. Since we create HastoryClient once, we save
 -- the token so that users won't have to deal with tokens afterwards.
-runHastoryClientM :: HastoryClient -> (Token -> ClientM a) -> IO (Either ServantError a)
+runHastoryClientM ::
+     HastoryClient -> (Token -> ClientM a) -> IO (Either ServantError a)
 runHastoryClientM (HastoryClient clientEnv token) action =
   runClientM (action token) clientEnv

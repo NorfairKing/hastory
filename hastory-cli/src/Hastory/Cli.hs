@@ -1,8 +1,8 @@
 {-# LANGUAGE FlexibleContexts #-}
 
 module Hastory.Cli
-    ( hastoryCli
-    ) where
+  ( hastoryCli
+  ) where
 
 import Hastory.Cli.Commands.ChangeDir (change)
 import Hastory.Cli.Commands.Gather (gather)
@@ -18,13 +18,14 @@ import Control.Monad.Reader
 
 hastoryCli :: IO ()
 hastoryCli = do
-    Instructions d sets <- getInstructions
-    runReaderT (dispatch d) sets
+  Instructions d sets <- getInstructions
+  runReaderT (dispatch d) sets
 
-dispatch :: (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => Dispatch -> m ()
-dispatch DispatchGather                 = gather
+dispatch ::
+     (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => Dispatch -> m ()
+dispatch DispatchGather = gather
 dispatch DispatchGenGatherWrapperScript = liftIO genGatherWrapperScript
-dispatch (DispatchChangeDir ix)         = change ix
-dispatch (DispatchListRecentDirs lrds)  = listRecentDirs lrds
+dispatch (DispatchChangeDir ix) = change ix
+dispatch (DispatchListRecentDirs lrds) = listRecentDirs lrds
 dispatch DispatchGenChangeWrapperScript = liftIO genChangeWrapperScript
-dispatch DispatchSuggestAlias           = suggest
+dispatch DispatchSuggestAlias = suggest

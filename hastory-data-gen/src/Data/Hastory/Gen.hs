@@ -12,11 +12,11 @@ import Test.QuickCheck
 instance GenUnchecked Entry
 
 instance GenValid Entry where
-    genValid =
-        (Entry <$> genValid <*> genValid <*> genValid <*> genValid <*> genValid) `suchThat`
-        isValid
+  genValid =
+    (Entry <$> genValid <*> genValid <*> genValid <*> genValid <*> genValid) `suchThat`
+    isValid
 
 instance GenInvalid Entry
 
 instance Arbitrary Entry where
-    arbitrary = genValid
+  arbitrary = genValid

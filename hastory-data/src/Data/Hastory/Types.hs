@@ -1,12 +1,12 @@
-{-# LANGUAGE DeriveGeneric              #-}
-{-# LANGUAGE GADTs                      #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE GADTs #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE MultiParamTypeClasses      #-}
-{-# LANGUAGE OverloadedStrings          #-}
-{-# LANGUAGE QuasiQuotes                #-}
-{-# LANGUAGE RecordWildCards            #-}
-{-# LANGUAGE TemplateHaskell            #-}
-{-# LANGUAGE TypeFamilies               #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TypeFamilies #-}
 
 module Data.Hastory.Types where
 
@@ -14,7 +14,7 @@ import Data.Hastory.Types.Path ()
 
 import Control.DeepSeq
 import Data.Aeson
-import Data.Hashable (Hashable (hashWithSalt))
+import Data.Hashable (Hashable(hashWithSalt))
 import Data.Hashable.Time ()
 import Data.Int (Int64)
 import Data.Text (Text)
@@ -23,12 +23,19 @@ import Data.Validity
 import Data.Validity.Path ()
 import Data.Validity.Text ()
 import Data.Validity.Time.Clock ()
-import Database.Persist.TH (mkMigrate, mkPersist, persistLowerCase, share,
-                            sqlSettings)
+import Database.Persist.TH
+  ( mkMigrate
+  , mkPersist
+  , persistLowerCase
+  , share
+  , sqlSettings
+  )
 import GHC.Generics (Generic)
 import Path (Abs, Dir, Path, toFilePath)
 
-share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
+share
+  [mkPersist sqlSettings, mkMigrate "migrateAll"]
+  [persistLowerCase|
 Entry
     text Text
     workingDir (Path Abs Dir)
@@ -41,22 +48,26 @@ Entry
 instance NFData Entry
 
 instance Hashable Entry where
-    hashWithSalt salt Entry {..} =
-        salt `hashWithSalt` entryText `hashWithSalt` toFilePath entryWorkingDir `hashWithSalt`
-        entryDateTime `hashWithSalt`
-        entryHostName `hashWithSalt`
-        entryUser
+  hashWithSalt salt Entry {..} =
+    salt `hashWithSalt` entryText `hashWithSalt` toFilePath entryWorkingDir `hashWithSalt`
+    entryDateTime `hashWithSalt`
+    entryHostName `hashWithSalt`
+    entryUser
 
 instance Validity Entry where
-    isValid Entry {..} = isValid entryText && isValid entryWorkingDir
+  isValid Entry {..} = isValid entryText && isValid entryWorkingDir
 
 instance ToJSON Entry
+
 instance FromJSON Entry
 
-data EntryWithKey = EntryWithKey
-  { _ewkKey   :: Int64
-  , _ewkEntry :: Entry
-  } deriving (Show, Eq, Generic)
+data EntryWithKey =
+  EntryWithKey
+    { _ewkKey :: Int64
+    , _ewkEntry :: Entry
+    }
+  deriving (Show, Eq, Generic)
 
 instance ToJSON EntryWithKey
+
 instance FromJSON EntryWithKey

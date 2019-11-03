@@ -20,7 +20,7 @@ steps:
   # line. All default to true.
   - simple_align:
       cases: true
-      top_level_patterns: true
+      top_level_patterns: false
       records: true
 
   # Import cleanup
