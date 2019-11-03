@@ -1,0 +1,71 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: aff55454a4e3cd45c997367fca7233634bc0735a7decd26a66e0487742b6e48b
+
+name:           hastory-server
+version:        0.0.0.0
+category:       Command Line
+homepage:       https://github.com/NorfairKing/hastory
+author:         Tom Sydney Kerckhove
+maintainer:     syd.kerckhove@gmail.com
+copyright:      Copyright: (c) 2016-2018 Tom Sydney Kerckhove
+license:        AllRightsReserved
+license-file:   LICENSE
+build-type:     Simple
+
+library
+  exposed-modules:
+      Data.Hastory.Server
+  other-modules:
+      Paths_hastory_server
+  hs-source-dirs:
+      src/
+  ghc-options: -Wall -Wincomplete-uni-patterns -Wincomplete-record-updates -Wredundant-constraints
+  build-depends:
+      aeson
+    , aeson-pretty
+    , base
+    , bytestring
+    , deepseq
+    , exceptions
+    , hashable
+    , hashable-time
+    , hastory-data
+    , hostname
+    , http-types
+    , monad-logger
+    , mtl
+    , optparse-applicative
+    , path
+    , path-io
+    , random
+    , safe
+    , servant
+    , servant-server
+    , text
+    , time
+    , unix
+    , unordered-containers
+    , validity
+    , validity-path
+    , validity-text
+    , wai
+    , warp
+  default-language: Haskell2010
+
+executable hastory-server
+  main-is: Main.hs
+  other-modules:
+      Paths_hastory_server
+  hs-source-dirs:
+      app/
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.9 && <=5
+    , hastory-server
+    , monad-logger
+  default-language: Haskell2010
