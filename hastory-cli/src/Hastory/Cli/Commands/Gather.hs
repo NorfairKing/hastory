@@ -1,9 +1,11 @@
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Hastory.Cli.Commands.Gather where
 
 import Control.Monad.Catch
+import Control.Monad.Except (runExceptT)
 import Control.Monad.Extra (whenJustM)
 import Control.Monad.IO.Unlift (MonadUnliftIO)
 import Control.Monad.Logger (MonadLogger)
@@ -32,19 +34,25 @@ gatherFrom text = do
   storeHistory entry
 
 sendEntryToStorageServer ::
-     (MonadIO m, MonadLogger m) => Entry -> HastoryClient -> m ()
-sendEntryToStorageServer entry client = do
-  resp <- liftIO $ runHastoryClientM client $ \t -> appendCommand (Just t) entry
-  case resp of
+     (MonadIO m, MonadLogger m) => Entry -> RemoteStorageClientInfo -> m ()
+sendEntryToStorageServer entry (RemoteStorageClientInfo url token) =
+  runExceptT (mkHastoryClient url token) >>= \case
     Left err ->
       logWarn $
-      "Saving command in remote storage server has failed: " <>
-      T.pack (show err)
-    Right _ -> pure ()
+      "Couldn't create the remote storage client: " <> T.pack (show err)
+    Right client -> do
+      resp <-
+        liftIO $ runHastoryClientM client $ \t -> appendCommand (Just t) entry
+      case resp of
+        Left err ->
+          logWarn $
+          "Saving command in remote storage server has failed: " <>
+          T.pack (show err)
+        Right _ -> pure ()
 
 storeHistory ::
      (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => Entry -> m ()
 storeHistory entry = do
   _key <- runDb (SQL.insert entry)
-  whenJustM (asks remoteStorageClient) $
+  whenJustM (asks remoteStorageClientInfo) $
     runStdoutLoggingT . sendEntryToStorageServer entry

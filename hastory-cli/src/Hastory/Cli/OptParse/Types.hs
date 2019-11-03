@@ -1,6 +1,6 @@
 module Hastory.Cli.OptParse.Types where
 
-import Data.Hastory.API (HastoryClient)
+import Data.Hastory.API (Token)
 import qualified Data.Text as T
 import Path (Abs, Dir, Path)
 
@@ -57,6 +57,10 @@ newtype ListRecentDirSets =
 data Settings =
   Settings
     { setCacheDir :: Path Abs Dir
-    , remoteStorageClient :: Maybe HastoryClient
+    , remoteStorageClientInfo :: Maybe RemoteStorageClientInfo
     }
-  deriving (Show)
+  deriving (Show, Eq)
+
+data RemoteStorageClientInfo =
+  RemoteStorageClientInfo T.Text Token
+  deriving (Show, Eq)

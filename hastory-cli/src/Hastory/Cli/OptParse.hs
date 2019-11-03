@@ -8,7 +8,6 @@ module Hastory.Cli.OptParse
   , Settings(..)
   ) where
 
-import Control.Monad.Except
 import Data.Maybe (fromMaybe)
 import Data.Semigroup ((<>))
 import qualified Data.Text as T
@@ -16,7 +15,7 @@ import Options.Applicative
 import Path.IO (getHomeDir, resolveDir, resolveDir')
 import System.Environment (getArgs)
 
-import Data.Hastory.API (HastoryClient, Token(..), mkHastoryClient)
+import Data.Hastory.API (Token(..))
 import Hastory.Cli.OptParse.Types
 
 getInstructions :: IO Instructions
@@ -45,20 +44,18 @@ combineToInstructions cmd Flags {..} Configuration = Instructions d <$> sets
         case flagCacheDir of
           Nothing -> resolveDir home ".hastory"
           Just fcd -> resolveDir' fcd
-      mbRemoteStorageClient <-
-        mkRemoteStorageClient flagStorageServer (Token <$> flagStorageToken)
+      let mbRemoteStorageClientInfo =
+            liftA2
+              RemoteStorageClientInfo
+              flagStorageServer
+              (Token <$> flagStorageToken)
+      -- mbRemoteStorageClient <-
+      --   mkRemoteStorageClient flagStorageServer (Token <$> flagStorageToken)
       pure
         Settings
-          {setCacheDir = cacheDir, remoteStorageClient = mbRemoteStorageClient}
-
-mkRemoteStorageClient :: Maybe T.Text -> Maybe Token -> IO (Maybe HastoryClient)
-mkRemoteStorageClient url token =
-  runExceptT (sequence (mkHastoryClient <$> url <*> token)) >>= \case
-    Left _err
-      -- Error occurred while creating the client.
-      -- Do we want to log this?
-     -> pure Nothing
-    Right mb_client -> pure mb_client
+          { setCacheDir = cacheDir
+          , remoteStorageClientInfo = mbRemoteStorageClientInfo
+          }
 
 getConfiguration :: Command -> Flags -> IO Configuration
 getConfiguration _ _ = pure Configuration

@@ -44,6 +44,7 @@ tokenHeaderKey = fromString $ symbolVal (Proxy @TokenHeaderKey)
 -- | Token for authenticating Hastory Server users.
 newtype Token =
   Token T.Text
+  deriving (Show, Eq)
 
 instance FromHttpApiData Token where
   parseHeader = fmap Token . parseHeader
