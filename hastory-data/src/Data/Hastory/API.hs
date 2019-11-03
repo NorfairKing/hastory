@@ -27,7 +27,7 @@ import Servant.Client
   )
 import Servant.Client.Core.Reexport (ServantError, parseBaseUrl)
 
-import Data.Hastory.Types (EntryWithKey)
+import Data.Hastory.Types (Entry)
 
 -- * Hastory API
 -- | Header key to use while authorizing users via tokens.
@@ -54,7 +54,7 @@ instance ToHttpApiData Token where
 
 -- | Main Hastory API specification.
 type HastoryAPI
-   = "commands" :> "append" :> Header TokenHeaderKey Token :> ReqBody '[ JSON] EntryWithKey :> Post '[ JSON] ()
+   = "commands" :> "append" :> Header TokenHeaderKey Token :> ReqBody '[ JSON] Entry :> Post '[ JSON] ()
 
 api :: Proxy HastoryAPI
 api = Proxy
@@ -86,7 +86,7 @@ mkHastoryClient baseUrl token = do
 -- `appendCommand :<|> method2 :<|> method3 = client api`
 --
 -- See https://hackage.haskell.org/package/servant-client-0.16.0.1/docs/Servant-Client.html#v:client
-appendCommand :: Maybe Token -> EntryWithKey -> ClientM ()
+appendCommand :: Maybe Token -> Entry -> ClientM ()
 appendCommand = client api
 
 -- | Run a hastory API method that requires passing a token by using

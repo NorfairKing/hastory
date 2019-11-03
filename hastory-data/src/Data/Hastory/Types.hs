@@ -16,7 +16,6 @@ import Control.DeepSeq
 import Data.Aeson
 import Data.Hashable (Hashable(hashWithSalt))
 import Data.Hashable.Time ()
-import Data.Int (Int64)
 import Data.Text (Text)
 import Data.Time (UTCTime)
 import Data.Validity
@@ -60,14 +59,3 @@ instance Validity Entry where
 instance ToJSON Entry
 
 instance FromJSON Entry
-
-data EntryWithKey =
-  EntryWithKey
-    { _ewkKey :: Int64
-    , _ewkEntry :: Entry
-    }
-  deriving (Show, Eq, Generic)
-
-instance ToJSON EntryWithKey
-
-instance FromJSON EntryWithKey

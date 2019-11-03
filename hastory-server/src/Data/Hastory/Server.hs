@@ -10,7 +10,7 @@ import Control.Monad.IO.Class (MonadIO, liftIO)
 import Control.Monad.Logger (MonadLogger)
 import Control.Monad.Logger.CallStack (logInfo)
 import Data.Hastory.API
-import Data.Hastory.Types (EntryWithKey(..))
+import Data.Hastory.Types (Entry(..))
 import Data.Proxy (Proxy(..))
 import Data.Semigroup ((<>))
 import qualified Data.Text as T
@@ -67,7 +67,7 @@ optParser =
 server :: Options -> ServerSettings -> Server HastoryAPI
 server Options {..} ServerSettings {..} = sAppendCommand
   where
-    sAppendCommand :: Maybe Token -> EntryWithKey -> Handler ()
+    sAppendCommand :: Maybe Token -> Entry -> Handler ()
     sAppendCommand (Just (Token token)) command
       | token == _ssToken =
         liftIO $ appendFile _oDataOutputFilePath (show command <> "\n")
