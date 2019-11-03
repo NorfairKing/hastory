@@ -1,7 +1,6 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
@@ -11,20 +10,13 @@ module Data.Hastory.API where
 import Control.Monad.Except (MonadError, liftEither)
 import Control.Monad.IO.Class
 import Data.Bifunctor (first)
-import Data.Semigroup ((<>))
 import Data.String (IsString, fromString)
 import qualified Data.Text as T
 import GHC.TypeLits (symbolVal)
 import Network.HTTP.Client (defaultManagerSettings, newManager)
 import Prelude
 import Servant
-import Servant.Client
-  ( ClientEnv(ClientEnv)
-  , ClientM
-  , client
-  , mkClientEnv
-  , runClientM
-  )
+import Servant.Client (ClientEnv, ClientM, client, mkClientEnv, runClientM)
 import Servant.Client.Core.Reexport (ServantError, parseBaseUrl)
 
 import Data.Hastory.Types (Entry)
@@ -62,10 +54,6 @@ api = Proxy
 
 data HastoryClient =
   HastoryClient ClientEnv Token
-
-instance Show HastoryClient where
-  show (HastoryClient (ClientEnv _ baseUrl _) _) =
-    "HastoryClient with baseUrl " <> show baseUrl
 
 -- * Hastory Client
 -- | Creates a hastory client type.
