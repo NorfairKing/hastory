@@ -86,7 +86,7 @@ mkWarpSettings Options {..} =
   maybe id (Warp.setLogger . mkWarpLogger) _oLogFile
   Warp.defaultSettings
 
--- | How long the generated token should be. This can be converted into a command-line flag in the future.
+-- | How long the generated token should be.
 tokenLength :: Int
 tokenLength = 20
 
