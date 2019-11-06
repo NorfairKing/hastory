@@ -51,16 +51,9 @@ newtype ServerSettings =
 optParser :: A.ParserInfo Options
 optParser =
   A.info
-    (Options <$>
-     A.option
-       A.auto
-       (A.value 8080 <> A.showDefault <> A.long "port" <> A.short 'p') <*>
-     A.strOption
-       (A.value "/home/yigit/.hastory/data" <>
-        A.long "data-directory" <> A.short 'd') <*>
-     A.option
-       A.auto
-       (A.value (Just "server.logs") <> A.long "log-output" <> A.short 'l'))
+    (Options <$> A.option A.auto (A.value 8080 <> A.showDefault <> A.long "port" <> A.short 'p') <*>
+     A.strOption (A.value "/home/yigit/.hastory/data" <> A.long "data-directory" <> A.short 'd') <*>
+     A.option A.auto (A.value (Just "server.logs") <> A.long "log-output" <> A.short 'l'))
     mempty
 
 -- | Main server logic for Hastory Server.
@@ -69,8 +62,7 @@ server Options {..} ServerSettings {..} = sAppendCommand
   where
     sAppendCommand :: Maybe Token -> Entry -> Handler ()
     sAppendCommand (Just (Token token)) command
-      | token == _ssToken =
-        liftIO $ appendFile _oDataOutputFilePath (show command <> "\n")
+      | token == _ssToken = liftIO $ appendFile _oDataOutputFilePath (show command <> "\n")
       | otherwise = throwError $ err403 {errBody = "Invalid Token provided."}
     sAppendCommand Nothing _ =
       throwError $ err403 {errBody = tokenHeaderKey <> " header should exist."}
@@ -91,8 +83,7 @@ mkWarpLogger logPath req _ _ = appendFile logPath $ show req <> "\n"
 mkWarpSettings :: Options -> Warp.Settings
 mkWarpSettings Options {..} =
   Warp.setTimeout 20 $
-  Warp.setPort _oPort $
-  maybe id (Warp.setLogger . mkWarpLogger) _oLogFile Warp.defaultSettings
+  Warp.setPort _oPort $ maybe id (Warp.setLogger . mkWarpLogger) _oLogFile Warp.defaultSettings
 
 -- | How long the generated token should be.
 tokenLength :: Int
@@ -101,13 +92,11 @@ tokenLength = 20
 -- | Generate a random token that this server requires with every request.
 -- See @_ssToken@ for more info.
 generateToken :: MonadIO m => m T.Text
-generateToken =
-  T.pack . take tokenLength . randomRs ('a', 'z') <$> liftIO newStdGen
+generateToken = T.pack . take tokenLength . randomRs ('a', 'z') <$> liftIO newStdGen
   -- | Displays the port this server will use. This port is configurable via command-line flags.
 
 reportPort :: MonadLogger m => Options -> m ()
-reportPort Options {..} =
-  logInfo $ "Starting server on port " <> T.pack (show _oPort)
+reportPort Options {..} = logInfo $ "Starting server on port " <> T.pack (show _oPort)
   -- | Logs information about the data file. This data file serves as a database for this primitive append-only server.
 
 reportDataFileStatus :: (MonadIO m, MonadLogger m) => Options -> m ()
@@ -115,8 +104,7 @@ reportDataFileStatus Options {..} = do
   dataFileExists <- liftIO $ fileExist _oDataOutputFilePath
   if dataFileExists
     then logInfo $
-         "Data file exists at " <>
-         T.pack _oDataOutputFilePath <> ". Appending commands to it."
+         "Data file exists at " <> T.pack _oDataOutputFilePath <> ". Appending commands to it."
     else logInfo "Data file doesn't exist. Creating a new one."
   -- | Starts a webserver by reading command line flags.
 
@@ -127,7 +115,4 @@ hastoryServer = do
   reportDataFileStatus options
   token <- generateToken
   logInfo $ "Token: " <> token
-  liftIO $
-    Warp.runSettings
-      (mkWarpSettings options)
-      (app options (ServerSettings token))
+  liftIO $ Warp.runSettings (mkWarpSettings options) (app options (ServerSettings token))

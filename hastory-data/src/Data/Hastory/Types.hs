@@ -22,13 +22,7 @@ import Data.Validity
 import Data.Validity.Path ()
 import Data.Validity.Text ()
 import Data.Validity.Time.Clock ()
-import Database.Persist.TH
-  ( mkMigrate
-  , mkPersist
-  , persistLowerCase
-  , share
-  , sqlSettings
-  )
+import Database.Persist.TH (mkMigrate, mkPersist, persistLowerCase, share, sqlSettings)
 import GHC.Generics (Generic)
 import Path (Abs, Dir, Path, toFilePath)
 

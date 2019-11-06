@@ -16,17 +16,7 @@ import qualified Data.Text as T
 import Data.Time
 import Database.Persist.Sqlite (SqlBackend)
 import qualified Database.Persist.Sqlite as SQL
-import Path
-  ( Abs
-  , Dir
-  , File
-  , Path
-  , (</>)
-  , mkRelDir
-  , parent
-  , parseRelFile
-  , toFilePath
-  )
+import Path (Abs, Dir, File, Path, (</>), mkRelDir, parent, parseRelFile, toFilePath)
 import Path.IO (ensureDir)
 
 hastoryDir :: MonadReader Settings m => m (Path Abs Dir)
@@ -42,9 +32,7 @@ histDb = do
   pure $ hd </> file
 
 getLastNDaysOfHistory ::
-     (MonadReader Settings m, MonadThrow m, MonadUnliftIO m)
-  => Integer
-  -> m [Entry]
+     (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => Integer -> m [Entry]
 getLastNDaysOfHistory n = do
   currentTime <- liftIO getCurrentTime
   let minDateTime = addUTCTime nDaysInPast currentTime

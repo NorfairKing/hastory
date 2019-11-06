@@ -21,8 +21,7 @@ import Data.Hastory.Gen ()
 
 main :: IO ()
 main =
-  let config =
-        Criterion.defaultConfig {Criterion.reportFile = Just "bench.html"}
+  let config = Criterion.defaultConfig {Criterion.reportFile = Just "bench.html"}
    in Criterion.defaultMainWith
         config
         [ bench "generate-valid-entry" $ nfIO $ generate (genValid :: Gen Entry)

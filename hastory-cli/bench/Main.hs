@@ -29,8 +29,7 @@ import Hastory.Cli.OptParse
 
 main :: IO ()
 main =
-  let config =
-        Criterion.defaultConfig {Criterion.reportFile = Just "bench.html"}
+  let config = Criterion.defaultConfig {Criterion.reportFile = Just "bench.html"}
    in Criterion.defaultMainWith
         config
         [ bench "help" $
@@ -42,8 +41,7 @@ main =
                ExitSuccess -> ()
                ExitFailure _ -> ())
         , bgroup "gather" $ map gatherBenchmark [10, 1000, 100000]
-        , bgroup "list-recent-directories" $
-          map listRecentDirsBenchmark [10, 1000, 100000]
+        , bgroup "list-recent-directories" $ map listRecentDirsBenchmark [10, 1000, 100000]
         ]
 
 benchSets :: Settings
@@ -53,9 +51,7 @@ gatherBenchmark :: Int -> Benchmark
 gatherBenchmark i =
   env
     (runReaderT (prepareEntries i) benchSets)
-    (\ ~() ->
-       bench ("gather-" ++ show i) $
-       whnfIO $ runReaderT (gatherFrom "ls -lr") benchSets)
+    (\ ~() -> bench ("gather-" ++ show i) $ whnfIO $ runReaderT (gatherFrom "ls -lr") benchSets)
 
 listRecentDirsBenchmark :: Int -> Benchmark
 listRecentDirsBenchmark i =
@@ -64,12 +60,7 @@ listRecentDirsBenchmark i =
     (\ ~() ->
        bench ("list-recent-directories-" ++ show i) $
        whnfIO $
-       runHastory
-         [ "list-recent-directories"
-         , "--bypass-cache"
-         , "--cache-dir"
-         , "/tmp/hastory-cache"
-         ])
+       runHastory ["list-recent-directories", "--bypass-cache", "--cache-dir", "/tmp/hastory-cache"])
 
 prepareEntries :: (MonadIO m, MonadReader Settings m) => Int -> m ()
 prepareEntries i = do

@@ -29,8 +29,7 @@ spec = do
       commandPrefixes e `shouldSatisfy` all (\p -> not $ null p || any T.null p)
   describe "aggregateSuggestions" $ do
     it "counts each command exactly once" $ forAllValid $ \es ->
-      sum (map (round . snd) (aggregateSuggestions (es :: [T.Text]))) `shouldBe`
-      length es
+      sum (map (round . snd) (aggregateSuggestions (es :: [T.Text]))) `shouldBe` length es
     it "is sorted by nonincreasing frequency" $ forAllValid $ \es ->
       map snd (aggregateSuggestions (es :: [T.Text])) `shouldSatisfy` and .
       (zipWith (>=) <*> tailSafe)

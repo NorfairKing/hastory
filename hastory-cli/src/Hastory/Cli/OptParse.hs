@@ -33,8 +33,7 @@ combineToInstructions cmd Flags {..} Configuration = Instructions d <$> sets
         CommandGenGatherWrapperScript -> DispatchGenGatherWrapperScript
         CommandListRecentDirs ListRecentDirArgs {..} ->
           DispatchListRecentDirs
-            ListRecentDirSets
-              {lrdSetBypassCache = fromMaybe False lrdArgBypassCache}
+            ListRecentDirSets {lrdSetBypassCache = fromMaybe False lrdArgBypassCache}
         CommandChangeDir i -> DispatchChangeDir i
         CommandGenChangeWrapperScript -> DispatchGenChangeWrapperScript
         CommandSuggestAlias -> DispatchSuggestAlias
@@ -45,17 +44,10 @@ combineToInstructions cmd Flags {..} Configuration = Instructions d <$> sets
           Nothing -> resolveDir home ".hastory"
           Just fcd -> resolveDir' fcd
       let mbRemoteStorageClientInfo =
-            liftA2
-              RemoteStorageClientInfo
-              flagStorageServer
-              (Token <$> flagStorageToken)
+            liftA2 RemoteStorageClientInfo flagStorageServer (Token <$> flagStorageToken)
       -- mbRemoteStorageClient <-
       --   mkRemoteStorageClient flagStorageServer (Token <$> flagStorageToken)
-      pure
-        Settings
-          { setCacheDir = cacheDir
-          , remoteStorageClientInfo = mbRemoteStorageClientInfo
-          }
+      pure Settings {setCacheDir = cacheDir, remoteStorageClientInfo = mbRemoteStorageClientInfo}
 
 getConfiguration :: Command -> Flags -> IO Configuration
 getConfiguration _ _ = pure Configuration
@@ -93,23 +85,17 @@ parseCommand =
     , command "generate-gather-wrapper-script" parseGenGatherWrapperScript
     , command "change-directory" parseCommandChangeDir
     , command "list-recent-directories" parseCommandListRecentDirs
-    , command
-        "generate-change-directory-wrapper-script"
-        parseGenChangeDirectoryWrapperScript
+    , command "generate-change-directory-wrapper-script" parseGenChangeDirectoryWrapperScript
     , command "suggest-alias" parseSuggestAlias
     ]
 
 parseCommandGather :: ParserInfo Command
 parseCommandGather =
-  info
-    (pure CommandGather)
-    (fullDesc <> progDesc "Read a single command on the standard input.")
+  info (pure CommandGather) (fullDesc <> progDesc "Read a single command on the standard input.")
 
 parseGenGatherWrapperScript :: ParserInfo Command
 parseGenGatherWrapperScript =
-  info
-    (pure CommandGenGatherWrapperScript)
-    (progDesc "Generate the wrapper script to use 'gather'")
+  info (pure CommandGenGatherWrapperScript) (progDesc "Generate the wrapper script to use 'gather'")
 
 parseCommandChangeDir :: ParserInfo Command
 parseCommandChangeDir =
@@ -118,8 +104,7 @@ parseCommandChangeDir =
      argument
        auto
        (mconcat
-          [ help
-              "The index of the directory to change to, see 'list-recent-directories'"
+          [ help "The index of the directory to change to, see 'list-recent-directories'"
           , metavar "INT"
           ]))
     (progDesc "Output a directory to change to based on the gathered data.")
@@ -131,19 +116,12 @@ parseCommandListRecentDirs =
      (ListRecentDirArgs <$>
       (flag'
          (Just True)
-         (mconcat
-            [ long "bypass-cache"
-            , help "Always recompute the recent directory options"
-            ]) <|>
+         (mconcat [long "bypass-cache", help "Always recompute the recent directory options"]) <|>
        flag'
          (Just False)
-         (mconcat
-            [ long "no-bypass-cache"
-            , help "Use the recent directory cache when available."
-            ]) <|>
+         (mconcat [long "no-bypass-cache", help "Use the recent directory cache when available."]) <|>
        pure Nothing)))
-    (progDesc
-       "List the directories that were the working directory most often (recently )")
+    (progDesc "List the directories that were the working directory most often (recently )")
 
 parseGenChangeDirectoryWrapperScript :: ParserInfo Command
 parseGenChangeDirectoryWrapperScript =
@@ -163,11 +141,7 @@ parseFlags =
   option
     (Just <$> str)
     (mconcat
-       [ long "cache-dir"
-       , metavar "DIR"
-       , value Nothing
-       , help "the cache directory for hastory"
-       ]) <*>
+       [long "cache-dir", metavar "DIR", value Nothing, help "the cache directory for hastory"]) <*>
   option
     (Just . T.pack <$> str)
     (mconcat

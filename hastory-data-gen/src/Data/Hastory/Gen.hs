@@ -13,8 +13,7 @@ instance GenUnchecked Entry
 
 instance GenValid Entry where
   genValid =
-    (Entry <$> genValid <*> genValid <*> genValid <*> genValid <*> genValid) `suchThat`
-    isValid
+    (Entry <$> genValid <*> genValid <*> genValid <*> genValid <*> genValid) `suchThat` isValid
 
 instance GenInvalid Entry
 

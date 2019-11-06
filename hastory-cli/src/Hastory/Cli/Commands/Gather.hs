@@ -27,32 +27,23 @@ gather = do
   text <- liftIO T.getContents
   gatherFrom text
 
-gatherFrom ::
-     (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => Text -> m ()
+gatherFrom :: (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => Text -> m ()
 gatherFrom text = do
   entry <- liftIO $ gatherEntryWith text
   storeHistory entry
 
-sendEntryToStorageServer ::
-     (MonadIO m, MonadLogger m) => Entry -> RemoteStorageClientInfo -> m ()
+sendEntryToStorageServer :: (MonadIO m, MonadLogger m) => Entry -> RemoteStorageClientInfo -> m ()
 sendEntryToStorageServer entry (RemoteStorageClientInfo url token) =
   runExceptT (mkHastoryClient url token) >>= \case
-    Left err ->
-      logWarn $
-      "Couldn't create the remote storage client: " <> T.pack (show err)
+    Left err -> logWarn $ "Couldn't create the remote storage client: " <> T.pack (show err)
     Right client -> do
-      resp <-
-        liftIO $ runHastoryClientM client $ \t -> appendCommand (Just t) entry
+      resp <- liftIO $ runHastoryClientM client $ \t -> appendCommand (Just t) entry
       case resp of
         Left err ->
-          logWarn $
-          "Saving command in remote storage server has failed: " <>
-          T.pack (show err)
+          logWarn $ "Saving command in remote storage server has failed: " <> T.pack (show err)
         Right _ -> pure ()
 
-storeHistory ::
-     (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => Entry -> m ()
+storeHistory :: (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => Entry -> m ()
 storeHistory entry = do
   _key <- runDb (SQL.insert entry)
-  whenJustM (asks remoteStorageClientInfo) $
-    runStdoutLoggingT . sendEntryToStorageServer entry
+  whenJustM (asks remoteStorageClientInfo) $ runStdoutLoggingT . sendEntryToStorageServer entry

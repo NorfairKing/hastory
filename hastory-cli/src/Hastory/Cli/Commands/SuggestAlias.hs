@@ -26,8 +26,7 @@ suggest = do
   let tups = take 10 $ suggestions rawEnts
   let maxlen = maximum $ map (length . show . snd) tups
       formatTup (t, x) =
-        show x ++
-        replicate (maxlen - length (show x) + 1) ' ' ++ T.unpack (T.strip t)
+        show x ++ replicate (maxlen - length (show x) + 1) ' ' ++ T.unpack (T.strip t)
   liftIO $ forM_ tups $ putStrLn . formatTup
 
 suggestions :: [Entry] -> [(Text, Integer)]
@@ -45,5 +44,4 @@ commandPrefixes :: Entry -> [[Text]]
 commandPrefixes = tailSafe . inits . T.words . entryText
 
 aggregateSuggestions :: (Eq a, Hashable a) => [a] -> [(a, Double)]
-aggregateSuggestions =
-  sortBy (comparing $ Down . snd) . HM.toList . doCountsWith id (const 1.0)
+aggregateSuggestions = sortBy (comparing $ Down . snd) . HM.toList . doCountsWith id (const 1.0)

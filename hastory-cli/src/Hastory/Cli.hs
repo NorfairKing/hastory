@@ -21,8 +21,7 @@ hastoryCli = do
   Instructions d sets <- getInstructions
   runReaderT (dispatch d) sets
 
-dispatch ::
-     (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => Dispatch -> m ()
+dispatch :: (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => Dispatch -> m ()
 dispatch DispatchGather = gather
 dispatch DispatchGenGatherWrapperScript = liftIO genGatherWrapperScript
 dispatch (DispatchChangeDir ix) = change ix

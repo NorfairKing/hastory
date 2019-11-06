@@ -60,11 +60,9 @@ data HastoryClient =
 --
 -- This type is needed because creating & destroying HTTP managers are expensive.
 -- Once a user gets a HastoryClient, it's being used throughout the entire life of the user.
-mkHastoryClient ::
-     (MonadError T.Text m, MonadIO m) => T.Text -> Token -> m HastoryClient
+mkHastoryClient :: (MonadError T.Text m, MonadIO m) => T.Text -> Token -> m HastoryClient
 mkHastoryClient baseUrl token = do
-  parsedBaseUrl <-
-    liftEither $ first (T.pack . show) $ parseBaseUrl (T.unpack baseUrl)
+  parsedBaseUrl <- liftEither $ first (T.pack . show) $ parseBaseUrl (T.unpack baseUrl)
   manager <- liftIO $ newManager defaultManagerSettings
   let clientEnv = mkClientEnv manager parsedBaseUrl
   pure $ HastoryClient clientEnv token
@@ -81,7 +79,5 @@ appendCommand = client api
 -- | Run a hastory API method that requires passing a token by using
 -- the existing token in HastoryClient. Since we create HastoryClient once, we save
 -- the token so that users won't have to deal with tokens afterwards.
-runHastoryClientM ::
-     HastoryClient -> (Token -> ClientM a) -> IO (Either ServantError a)
-runHastoryClientM (HastoryClient clientEnv token) action =
-  runClientM (action token) clientEnv
+runHastoryClientM :: HastoryClient -> (Token -> ClientM a) -> IO (Either ServantError a)
+runHastoryClientM (HastoryClient clientEnv token) action = runClientM (action token) clientEnv

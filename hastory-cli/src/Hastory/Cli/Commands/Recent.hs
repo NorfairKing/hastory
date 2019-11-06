@@ -29,17 +29,13 @@ import GHC.Generics (Generic)
 import Path (Abs, File, Path, (</>), mkRelFile, toFilePath)
 import Path.IO (forgivingAbsence, getHomeDir)
 
-getRecentDirOpts ::
-     (MonadReader Settings m, MonadThrow m, MonadUnliftIO m)
-  => Bool
-  -> m [FilePath]
+getRecentDirOpts :: (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => Bool -> m [FilePath]
 getRecentDirOpts bypassCache =
   if bypassCache
     then recompute
     else do
       cacheFile <- recentDirsCacheFile
-      mcontents <-
-        liftIO $ forgivingAbsence $ LB.readFile $ toFilePath cacheFile
+      mcontents <- liftIO $ forgivingAbsence $ LB.readFile $ toFilePath cacheFile
       case mcontents of
         Nothing -> recompute
         Just contents ->
@@ -47,9 +43,7 @@ getRecentDirOpts bypassCache =
             Left _ -> recompute -- If the file is corrupt, just don't care.
             Right RecentDirOptsCache {..} -> do
               now <- liftIO Time.getZonedTime
-              if Time.diffUTCTime
-                   (Time.zonedTimeToUTC now)
-                   (Time.zonedTimeToUTC cacheTimestamp) >
+              if Time.diffUTCTime (Time.zonedTimeToUTC now) (Time.zonedTimeToUTC cacheTimestamp) >
                  cacheInvalidationDuration
                 then recompute
                 else do
@@ -64,8 +58,7 @@ getRecentDirOpts bypassCache =
 cacheInvalidationDuration :: NominalDiffTime
 cacheInvalidationDuration = 10 -- seconds
 
-computeRecentDirOpts ::
-     (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => m [FilePath]
+computeRecentDirOpts :: (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => m [FilePath]
 computeRecentDirOpts = do
   rawEnts <- getLastNDaysOfHistory 7
   home <- liftIO getHomeDir
@@ -86,8 +79,7 @@ cacheRecentDirOpts fs = do
   liftIO $ LB.writeFile (toFilePath cacheFile) $ JSON.encodePretty cache
 
 recentDirsCacheFile :: MonadReader Settings m => m (Path Abs File)
-recentDirsCacheFile =
-  fmap (</> $(mkRelFile "recent-dirs-cache.json")) hastoryDir
+recentDirsCacheFile = fmap (</> $(mkRelFile "recent-dirs-cache.json")) hastoryDir
 
 data RecentDirOptsCache =
   RecentDirOptsCache
