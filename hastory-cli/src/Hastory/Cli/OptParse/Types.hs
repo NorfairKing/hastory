@@ -61,6 +61,8 @@ data Settings =
     }
   deriving (Show, Eq)
 
+type RemoteStorageUrl = T.Text
+
 data RemoteStorageClientInfo =
-  RemoteStorageClientInfo T.Text Token
+  RemoteStorageClientInfo RemoteStorageUrl Token
   deriving (Show, Eq)
