@@ -52,7 +52,7 @@ optParser :: A.ParserInfo Options
 optParser =
   A.info
     (Options <$> A.option A.auto (A.value 8080 <> A.showDefault <> A.long "port" <> A.short 'p') <*>
-     A.strOption (A.value "/home/yigit/.hastory/data" <> A.long "data-directory" <> A.short 'd') <*>
+     A.strOption (A.value ".hastory_data" <> A.long "data-directory" <> A.short 'd') <*>
      A.option A.auto (A.value (Just "server.logs") <> A.long "log-output" <> A.short 'l'))
     mempty
 
