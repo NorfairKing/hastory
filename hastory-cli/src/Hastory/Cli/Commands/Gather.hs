@@ -9,7 +9,7 @@ import Control.Monad.Except (runExceptT)
 import Control.Monad.Extra (whenJustM)
 import Control.Monad.IO.Unlift (MonadUnliftIO)
 import Control.Monad.Logger (MonadLogger)
-import Control.Monad.Logger.CallStack (logWarn, runStdoutLoggingT)
+import Control.Monad.Logger.CallStack (logWarn, runNoLoggingT)
 import Control.Monad.Reader
 import Data.Semigroup ((<>))
 import Data.Text (Text)
@@ -46,4 +46,4 @@ sendEntryToStorageServer entry (RemoteStorageClientInfo url token) =
 storeHistory :: (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => Entry -> m ()
 storeHistory entry = do
   _key <- runDb (SQL.insert entry)
-  whenJustM (asks remoteStorageClientInfo) $ runStdoutLoggingT . sendEntryToStorageServer entry
+  whenJustM (asks remoteStorageClientInfo) $ runNoLoggingT . sendEntryToStorageServer entry
