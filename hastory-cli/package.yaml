@@ -50,6 +50,8 @@ library:
   - persistent-sqlite
   - resourcet
   - safe
+  - servant-client
+  - servant-client-core
   - text
   - time
   - unix
