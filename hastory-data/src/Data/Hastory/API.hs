@@ -7,9 +7,8 @@
 
 module Data.Hastory.API where
 
-import Control.Monad.Except (MonadError, liftEither)
+import Control.Monad.Except (MonadError)
 import Control.Monad.IO.Class
-import Data.Bifunctor (first)
 import Data.String (IsString, fromString)
 import qualified Data.Text as T
 import GHC.TypeLits (symbolVal)
@@ -17,7 +16,7 @@ import Network.HTTP.Client (defaultManagerSettings, newManager)
 import Prelude
 import Servant
 import Servant.Client (ClientEnv, ClientM, client, mkClientEnv, runClientM)
-import Servant.Client.Core.Reexport (ServantError, parseBaseUrl)
+import Servant.Client.Core.Reexport (ServantError, BaseUrl)
 
 import Data.Hastory.Types (Entry)
 
@@ -60,11 +59,10 @@ data HastoryClient =
 --
 -- This type is needed because creating & destroying HTTP managers are expensive.
 -- Once a user gets a HastoryClient, it's being used throughout the entire life of the user.
-mkHastoryClient :: (MonadError T.Text m, MonadIO m) => T.Text -> Token -> m HastoryClient
+mkHastoryClient :: (MonadError T.Text m, MonadIO m) => BaseUrl -> Token -> m HastoryClient
 mkHastoryClient baseUrl token = do
-  parsedBaseUrl <- liftEither $ first (T.pack . show) $ parseBaseUrl (T.unpack baseUrl)
   manager <- liftIO $ newManager defaultManagerSettings
-  let clientEnv = mkClientEnv manager parsedBaseUrl
+  let clientEnv = mkClientEnv manager baseUrl
   pure $ HastoryClient clientEnv token
 
 -- | Hastory API client.

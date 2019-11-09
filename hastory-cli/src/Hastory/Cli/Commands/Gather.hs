@@ -35,7 +35,7 @@ gatherFrom text = do
 sendEntryToStorageServer :: (MonadIO m, MonadLogger m) => Entry -> RemoteStorageClientInfo -> m ()
 sendEntryToStorageServer entry (RemoteStorageClientInfo url token) =
   runExceptT (mkHastoryClient url token) >>= \case
-    Left err -> logWarn $ "Couldn't create the remote storage client: " <> T.pack (show err)
+    Left err -> logWarn $ "Couldn't create the remote storage client: " <> err
     Right client -> do
       resp <- liftIO $ runHastoryClientM client $ \t -> appendCommand (Just t) entry
       case resp of

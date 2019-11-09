@@ -3,6 +3,7 @@ module Hastory.Cli.OptParse.Types where
 import Data.Hastory.API (Token)
 import qualified Data.Text as T
 import Path (Abs, Dir, Path)
+import Servant.Client.Core.Reexport (BaseUrl)
 
 data Arguments =
   Arguments Command Flags
@@ -61,8 +62,6 @@ data Settings =
     }
   deriving (Show, Eq)
 
-type RemoteStorageUrl = T.Text
-
 data RemoteStorageClientInfo =
-  RemoteStorageClientInfo RemoteStorageUrl Token
+  RemoteStorageClientInfo BaseUrl Token
   deriving (Show, Eq)

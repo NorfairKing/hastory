@@ -13,6 +13,7 @@ import Data.Semigroup ((<>))
 import qualified Data.Text as T
 import Options.Applicative
 import Path.IO (getHomeDir, resolveDir, resolveDir')
+import Servant.Client.Core.Reexport (parseBaseUrl)
 import System.Environment (getArgs)
 
 import Data.Hastory.API (Token(..))
@@ -43,10 +44,10 @@ combineToInstructions cmd Flags {..} Configuration = Instructions d <$> sets
         case flagCacheDir of
           Nothing -> resolveDir home ".hastory"
           Just fcd -> resolveDir' fcd
+
+      let baseUrl = parseBaseUrl . T.unpack =<< flagStorageServer
       let mbRemoteStorageClientInfo =
-            liftA2 RemoteStorageClientInfo flagStorageServer (Token <$> flagStorageToken)
-      -- mbRemoteStorageClient <-
-      --   mkRemoteStorageClient flagStorageServer (Token <$> flagStorageToken)
+            liftA2 RemoteStorageClientInfo baseUrl (Token <$> flagStorageToken)
       pure Settings {setCacheDir = cacheDir, remoteStorageClientInfo = mbRemoteStorageClientInfo}
 
 getConfiguration :: Command -> Flags -> IO Configuration
