@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.31.1.
+-- This file has been generated from package.yaml by hpack version 0.31.2.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 7bd04178427e6e8b2c46e3811231e7168a95575e352e5de37398dccd9327b891
+-- hash: 812f70f9f877e71e98930383d11f8dba3f3550dc1499cfa333eeb922921d17de
 
 name:           hastory-data
 version:        0.0.0.0
@@ -24,11 +24,14 @@ library
   ghc-options: -Wall -Wincomplete-uni-patterns -Wincomplete-record-updates -Wimplicit-prelude -Wredundant-constraints
   build-depends:
       base >=4.9 && <=5
+    , conduit
     , deepseq
     , exceptions
     , hashable
     , hashable-time
     , hostname
+    , hspec
+    , monad-logger
     , mtl
     , path
     , path-io
