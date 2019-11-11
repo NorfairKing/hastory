@@ -15,7 +15,6 @@ import Import
 import Data.Hastory.Types.Path ()
 
 import Control.DeepSeq
-import Data.Function
 import Data.Hashable (Hashable(hashWithSalt))
 import Data.Hashable.Time ()
 import Data.Text (Text)
