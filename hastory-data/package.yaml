@@ -29,11 +29,14 @@ library:
   - Data.Hastory.Utils
 
   dependencies:
+  - conduit
   - deepseq
   - exceptions
   - hashable
   - hashable-time
   - hostname
+  - hspec
+  - monad-logger
   - mtl
   - path
   - path-io
