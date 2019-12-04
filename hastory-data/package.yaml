@@ -28,6 +28,7 @@ library:
 
   dependencies:
   - aeson
+  - conduit
   - deepseq
   - exceptions
   - hashable
@@ -36,6 +37,8 @@ library:
   - http-client
   - lifted-base
   - monad-control
+  - hspec
+  - monad-logger
   - mtl
   - path
   - path-io
