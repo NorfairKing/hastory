@@ -11,7 +11,9 @@ import qualified Data.HashMap.Lazy as HM
 import Data.Hashable (Hashable)
 
 import Conduit (MonadUnliftIO)
+import Control.Monad.IO.Class (liftIO)
 import Control.Monad.Logger (runNoLoggingT)
+import Control.Monad.Reader (ReaderT)
 import Data.Hastory.Types (migrateAll)
 import Database.Persist.Sqlite (SqlBackend, runMigrationSilent, runSqlConn, withSqliteConn)
 import Test.Hspec (ActionWith, Spec, SpecWith, around)
