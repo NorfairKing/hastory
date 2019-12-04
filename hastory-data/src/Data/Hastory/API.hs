@@ -16,7 +16,7 @@ import Network.HTTP.Client (defaultManagerSettings, newManager)
 import Prelude
 import Servant
 import Servant.Client (ClientEnv, ClientM, client, mkClientEnv, runClientM)
-import Servant.Client.Core.Reexport (ServantError, BaseUrl)
+import Servant.Client.Core.Reexport (BaseUrl, ServantError)
 
 import Data.Hastory.Types (Entry)
 

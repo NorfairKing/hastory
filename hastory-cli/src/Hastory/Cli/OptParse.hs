@@ -44,7 +44,6 @@ combineToInstructions cmd Flags {..} Configuration = Instructions d <$> sets
         case flagCacheDir of
           Nothing -> resolveDir home ".hastory"
           Just fcd -> resolveDir' fcd
-
       let baseUrl = parseBaseUrl . T.unpack =<< flagStorageServer
       let mbRemoteStorageClientInfo =
             liftA2 RemoteStorageClientInfo baseUrl (Token <$> flagStorageToken)
