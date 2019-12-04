@@ -14,8 +14,6 @@ dependencies:
 
 library:
   source-dirs: src/
-  default-extensions:
-  - NoImplicitPrelude
   ghc-options: -Wall
   exposed-modules:
   - Data.Hastory.Gen

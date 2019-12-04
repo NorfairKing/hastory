@@ -1,4 +1,4 @@
-name: hastory-data
+name: hastory-server
 version: '0.0.0.0'
 category: Command Line
 author: Tom Sydney Kerckhove
@@ -10,7 +10,6 @@ homepage: https://github.com/NorfairKing/hastory
 dependencies:
 - base >=4.9 && <=5
 
-
 library:
   source-dirs: src/
   ghc-options:
@@ -20,36 +19,24 @@ library:
   - -Wredundant-constraints
 
   exposed-modules:
-  - Data.Hastory
-  - Data.Hastory.Gather
-  - Data.Hastory.Types
-  - Data.Hastory.Utils
-  - Data.Hastory.API
+  - Data.Hastory.Server
 
   dependencies:
   - aeson
-  - conduit
+  - aeson-pretty
+  - base
+  - bytestring
   - deepseq
   - exceptions
   - hashable
   - hashable-time
   - hostname
-  - http-client
-  - lifted-base
-  - monad-control
-  - hspec
   - monad-logger
   - mtl
+  - optparse-applicative
   - path
   - path-io
-  - persistent
-  - persistent-sqlite
-  - persistent-template
   - safe
-  - servant
-  - servant-client
-  - servant-client-core
-  - servant-server
   - text
   - time
   - unix
@@ -57,4 +44,23 @@ library:
   - validity
   - validity-path
   - validity-text
-  - validity-time
+  - warp
+  - wai
+  - http-types
+  - servant
+  - servant-server
+  - optparse-applicative
+  - random
+  - hastory-data
+
+executables:
+  hastory-server:
+    main: Main.hs
+    source-dirs: app/
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+      - monad-logger
+      - hastory-server

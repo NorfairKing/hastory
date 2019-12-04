@@ -11,13 +11,10 @@ dependencies:
 
 library:
   source-dirs: src/
-  default-extensions:
-  - NoImplicitPrelude
   ghc-options:
   - -Wall
   - -Wincomplete-uni-patterns
   - -Wincomplete-record-updates
-  - -Wimplicit-prelude
   - -Wredundant-constraints
 
   exposed-modules:
@@ -40,6 +37,7 @@ library:
   - bytestring
   - deepseq
   - exceptions
+  - extra
   - hashable
   - hashable-time
   - hastory-data
@@ -52,6 +50,8 @@ library:
   - persistent-sqlite
   - resourcet
   - safe
+  - servant-client
+  - servant-client-core
   - text
   - time
   - unix
@@ -77,8 +77,6 @@ tests:
   hastory-cli-test:
     main: Spec.hs
     source-dirs: test/
-    default-extensions:
-    - NoImplicitPrelude
     ghc-options:
     - -threaded
     - -rtsopts

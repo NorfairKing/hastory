@@ -1,51 +1,67 @@
 module Hastory.Cli.OptParse.Types where
 
-import Import
+import Data.Hastory.API (Token)
+import qualified Data.Text as T
+import Path (Abs, Dir, Path)
+import Servant.Client.Core.Reexport (BaseUrl)
 
 data Arguments =
-    Arguments Command
-              Flags
-    deriving (Show, Eq)
+  Arguments Command Flags
+  deriving (Show, Eq)
 
 data Instructions =
-    Instructions Dispatch
-                 Settings
-    deriving (Show, Eq)
+  Instructions Dispatch Settings
+  deriving (Show)
 
 data Command
-    = CommandGather
-    | CommandGenGatherWrapperScript
-    | CommandListRecentDirs ListRecentDirArgs
-    | CommandChangeDir Int
-    | CommandGenChangeWrapperScript
-    | CommandSuggestAlias
-    deriving (Show, Eq)
+  = CommandGather
+  | CommandGenGatherWrapperScript
+  | CommandListRecentDirs ListRecentDirArgs
+  | CommandChangeDir Int
+  | CommandGenChangeWrapperScript
+  | CommandSuggestAlias
+  deriving (Show, Eq)
 
-newtype ListRecentDirArgs = ListRecentDirArgs
+newtype ListRecentDirArgs =
+  ListRecentDirArgs
     { lrdArgBypassCache :: Maybe Bool
-    } deriving (Show, Eq)
+    }
+  deriving (Show, Eq)
 
-newtype Flags = Flags
+data Flags =
+  Flags
     { flagCacheDir :: Maybe FilePath
-    } deriving (Show, Eq)
+    , flagStorageServer :: Maybe T.Text
+    , flagStorageToken :: Maybe T.Text
+    }
+  deriving (Show, Eq)
 
 data Configuration =
-    Configuration
-    deriving (Show, Eq)
+  Configuration
+  deriving (Show, Eq)
 
 data Dispatch
-    = DispatchGather
-    | DispatchGenGatherWrapperScript
-    | DispatchListRecentDirs ListRecentDirSets
-    | DispatchChangeDir Int
-    | DispatchGenChangeWrapperScript
-    | DispatchSuggestAlias
-    deriving (Show, Eq)
+  = DispatchGather
+  | DispatchGenGatherWrapperScript
+  | DispatchListRecentDirs ListRecentDirSets
+  | DispatchChangeDir Int
+  | DispatchGenChangeWrapperScript
+  | DispatchSuggestAlias
+  deriving (Show, Eq)
 
-newtype ListRecentDirSets = ListRecentDirSets
+newtype ListRecentDirSets =
+  ListRecentDirSets
     { lrdSetBypassCache :: Bool
-    } deriving (Show, Eq)
+    }
+  deriving (Show, Eq)
 
-newtype Settings = Settings
+data Settings =
+  Settings
     { setCacheDir :: Path Abs Dir
-    } deriving (Show, Eq)
+    , remoteStorageClientInfo :: Maybe RemoteStorageClientInfo
+    }
+  deriving (Show, Eq)
+
+data RemoteStorageClientInfo =
+  RemoteStorageClientInfo BaseUrl Token
+  deriving (Show, Eq)

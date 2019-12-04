@@ -2,30 +2,32 @@
 
 module Hastory.Cli.Commands.SuggestAlias where
 
-import Import
-
 import Data.Hastory
 import Hastory.Cli.Internal
 import Hastory.Cli.OptParse.Types
 import Hastory.Cli.Utils (doCountsWith)
 
 import Control.Arrow ((***))
+import Control.Monad.Catch
+import Control.Monad.IO.Unlift (MonadUnliftIO)
+import Control.Monad.Reader
 import Data.Hashable (Hashable)
+import Data.List (inits, sortBy)
 import Data.Ord (Down(..), comparing)
 import Data.Text (Text)
+import Safe (tailSafe)
 
 import qualified Data.HashMap.Lazy as HM
 import qualified Data.Text as T
 
 suggest :: (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => m ()
 suggest = do
-    rawEnts <- getLastNDaysOfHistory 7
-    let tups = take 10 $ suggestions rawEnts
-    let maxlen = maximum $ map (length . show . snd) tups
-        formatTup (t, x) =
-            show x ++
-            replicate (maxlen - length (show x) + 1) ' ' ++ T.unpack (T.strip t)
-    liftIO $ forM_ tups $ putStrLn . formatTup
+  rawEnts <- getLastNDaysOfHistory 7
+  let tups = take 10 $ suggestions rawEnts
+  let maxlen = maximum $ map (length . show . snd) tups
+      formatTup (t, x) =
+        show x ++ replicate (maxlen - length (show x) + 1) ' ' ++ T.unpack (T.strip t)
+  liftIO $ forM_ tups $ putStrLn . formatTup
 
 suggestions :: [Entry] -> [(Text, Integer)]
 suggestions rawEnts = map (T.unwords *** round) tups
@@ -42,5 +44,4 @@ commandPrefixes :: Entry -> [[Text]]
 commandPrefixes = tailSafe . inits . T.words . entryText
 
 aggregateSuggestions :: (Eq a, Hashable a) => [a] -> [(a, Double)]
-aggregateSuggestions =
-    sortBy (comparing $ Down . snd) . HM.toList . doCountsWith id (const 1.0)
+aggregateSuggestions = sortBy (comparing $ Down . snd) . HM.toList . doCountsWith id (const 1.0)
