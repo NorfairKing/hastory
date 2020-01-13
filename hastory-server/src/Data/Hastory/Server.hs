@@ -93,12 +93,12 @@ tokenLength = 20
 -- See @_ssToken@ for more info.
 generateToken :: MonadIO m => m T.Text
 generateToken = T.pack . take tokenLength . randomRs ('a', 'z') <$> liftIO newStdGen
-  -- | Displays the port this server will use. This port is configurable via command-line flags.
 
+-- | Displays the port this server will use. This port is configurable via command-line flags.
 reportPort :: MonadLogger m => Options -> m ()
 reportPort Options {..} = logInfo $ "Starting server on port " <> T.pack (show _oPort)
-  -- | Logs information about the data file. This data file serves as a database for this primitive append-only server.
 
+-- | Logs information about the data file. This data file serves as a database for this primitive append-only server.
 reportDataFileStatus :: (MonadIO m, MonadLogger m) => Options -> m ()
 reportDataFileStatus Options {..} = do
   dataFileExists <- liftIO $ fileExist _oDataOutputFilePath
@@ -106,8 +106,8 @@ reportDataFileStatus Options {..} = do
     then logInfo $
          "Data file exists at " <> T.pack _oDataOutputFilePath <> ". Appending commands to it."
     else logInfo "Data file doesn't exist. Creating a new one."
-  -- | Starts a webserver by reading command line flags.
 
+-- | Starts a webserver by reading command line flags.
 hastoryServer :: (MonadIO m, MonadLogger m) => m ()
 hastoryServer = do
   options@Options {..} <- liftIO $ A.execParser optParser

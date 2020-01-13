@@ -1,5 +1,3 @@
-{-# LANGUAGE TypeApplications #-}
-
 module Hastory.Cli.Commands.SuggestionSpec
   ( spec
   ) where

@@ -6,7 +6,8 @@ module Data.Hastory.Gather
 
 import Data.Hastory.Types
 
-import Data.Text (Text, pack)
+import Data.Text (Text)
+import qualified Data.Text as T
 import Network.HostName (getHostName)
 import Path.IO (getCurrentDir)
 import System.Posix.User (getEffectiveUserName)
@@ -24,6 +25,6 @@ gatherEntryWith text = do
       { entryText = text
       , entryDateTime = curtime
       , entryWorkingDir = curdir
-      , entryHostName = (pack hostname)
-      , entryUser = (pack user)
+      , entryHostName = T.pack hostname
+      , entryUser = T.pack user
       }

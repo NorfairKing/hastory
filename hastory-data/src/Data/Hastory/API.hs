@@ -15,7 +15,7 @@ import GHC.TypeLits (symbolVal)
 import Network.HTTP.Client (defaultManagerSettings, newManager)
 import Prelude
 import Servant
-import Servant.Client (ClientEnv, ClientM, client, mkClientEnv, runClientM, BaseUrl, ClientError)
+import Servant.Client (BaseUrl, ClientEnv, ClientError, ClientM, client, mkClientEnv, runClientM)
 
 import Data.Hastory.Types (Entry)
 

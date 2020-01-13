@@ -12,8 +12,8 @@ import Control.Monad.Catch
 import Control.Monad.IO.Unlift (MonadUnliftIO)
 import Control.Monad.Reader
 import Data.Hashable (Hashable)
-import Data.List (inits, sortBy)
-import Data.Ord (Down(..), comparing)
+import Data.List (inits, sortOn)
+import Data.Ord (Down(..))
 import Data.Text (Text)
 import Safe (tailSafe)
 
@@ -44,4 +44,4 @@ commandPrefixes :: Entry -> [[Text]]
 commandPrefixes = tailSafe . inits . T.words . entryText
 
 aggregateSuggestions :: (Eq a, Hashable a) => [a] -> [(a, Double)]
-aggregateSuggestions = sortBy (comparing $ Down . snd) . HM.toList . doCountsWith id (const 1.0)
+aggregateSuggestions = sortOn (Down . snd) . HM.toList . doCountsWith id (const 1.0)

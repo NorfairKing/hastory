@@ -16,21 +16,6 @@ library:
   - -Wincomplete-uni-patterns
   - -Wincomplete-record-updates
   - -Wredundant-constraints
-
-  exposed-modules:
-  - Hastory.Cli
-  - Hastory.Cli.Commands.ChangeDir
-  - Hastory.Cli.Commands.Gather
-  - Hastory.Cli.Commands.GenChangeWrapper
-  - Hastory.Cli.Commands.GenGatherWrapper
-  - Hastory.Cli.Commands.ListDir
-  - Hastory.Cli.Commands.Recent
-  - Hastory.Cli.Commands.SuggestAlias
-  - Hastory.Cli.Internal
-  - Hastory.Cli.OptParse
-  - Hastory.Cli.OptParse.Types
-  - Hastory.Cli.Utils
-
   dependencies:
   - aeson
   - aeson-pretty
@@ -113,8 +98,8 @@ benchmarks:
     - -with-rtsopts=-T
     - -Wall
     dependencies:
-    - base
     - QuickCheck
+    - base
     - criterion
     - exceptions
     - genvalidity
@@ -125,4 +110,5 @@ benchmarks:
     - path
     - path-io
     - silently
+    - unliftio
 

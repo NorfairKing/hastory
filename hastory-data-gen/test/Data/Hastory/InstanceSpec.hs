@@ -10,7 +10,7 @@ import Data.Hastory
 import Data.Hastory.Gen ()
 
 spec :: Spec
-spec = do
+spec =
   describe "Entry" $ do
     eqSpecOnValid @Entry
     arbitrarySpec @Entry

@@ -21,6 +21,7 @@ import Data.Aeson.Encode.Pretty as JSON
 import qualified Data.ByteString.Lazy as LB
 import qualified Data.HashMap.Lazy as HM
 import Data.List (sortOn)
+import Data.Ord
 import Data.Time.Clock (NominalDiffTime)
 import qualified Data.Time.Clock as Time
 import Data.Time.LocalTime (ZonedTime)
@@ -68,7 +69,7 @@ computeRecentDirOpts = do
         where
           d = realToFrac $ Time.diffUTCTime now (entryDateTime entry)
   let counts = doCountsWith (toFilePath . entryWorkingDir) dateFunc entries
-  let tups = reverse $ sortOn snd $ HM.toList counts
+  let tups = sortOn (Down . snd) $ HM.toList counts
   pure $ take 10 $ map fst tups
 
 cacheRecentDirOpts :: (MonadIO m, MonadReader Settings m) => [FilePath] -> m ()

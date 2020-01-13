@@ -1,14 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE TemplateHaskell #-}
 
 module Main where
-
-import Import
-
-import Control.Monad.Catch
-import Control.Monad.Reader
-import Control.Monad.State
 
 import Data.GenValidity
 import Test.QuickCheck

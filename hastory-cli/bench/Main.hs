@@ -12,6 +12,7 @@ import Control.Monad.State
 import System.Environment
 import System.Exit
 import System.IO.Silently
+import UnliftIO (MonadUnliftIO)
 
 import Data.GenValidity
 import Test.QuickCheck
@@ -45,7 +46,8 @@ main =
         ]
 
 benchSets :: Settings
-benchSets = Settings {setCacheDir = $(mkAbsDir "/tmp/hastory-cache")}
+benchSets =
+  Settings {setCacheDir = $(mkAbsDir "/tmp/hastory-cache"), remoteStorageClientInfo = Nothing}
 
 gatherBenchmark :: Int -> Benchmark
 gatherBenchmark i =
@@ -62,7 +64,7 @@ listRecentDirsBenchmark i =
        whnfIO $
        runHastory ["list-recent-directories", "--bypass-cache", "--cache-dir", "/tmp/hastory-cache"])
 
-prepareEntries :: (MonadIO m, MonadReader Settings m) => Int -> m ()
+prepareEntries :: (MonadIO m, MonadThrow m, MonadUnliftIO m, MonadReader Settings m) => Int -> m ()
 prepareEntries i = do
   clearCacheDir
   absDirs <- liftIO getSomeAbsDirs
