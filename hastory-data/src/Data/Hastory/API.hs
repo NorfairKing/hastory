@@ -15,8 +15,7 @@ import GHC.TypeLits (symbolVal)
 import Network.HTTP.Client (defaultManagerSettings, newManager)
 import Prelude
 import Servant
-import Servant.Client (ClientEnv, ClientM, client, mkClientEnv, runClientM)
-import Servant.Client.Core.Reexport (BaseUrl, ServantError)
+import Servant.Client (ClientEnv, ClientM, client, mkClientEnv, runClientM, BaseUrl, ClientError)
 
 import Data.Hastory.Types (Entry)
 
@@ -77,5 +76,5 @@ appendCommand = client api
 -- | Run a hastory API method that requires passing a token by using
 -- the existing token in HastoryClient. Since we create HastoryClient once, we save
 -- the token so that users won't have to deal with tokens afterwards.
-runHastoryClientM :: HastoryClient -> (Token -> ClientM a) -> IO (Either ServantError a)
+runHastoryClientM :: HastoryClient -> (Token -> ClientM a) -> IO (Either ClientError a)
 runHastoryClientM (HastoryClient clientEnv token) action = runClientM (action token) clientEnv

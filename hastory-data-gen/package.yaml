@@ -20,7 +20,7 @@ library:
   dependencies:
   - QuickCheck
   - base >=4.9 && <=5
-  - genvalidity >=0.4 && <0.5
+  - genvalidity
   - genvalidity-hspec
   - genvalidity-hspec-aeson
   - genvalidity-path

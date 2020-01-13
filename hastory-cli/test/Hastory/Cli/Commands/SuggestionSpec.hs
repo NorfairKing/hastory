@@ -17,10 +17,6 @@ import Hastory.Cli.Commands.SuggestAlias
 
 spec :: Spec
 spec = do
-  describe "Entry" $ do
-    eqSpec @Entry
-    arbitrarySpec @Entry
-    genValiditySpec @Entry
   describe "commandPrefixes" $ do
     it "lists only prefixes of the command, ignoring whitespace" $ forAllValid $ \e ->
       map T.concat (commandPrefixes e) `shouldSatisfy`

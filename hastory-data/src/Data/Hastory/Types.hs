@@ -14,17 +14,17 @@ import Data.Hastory.Types.Path ()
 
 import Control.DeepSeq
 import Data.Aeson
-import Data.Hashable (Hashable(hashWithSalt))
+import Data.Hashable
 import Data.Hashable.Time ()
 import Data.Text (Text)
-import Data.Time (UTCTime)
+import Data.Time
 import Data.Validity
 import Data.Validity.Path ()
 import Data.Validity.Text ()
 import Data.Validity.Time.Clock ()
 import Database.Persist.TH (mkMigrate, mkPersist, persistLowerCase, share, sqlSettings)
 import GHC.Generics (Generic)
-import Path (Abs, Dir, Path, toFilePath)
+import Path
 
 share
   [mkPersist sqlSettings, mkMigrate "migrateAll"]
@@ -35,20 +35,14 @@ Entry
     dateTime UTCTime
     hostName Text
     user Text
-    deriving Show Generic Eq
+    deriving Show Eq Generic
 |]
 
 instance NFData Entry
 
-instance Hashable Entry where
-  hashWithSalt salt Entry {..} =
-    salt `hashWithSalt` entryText `hashWithSalt` toFilePath entryWorkingDir `hashWithSalt`
-    entryDateTime `hashWithSalt`
-    entryHostName `hashWithSalt`
-    entryUser
+instance Hashable Entry
 
-instance Validity Entry where
-  isValid Entry {..} = isValid entryText && isValid entryWorkingDir
+instance Validity Entry
 
 instance ToJSON Entry
 

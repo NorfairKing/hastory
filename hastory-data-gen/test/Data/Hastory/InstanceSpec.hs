@@ -12,6 +12,6 @@ import Data.Hastory.Gen ()
 spec :: Spec
 spec = do
   describe "Entry" $ do
-    eqSpec @Entry
+    eqSpecOnValid @Entry
     arbitrarySpec @Entry
-    genValiditySpec @Entry
+    genValidSpec @Entry
