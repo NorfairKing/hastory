@@ -73,7 +73,7 @@ server Options {..} ServerSettings {..} = sAppendCommand
       | otherwise = throwError $ err403 {errBody = "Invalid Token provided."}
 
 persistEntry :: (MonadUnliftIO m) => Entry -> Pool SqlBackend -> m ()
-persistEntry entry dbPool = SQL.runSqlPool (SQL.insert_ entry) dbPool
+persistEntry = SQL.runSqlPool . SQL.insert_
 
 -- | Proxy for Hastory API.
 myApi :: Proxy HastoryAPI
