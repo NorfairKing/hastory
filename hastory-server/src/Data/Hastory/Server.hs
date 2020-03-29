@@ -67,12 +67,10 @@ optParser =
 server :: Options -> ServerSettings -> Server HastoryAPI
 server Options {..} ServerSettings {..} = sAppendCommand
   where
-    sAppendCommand :: Maybe Token -> Entry -> Handler ()
-    sAppendCommand (Just token) entry
+    sAppendCommand :: Token -> Entry -> Handler ()
+    sAppendCommand token entry
       | token == _ssToken = liftIO $ persistEntry entry _ssDbPool
       | otherwise = throwError $ err403 {errBody = "Invalid Token provided."}
-    sAppendCommand Nothing _ =
-      throwError $ err403 {errBody = tokenHeaderKey <> " header should exist."}
 
 persistEntry :: (MonadUnliftIO m) => Entry -> Pool SqlBackend -> m ()
 persistEntry entry dbPool = SQL.runSqlPool (SQL.insert_ entry) dbPool
@@ -113,18 +111,17 @@ hastoryServer :: (MonadIO m, MonadLogger m, MonadUnliftIO m, MonadThrow m) => m 
 hastoryServer = do
   options@Options {..} <- liftIO $ A.execParser optParser
   reportPort options
-  token   <- generateToken
-  dir     <- getAppUserDataDir "hastory-server"
+  token <- generateToken
+  dir <- getAppUserDataDir "hastory-server"
   relFile <- parseRelFile "server.db"
-  dbPool  <- prepareDb (dir </> relFile)
+  dbPool <- prepareDb (dir </> relFile)
   let (Token token') = token
   logInfo $ "Token: " <> token'
   liftIO $ Warp.runSettings (mkWarpSettings options) (app options (ServerSettings token dbPool))
 
-prepareDb ::
-     (MonadIO m, MonadLogger m, MonadUnliftIO m) => Path Abs File -> m (Pool SqlBackend)
+prepareDb :: (MonadIO m, MonadLogger m, MonadUnliftIO m) => Path Abs File -> m (Pool SqlBackend)
 prepareDb file = do
-  _    <- ensureDir (parent file)
+  _ <- ensureDir (parent file)
   pool <- SQL.createSqlitePool (T.pack $ toFilePath file) 10
-  _    <- SQL.runSqlPool (SQL.runMigration migrateAll) pool
+  _ <- SQL.runSqlPool (SQL.runMigrationSilent migrateAll) pool
   return pool

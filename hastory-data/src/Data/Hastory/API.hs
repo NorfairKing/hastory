@@ -32,7 +32,11 @@ tokenHeaderKey :: IsString s => s
 tokenHeaderKey = fromString $ symbolVal (Proxy @TokenHeaderKey)
 
 -- | Token for authenticating Hastory Server users.
-newtype Token = Token { unToken :: T.Text } deriving (Show, Eq)
+newtype Token =
+  Token
+    { unToken :: T.Text
+    }
+  deriving (Show, Eq)
 
 instance FromHttpApiData Token where
   parseHeader = fmap Token . parseHeader
@@ -41,9 +45,11 @@ instance FromHttpApiData Token where
 instance ToHttpApiData Token where
   toUrlPiece (Token token) = toUrlPiece token
 
+type RequiredHeader = Header' '[ Required, Strict]
+
 -- | Main Hastory API specification.
 type HastoryAPI
-   = "commands" :> "append" :> Header TokenHeaderKey Token :> ReqBody '[ JSON] Entry :> Post '[ JSON] ()
+   = "commands" :> "append" :> RequiredHeader TokenHeaderKey Token :> ReqBody '[ JSON] Entry :> Post '[ JSON] ()
 
 api :: Proxy HastoryAPI
 api = Proxy
@@ -68,7 +74,7 @@ mkHastoryClient baseUrl token = do
 -- `appendCommand :<|> method2 :<|> method3 = client api`
 --
 -- See https://hackage.haskell.org/package/servant-client-0.16.0.1/docs/Servant-Client.html#v:client
-appendCommand :: Maybe Token -> Entry -> ClientM ()
+appendCommand :: Token -> Entry -> ClientM ()
 appendCommand = client api
 
 -- | Run a hastory API method that requires passing a token by using
