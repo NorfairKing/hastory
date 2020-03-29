@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 4713c78862fa9775424123937115bc9e67ff5aec5bae84c0dfde6a56dcab06d9
+-- hash: 2568ab412d4e5c5a9adfe6d98e5411b3040bb5b53cda342d3b82ca950f05fcf2
 
 name:           hastory-server
 version:        0.0.0.0
@@ -30,6 +30,7 @@ library
     , aeson-pretty
     , base
     , bytestring
+    , conduit
     , deepseq
     , exceptions
     , hashable
@@ -42,7 +43,10 @@ library
     , optparse-applicative
     , path
     , path-io
+    , persistent
+    , persistent-sqlite
     , random
+    , resource-pool
     , safe
     , servant
     , servant-server
@@ -87,8 +91,12 @@ test-suite hastory-server-test
     , hspec
     , http-client
     , http-types
+    , monad-logger
+    , mtl
     , path
     , path-io
+    , persistent-sqlite
+    , resource-pool
     , servant-client
     , time
     , warp

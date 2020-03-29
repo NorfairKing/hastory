@@ -6,36 +6,40 @@
 
 module Data.Hastory.Server where
 
+import Conduit (MonadUnliftIO)
+import Control.Monad.Catch (MonadThrow)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Control.Monad.Logger (MonadLogger)
 import Control.Monad.Logger.CallStack (logInfo)
 import Data.Hastory.API
-import Data.Hastory.Types (Entry(..))
+import Data.Hastory.Types (Entry(..), migrateAll)
+import Data.Pool (Pool)
 import Data.Proxy (Proxy(..))
 import Data.Semigroup ((<>))
 import qualified Data.Text as T
+import Database.Persist.Sql (SqlBackend)
+import qualified Database.Persist.Sqlite as SQL
 import qualified Network.HTTP.Types as HTTP
 import qualified Network.Wai as Wai
 import qualified Network.Wai.Handler.Warp as Warp
 import qualified Options.Applicative as A
+import Path (Abs, File, Path, (</>), parent, parseRelFile, toFilePath)
+import Path.IO (ensureDir, getAppUserDataDir)
 import Prelude
 import Servant
-import System.Posix.Files (fileExist)
 import System.Random (newStdGen, randomRs)
 
 data Options =
   Options
     { _oPort :: Int
     -- ^ Port that will be used by the server.
-    , _oDataOutputFilePath :: FilePath
-      -- ^ Path of the file to which received commands will be appended.
     , _oLogFile :: Maybe String
       -- ^ If provided, server will log to this file. If not provided, server
       -- doesn't log anything by default.
     }
   deriving (Show, Eq)
 
-newtype ServerSettings =
+data ServerSettings =
   ServerSettings
     { _ssToken :: Token
     -- ^ Token that is used to authenticate Hastory Remote Storage users. This token will
@@ -44,15 +48,18 @@ newtype ServerSettings =
       -- Currently, upon restarts, server generates a brand-new token, resulting in invalidating every request thereon.
       -- This issue may be solved by saving the token in disk and having another command line flag for generating a new
       -- token.
+    , _ssDbPool :: Pool SqlBackend
+    -- ^ A pool of database connections.
+      --
+      -- Curently, the database file is located at "~/hastory-data/hastory.db"
     }
-  deriving (Show, Eq)
+  deriving (Show)
 
 -- | Parser for the command line flags of Hastory Server.
 optParser :: A.ParserInfo Options
 optParser =
   A.info
     (Options <$> A.option A.auto (A.value 8080 <> A.showDefault <> A.long "port" <> A.short 'p') <*>
-     A.strOption (A.value ".hastory_data" <> A.long "data-directory" <> A.short 'd') <*>
      A.option A.auto (A.value (Just "server.logs") <> A.long "log-output" <> A.short 'l'))
     mempty
 
@@ -61,11 +68,14 @@ server :: Options -> ServerSettings -> Server HastoryAPI
 server Options {..} ServerSettings {..} = sAppendCommand
   where
     sAppendCommand :: Maybe Token -> Entry -> Handler ()
-    sAppendCommand (Just token) command
-      | token == _ssToken = liftIO $ appendFile _oDataOutputFilePath (show command <> "\n")
+    sAppendCommand (Just token) entry
+      | token == _ssToken = liftIO $ persistEntry entry _ssDbPool
       | otherwise = throwError $ err403 {errBody = "Invalid Token provided."}
     sAppendCommand Nothing _ =
       throwError $ err403 {errBody = tokenHeaderKey <> " header should exist."}
+
+persistEntry :: (MonadUnliftIO m) => Entry -> Pool SqlBackend -> m ()
+persistEntry entry dbPool = SQL.runSqlPool (SQL.insert_ entry) dbPool
 
 -- | Proxy for Hastory API.
 myApi :: Proxy HastoryAPI
@@ -98,22 +108,23 @@ generateToken = Token . T.pack . take tokenLength . randomRs ('a', 'z') <$> lift
 reportPort :: MonadLogger m => Options -> m ()
 reportPort Options {..} = logInfo $ "Starting server on port " <> T.pack (show _oPort)
 
--- | Logs information about the data file. This data file serves as a database for this primitive append-only server.
-reportDataFileStatus :: (MonadIO m, MonadLogger m) => Options -> m ()
-reportDataFileStatus Options {..} = do
-  dataFileExists <- liftIO $ fileExist _oDataOutputFilePath
-  if dataFileExists
-    then logInfo $
-         "Data file exists at " <> T.pack _oDataOutputFilePath <> ". Appending commands to it."
-    else logInfo "Data file doesn't exist. Creating a new one."
-
 -- | Starts a webserver by reading command line flags.
-hastoryServer :: (MonadIO m, MonadLogger m) => m ()
+hastoryServer :: (MonadIO m, MonadLogger m, MonadUnliftIO m, MonadThrow m) => m ()
 hastoryServer = do
   options@Options {..} <- liftIO $ A.execParser optParser
   reportPort options
-  reportDataFileStatus options
-  token <- generateToken
+  token   <- generateToken
+  dir     <- getAppUserDataDir "hastory-server"
+  relFile <- parseRelFile "server.db"
+  dbPool  <- prepareDb (dir </> relFile)
   let (Token token') = token
   logInfo $ "Token: " <> token'
-  liftIO $ Warp.runSettings (mkWarpSettings options) (app options (ServerSettings token))
+  liftIO $ Warp.runSettings (mkWarpSettings options) (app options (ServerSettings token dbPool))
+
+prepareDb ::
+     (MonadIO m, MonadLogger m, MonadUnliftIO m) => Path Abs File -> m (Pool SqlBackend)
+prepareDb file = do
+  _    <- ensureDir (parent file)
+  pool <- SQL.createSqlitePool (T.pack $ toFilePath file) 10
+  _    <- SQL.runSqlPool (SQL.runMigration migrateAll) pool
+  return pool
