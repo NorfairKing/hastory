@@ -5,3 +5,4 @@ result*
 *.css
 *.js
 .tool-versions
+stack.yaml.lock

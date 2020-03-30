@@ -26,6 +26,7 @@ library:
   - aeson-pretty
   - base
   - bytestring
+  - conduit
   - deepseq
   - exceptions
   - hashable
@@ -36,6 +37,8 @@ library:
   - optparse-applicative
   - path
   - path-io
+  - persistent
+  - resource-pool
   - safe
   - text
   - time
@@ -52,6 +55,7 @@ library:
   - optparse-applicative
   - random
   - hastory-data
+  - persistent-sqlite
 
 executables:
   hastory-server:
@@ -64,3 +68,29 @@ executables:
     dependencies:
       - monad-logger
       - hastory-server
+
+tests:
+  hastory-server-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -Wall
+    dependencies:
+    - hastory-data
+    - hastory-server
+    - exceptions
+    - hspec
+    - http-client
+    - http-types
+    - monad-logger
+    - mtl
+    - path
+    - path-io
+    - persistent-sqlite
+    - resource-pool
+    - servant-client
+    - time
+    - warp
