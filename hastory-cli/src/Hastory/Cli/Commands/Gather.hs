@@ -37,7 +37,7 @@ sendEntryToStorageServer entry (RemoteStorageClientInfo url token) =
   runExceptT (mkHastoryClient url token) >>= \case
     Left err -> logWarn $ "Couldn't create the remote storage client: " <> err
     Right client -> do
-      resp <- liftIO $ runHastoryClientM client $ \t -> appendCommand (Just t) entry
+      resp <- liftIO $ runHastoryClientM client $ \t -> appendCommand t entry
       case resp of
         Left err ->
           logWarn $ "Saving command in remote storage server has failed: " <> T.pack (show err)
