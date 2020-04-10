@@ -58,3 +58,7 @@ library:
   - validity-path
   - validity-text
   - validity-time
+  - genvalidity
+  - genvalidity-time
+  - genvalidity-path
+  - genvalidity-text

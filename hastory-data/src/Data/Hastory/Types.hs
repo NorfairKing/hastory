@@ -1,12 +1,12 @@
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE GADTs #-}
+{-# LANGUAGE DeriveGeneric              #-}
+{-# LANGUAGE GADTs                      #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE QuasiQuotes #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE MultiParamTypeClasses      #-}
+{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE QuasiQuotes                #-}
+{-# LANGUAGE RecordWildCards            #-}
+{-# LANGUAGE TemplateHaskell            #-}
+{-# LANGUAGE TypeFamilies               #-}
 
 module Data.Hastory.Types where
 
@@ -14,6 +14,10 @@ import Data.Hastory.Types.Path ()
 
 import Control.DeepSeq
 import Data.Aeson
+import Data.GenValidity
+import Data.GenValidity.Path
+import Data.GenValidity.Text
+import Data.GenValidity.Time ()
 import Data.Hashable
 import Data.Hashable.Time ()
 import Data.Text (Text)
@@ -43,6 +47,16 @@ instance NFData Entry
 instance Hashable Entry
 
 instance Validity Entry
+
+instance GenValid Entry where
+  genValid = Entry
+               <$> genValid -- Gen Text
+               <*> genValid -- Gen (Path Abs Dir)
+               <*> genValid -- Gen UTCTime
+               <*> genValid -- Gen Text
+               <*> genValid -- Gen Text
+
+  shrinkValid entry = [entry]
 
 instance ToJSON Entry
 
