@@ -9,17 +9,22 @@ homepage: https://github.com/NorfairKing/hastory
 
 dependencies:
 - base >=4.9 && <=5
+ghc-options:
+- -Wall
+- -Wcompat
+- -Widentities
+- -Wincomplete-record-updates
+- -Wincomplete-uni-patterns
+- -Wmissing-export-lists
+- -Wpartial-fields
+- -Wredundant-constraints
+- -fhide-source-paths
 
 library:
   source-dirs: src/
-  ghc-options:
-  - -Wall
-  - -Wincomplete-uni-patterns
-  - -Wincomplete-record-updates
-  - -Wredundant-constraints
-
   exposed-modules:
   - Data.Hastory.Server
+  - Data.Hastory.Server.TestUtils
 
   dependencies:
   - aeson
@@ -31,15 +36,25 @@ library:
   - exceptions
   - hashable
   - hashable-time
+  - hastory-data
   - hostname
+  - hspec
+  - http-client
+  - http-types
   - monad-logger
   - mtl
+  - optparse-applicative
   - optparse-applicative
   - path
   - path-io
   - persistent
+  - persistent-sqlite
+  - random
   - resource-pool
   - safe
+  - servant
+  - servant-client
+  - servant-server
   - text
   - time
   - unix
@@ -47,23 +62,16 @@ library:
   - validity
   - validity-path
   - validity-text
-  - warp
   - wai
-  - http-types
-  - servant
-  - servant-server
-  - optparse-applicative
-  - random
-  - hastory-data
-  - persistent-sqlite
+  - warp
 
 executables:
   hastory-server:
     main: Main.hs
     source-dirs: app/
     ghc-options:
-    - -threaded
     - -rtsopts
+    - -threaded
     - -with-rtsopts=-N
     dependencies:
       - monad-logger
@@ -81,16 +89,9 @@ tests:
     dependencies:
     - hastory-data
     - hastory-server
-    - exceptions
     - hspec
-    - http-client
     - http-types
-    - monad-logger
-    - mtl
     - path
-    - path-io
     - persistent-sqlite
-    - resource-pool
     - servant-client
     - time
-    - warp

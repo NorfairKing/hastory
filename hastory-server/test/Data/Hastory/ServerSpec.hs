@@ -1,50 +1,22 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE QuasiQuotes       #-}
+{-# LANGUAGE RecordWildCards   #-}
 
 module Data.Hastory.ServerSpec
   ( spec
   ) where
 
-import Data.Hastory.API (Token(..), appendCommand)
-import Data.Hastory.Server (Options(..), ServerSettings(..), app, generateToken, prepareDb)
-import Data.Hastory.Types
 
+import qualified Database.Persist.Sqlite as SQL
+import Network.HTTP.Types (status403)
+import Path (absdir)
+import Servant.Client (ClientError (FailureResponse), responseBody, responseStatusCode, runClientM)
 import Test.Hspec
 
-import Control.Monad.Logger (runNoLoggingT)
-import Data.Pool (Pool)
-import Data.Time (UTCTime(..), fromGregorian)
-import qualified Database.Persist.Sqlite as SQL
-import Database.Persist.Sqlite (SqlBackend)
-import Network.HTTP.Client (defaultManagerSettings, newManager)
-import Network.HTTP.Types (status403)
-import Network.Wai.Handler.Warp (testWithApplication)
-import Path (absdir)
-import Path.IO (resolveFile, withSystemTempDir)
-import Servant.Client
-  ( BaseUrl(..)
-  , ClientEnv
-  , ClientError(FailureResponse)
-  , Scheme(Http)
-  , mkClientEnv
-  , responseBody
-  , responseStatusCode
-  , runClientM
-  )
-
-data ServerInfo =
-  ServerInfo
-    { siClientEnv :: ClientEnv
-    , siToken :: Token
-    , siPool :: Pool SqlBackend
-    }
-
-testEntry :: Entry
-testEntry = Entry "testText" absDir utcTime "localhost" "testUser"
-  where
-    absDir = [absdir|/|]
-    utcTime = UTCTime (fromGregorian 2020 1 1) (toEnum 0)
+import Data.Hastory.API (Token (..), appendCommand)
+import Data.Hastory.Server.TestUtils (ServerInfo (..), serverSpec)
+import Data.Hastory.Types
+import Data.Time (UTCTime (..), fromGregorian)
 
 spec :: Spec
 spec =
@@ -65,19 +37,8 @@ spec =
         length dbEntries `shouldBe` 1
         head dbEntries `shouldBe` testEntry
 
-serverSpec :: SpecWith ServerInfo -> Spec
-serverSpec = around withTestServer
-
-withTestServer :: (ServerInfo -> IO a) -> IO a
-withTestServer func = do
-  manager <- newManager defaultManagerSettings
-  siToken <- generateToken
-  withSystemTempDir "hastory-server-test" $ \tmpDir -> do
-    filePath <- resolveFile tmpDir "server.db"
-    siPool <- runNoLoggingT $ prepareDb filePath
-    let mkApp = pure $ app opts settings
-        opts = Options 10 Nothing
-        settings = ServerSettings siToken siPool
-    testWithApplication mkApp $ \p ->
-      let siClientEnv = mkClientEnv manager (BaseUrl Http "127.0.0.1" p "")
-       in func (ServerInfo {..})
+testEntry :: Entry
+testEntry = Entry "testText" absDir utcTime "localhost" "testUser"
+  where
+    absDir = [absdir|/|]
+    utcTime = UTCTime (fromGregorian 2020 1 1) (toEnum 0)

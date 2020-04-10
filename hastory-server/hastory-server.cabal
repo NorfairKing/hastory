@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2568ab412d4e5c5a9adfe6d98e5411b3040bb5b53cda342d3b82ca950f05fcf2
+-- hash: 5813f3dfe569f264c986c0dde4b0b09f32d72ea8e6bc5cbeac6e8e8d8c60e359
 
 name:           hastory-server
 version:        0.0.0.0
@@ -20,11 +20,12 @@ build-type:     Simple
 library
   exposed-modules:
       Data.Hastory.Server
+      Data.Hastory.Server.TestUtils
   other-modules:
       Paths_hastory_server
   hs-source-dirs:
       src/
-  ghc-options: -Wall -Wincomplete-uni-patterns -Wincomplete-record-updates -Wredundant-constraints
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wpartial-fields -Wredundant-constraints -fhide-source-paths
   build-depends:
       aeson
     , aeson-pretty
@@ -37,6 +38,8 @@ library
     , hashable-time
     , hastory-data
     , hostname
+    , hspec
+    , http-client
     , http-types
     , monad-logger
     , mtl
@@ -49,6 +52,7 @@ library
     , resource-pool
     , safe
     , servant
+    , servant-client
     , servant-server
     , text
     , time
@@ -67,7 +71,7 @@ executable hastory-server
       Paths_hastory_server
   hs-source-dirs:
       app/
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wpartial-fields -Wredundant-constraints -fhide-source-paths -rtsopts -threaded -with-rtsopts=-N
   build-depends:
       base >=4.9 && <=5
     , hastory-server
@@ -82,22 +86,15 @@ test-suite hastory-server-test
       Paths_hastory_server
   hs-source-dirs:
       test
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wpartial-fields -Wredundant-constraints -fhide-source-paths -threaded -rtsopts -with-rtsopts=-N -Wall
   build-depends:
       base >=4.9 && <=5
-    , exceptions
     , hastory-data
     , hastory-server
     , hspec
-    , http-client
     , http-types
-    , monad-logger
-    , mtl
     , path
-    , path-io
     , persistent-sqlite
-    , resource-pool
     , servant-client
     , time
-    , warp
   default-language: Haskell2010
