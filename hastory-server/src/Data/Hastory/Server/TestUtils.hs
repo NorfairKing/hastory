@@ -11,6 +11,7 @@ import Network.Wai.Handler.Warp (testWithApplication)
 import Path.IO (resolveFile, withSystemTempDir)
 import Servant.Client (BaseUrl (..), ClientEnv, Scheme (Http), mkClientEnv)
 import Test.Hspec
+import Test.Hspec.QuickCheck (modifyMaxShrinks, modifyMaxSuccess)
 
 import Data.Hastory.API (Token (..))
 import Data.Hastory.Server (Options (..), ServerSettings (..), app, generateToken, prepareDb)
@@ -23,7 +24,7 @@ data ServerInfo =
     }
 
 serverSpec :: SpecWith ServerInfo -> Spec
-serverSpec = around withTestServer
+serverSpec = modifyMaxShrinks (const 0) . modifyMaxSuccess (`div` 20) . around withTestServer
 
 withTestServer :: (ServerInfo -> IO a) -> IO a
 withTestServer func = do

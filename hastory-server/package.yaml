@@ -15,7 +15,6 @@ ghc-options:
 - -Widentities
 - -Wincomplete-record-updates
 - -Wincomplete-uni-patterns
-- -Wmissing-export-lists
 - -Wpartial-fields
 - -Wredundant-constraints
 - -fhide-source-paths
@@ -95,3 +94,4 @@ tests:
     - persistent-sqlite
     - servant-client
     - time
+    - genvalidity-hspec

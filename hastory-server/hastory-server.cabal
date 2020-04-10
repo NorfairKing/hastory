@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 5813f3dfe569f264c986c0dde4b0b09f32d72ea8e6bc5cbeac6e8e8d8c60e359
+-- hash: 371888ac7d5c1f9ba653045b412e8d72f742a14306bff4162f37896439eaac7e
 
 name:           hastory-server
 version:        0.0.0.0
@@ -25,7 +25,7 @@ library
       Paths_hastory_server
   hs-source-dirs:
       src/
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wpartial-fields -Wredundant-constraints -fhide-source-paths
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -fhide-source-paths
   build-depends:
       aeson
     , aeson-pretty
@@ -71,7 +71,7 @@ executable hastory-server
       Paths_hastory_server
   hs-source-dirs:
       app/
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wpartial-fields -Wredundant-constraints -fhide-source-paths -rtsopts -threaded -with-rtsopts=-N
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -fhide-source-paths -rtsopts -threaded -with-rtsopts=-N
   build-depends:
       base >=4.9 && <=5
     , hastory-server
@@ -86,9 +86,10 @@ test-suite hastory-server-test
       Paths_hastory_server
   hs-source-dirs:
       test
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wpartial-fields -Wredundant-constraints -fhide-source-paths -threaded -rtsopts -with-rtsopts=-N -Wall
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -fhide-source-paths -threaded -rtsopts -with-rtsopts=-N -Wall
   build-depends:
       base >=4.9 && <=5
+    , genvalidity-hspec
     , hastory-data
     , hastory-server
     , hspec
