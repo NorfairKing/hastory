@@ -1,12 +1,12 @@
-{-# LANGUAGE DeriveGeneric              #-}
-{-# LANGUAGE GADTs                      #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE GADTs #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE MultiParamTypeClasses      #-}
-{-# LANGUAGE OverloadedStrings          #-}
-{-# LANGUAGE QuasiQuotes                #-}
-{-# LANGUAGE RecordWildCards            #-}
-{-# LANGUAGE TemplateHaskell            #-}
-{-# LANGUAGE TypeFamilies               #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TypeFamilies #-}
 
 module Data.Hastory.Types where
 
@@ -47,11 +47,6 @@ instance NFData Entry
 instance Hashable Entry
 
 instance Validity Entry
-
-instance GenValid Entry where
-  genValid = genValidStructurally
-
-  shrinkValid = shrinkValidStructurally
 
 instance ToJSON Entry
 

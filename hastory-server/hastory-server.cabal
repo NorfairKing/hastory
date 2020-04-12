@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 62dc3d9a4726e2c5028008f4e365f9be30c6c20fdc3c08c41e68b3d3d5eb533e
+-- hash: b6c7ed6bffe9d49f42880cb70ebb2428460db457508308af0a3fc94d57f932fe
 
 name:           hastory-server
 version:        0.0.0.0
@@ -91,6 +91,7 @@ test-suite hastory-server-test
       base >=4.9 && <=5
     , genvalidity-hspec
     , hastory-data
+    , hastory-data-gen
     , hastory-server
     , hspec
     , http-types

@@ -1,7 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE RecordWildCards #-}
 
-module Data.Hastory.Server.TestUtils (ServerInfo(..), serverSpec, withTestServer) where
+module Data.Hastory.Server.TestUtils
+  ( ServerInfo(..)
+  , serverSpec
+  , withTestServer
+  ) where
 
 import Control.Monad.Logger (runNoLoggingT)
 import Data.Pool (Pool)
@@ -9,18 +13,18 @@ import Database.Persist.Sqlite (SqlBackend)
 import Network.HTTP.Client (defaultManagerSettings, newManager)
 import Network.Wai.Handler.Warp (testWithApplication)
 import Path.IO (resolveFile, withSystemTempDir)
-import Servant.Client (BaseUrl (..), ClientEnv, Scheme (Http), mkClientEnv)
+import Servant.Client (BaseUrl(..), ClientEnv, Scheme(Http), mkClientEnv)
 import Test.Hspec
 import Test.Hspec.QuickCheck (modifyMaxShrinks, modifyMaxSuccess)
 
-import Data.Hastory.API (Token (..))
-import Data.Hastory.Server (Options (..), ServerSettings (..), app, generateToken, prepareDb)
+import Data.Hastory.API (Token(..))
+import Data.Hastory.Server (Options(..), ServerSettings(..), app, generateToken, prepareDb)
 
 data ServerInfo =
   ServerInfo
     { siClientEnv :: ClientEnv
-    , siToken     :: Token
-    , siPool      :: Pool SqlBackend
+    , siToken :: Token
+    , siPool :: Pool SqlBackend
     }
 
 serverSpec :: SpecWith ServerInfo -> Spec
@@ -39,4 +43,3 @@ withTestServer func = do
     testWithApplication mkApp $ \p ->
       let siClientEnv = mkClientEnv manager (BaseUrl Http "127.0.0.1" p "")
        in func (ServerInfo {..})
-

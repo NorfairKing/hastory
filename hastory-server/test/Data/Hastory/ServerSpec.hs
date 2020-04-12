@@ -1,19 +1,19 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module Data.Hastory.ServerSpec
   ( spec
   ) where
 
-
 import qualified Database.Persist.Sqlite as SQL
 import Network.HTTP.Types (status403)
-import Servant.Client (ClientError (FailureResponse), responseBody, responseStatusCode, runClientM)
+import Servant.Client (ClientError(FailureResponse), responseBody, responseStatusCode, runClientM)
 import Test.Hspec
 import Test.Validity (forAllValid)
 
-import Data.Hastory.API (Token (..), appendCommand)
-import Data.Hastory.Server.TestUtils (ServerInfo (..), serverSpec)
+import Data.Hastory.API (Token(..), appendCommand)
+import Data.Hastory.Gen ()
+import Data.Hastory.Server.TestUtils (ServerInfo(..), serverSpec)
 
 spec :: Spec
 spec =
@@ -22,7 +22,7 @@ spec =
     context "incorrect token" $
       it "is a 403 error with invalid token msg" $ \ServerInfo {..} ->
         forAllValid $ \entry -> do
-          let req            = appendCommand incorrectToken entry
+          let req = appendCommand incorrectToken entry
               incorrectToken = Token (unToken siToken <> "badSuffix")
           Left (FailureResponse _ resp) <- runClientM req siClientEnv
           responseBody resp `shouldBe` "Invalid Token provided."
@@ -30,7 +30,7 @@ spec =
     context "with correct token" $
       it "saves entry to database" $ \ServerInfo {..} ->
         forAllValid $ \entry -> do
-            _ <- runClientM (appendCommand siToken entry) siClientEnv
-            let selectEntries = fmap SQL.entityVal <$> SQL.selectList [] []
-            dbEntries <- SQL.runSqlPool selectEntries siPool
-            dbEntries `shouldBe` [entry]
+          _ <- runClientM (appendCommand siToken entry) siClientEnv
+          let selectEntries = fmap SQL.entityVal <$> SQL.selectList [] []
+          dbEntries <- SQL.runSqlPool selectEntries siPool
+          dbEntries `shouldBe` [entry]

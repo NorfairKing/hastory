@@ -87,9 +87,10 @@ tests:
     - -Wall
     dependencies:
     - hastory-data
+    - hastory-data-gen
     - hastory-server
+    - genvalidity-hspec
     - hspec
     - http-types
     - persistent-sqlite
     - servant-client
-    - genvalidity-hspec
