@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 371888ac7d5c1f9ba653045b412e8d72f742a14306bff4162f37896439eaac7e
+-- hash: 62dc3d9a4726e2c5028008f4e365f9be30c6c20fdc3c08c41e68b3d3d5eb533e
 
 name:           hastory-server
 version:        0.0.0.0
@@ -94,8 +94,6 @@ test-suite hastory-server-test
     , hastory-server
     , hspec
     , http-types
-    , path
     , persistent-sqlite
     , servant-client
-    , time
   default-language: Haskell2010

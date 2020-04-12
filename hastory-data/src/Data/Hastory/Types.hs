@@ -49,14 +49,9 @@ instance Hashable Entry
 instance Validity Entry
 
 instance GenValid Entry where
-  genValid = Entry
-               <$> genValid -- Gen Text
-               <*> genValid -- Gen (Path Abs Dir)
-               <*> genValid -- Gen UTCTime
-               <*> genValid -- Gen Text
-               <*> genValid -- Gen Text
+  genValid = genValidStructurally
 
-  shrinkValid entry = [entry] -- No Shrinking
+  shrinkValid = shrinkValidStructurally
 
 instance ToJSON Entry
 

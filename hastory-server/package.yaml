@@ -90,8 +90,6 @@ tests:
     - hastory-server
     - hspec
     - http-types
-    - path
     - persistent-sqlite
     - servant-client
-    - time
     - genvalidity-hspec
