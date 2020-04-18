@@ -12,7 +12,8 @@ import Control.Monad.IO.Class (MonadIO, liftIO)
 import Control.Monad.Logger (MonadLogger)
 import Control.Monad.Logger.CallStack (logInfo)
 import Data.Hastory.API
-import Data.Hastory.Types (Entry(..), migrateAll)
+import Data.Hastory.Types (ServerEntry(..), SyncRequest, toServerEntry)
+import Data.Hastory.Types.Server (migrateAll)
 import Data.Pool (Pool)
 import Data.Proxy (Proxy(..))
 import Data.Semigroup ((<>))
@@ -67,13 +68,13 @@ optParser =
 server :: Options -> ServerSettings -> Server HastoryAPI
 server Options {..} ServerSettings {..} = sAppendCommand
   where
-    sAppendCommand :: Token -> Entry -> Handler ()
-    sAppendCommand token entry
-      | token == _ssToken = liftIO $ persistEntry entry _ssDbPool
+    sAppendCommand :: Token -> SyncRequest -> Handler ()
+    sAppendCommand token syncRequest
+      | token == _ssToken = liftIO $ persistServerEntry (toServerEntry syncRequest) _ssDbPool
       | otherwise = throwError $ err403 {errBody = "Invalid Token provided."}
 
-persistEntry :: (MonadUnliftIO m) => Entry -> Pool SqlBackend -> m ()
-persistEntry = SQL.runSqlPool . SQL.insert_
+persistServerEntry :: (MonadUnliftIO m) => ServerEntry -> Pool SqlBackend -> m ()
+persistServerEntry = SQL.runSqlPool . SQL.insert_
 
 -- | Proxy for Hastory API.
 myApi :: Proxy HastoryAPI

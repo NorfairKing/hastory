@@ -1,0 +1,37 @@
+name:                hastory-data-cli
+version:             0.0.0.0
+homepage:            https://github.com/NorfairKing/hastory
+license:             AllRightsReserved
+author:              Tom Sydney Kerckhove
+maintainer:          syd.kerckhove@gmail.com
+copyright:           2020 Tom Sydney Kerckhove
+category:            Command Line
+
+dependencies:
+  - base >=4.9 && <=5
+
+library:
+  source-dirs: src/
+  dependencies:
+    - aeson
+    - deepseq
+    - genvalidity-path
+    - genvalidity-text
+    - genvalidity-time
+    - hastory-path
+    - path
+    - persistent-template
+    - text
+    - time
+    - validity
+  exposed-modules:
+    - Data.Hastory.Types.Cli
+  ghc-options:
+    - -Wall
+    - -Wcompat
+    - -Widentities
+    - -Wincomplete-record-updates
+    - -Wincomplete-uni-patterns
+    - -Wpartial-fields
+    - -Wredundant-constraints
+    - -fhide-source-paths

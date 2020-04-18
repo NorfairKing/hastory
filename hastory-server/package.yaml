@@ -36,6 +36,7 @@ library:
   - hashable
   - hashable-time
   - hastory-data
+  - hastory-data-server
   - hostname
   - hspec
   - http-client

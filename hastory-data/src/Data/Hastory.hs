@@ -2,7 +2,7 @@ module Data.Hastory
   ( Entry(..)
   , gatherEntryWith
   , EntityField(EntryDateTime)
-  , migrateAll
+  , SyncRequest
   ) where
 
 import Data.Hastory.Gather

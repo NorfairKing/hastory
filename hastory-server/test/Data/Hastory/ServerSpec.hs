@@ -14,6 +14,7 @@ import Test.Validity (forAllValid)
 import Data.Hastory.API (Token(..), appendCommand)
 import Data.Hastory.Gen ()
 import Data.Hastory.Server.TestUtils (ServerInfo(..), serverSpec)
+import Data.Hastory.Types as SyncRequest
 
 spec :: Spec
 spec =
@@ -21,16 +22,16 @@ spec =
   describe "POST /commands/append" $ do
     context "incorrect token" $
       it "is a 403 error with invalid token msg" $ \ServerInfo {..} ->
-        forAllValid $ \entry -> do
-          let req = appendCommand incorrectToken entry
+        forAllValid $ \syncRequest -> do
+          let req = appendCommand incorrectToken syncRequest
               incorrectToken = Token (unToken siToken <> "badSuffix")
           Left (FailureResponse _ resp) <- runClientM req siClientEnv
           responseBody resp `shouldBe` "Invalid Token provided."
           responseStatusCode resp `shouldBe` status403
     context "with correct token" $
       it "saves entry to database" $ \ServerInfo {..} ->
-        forAllValid $ \entry -> do
-          _ <- runClientM (appendCommand siToken entry) siClientEnv
+        forAllValid $ \syncRequest -> do
+          _ <- runClientM (appendCommand siToken syncRequest) siClientEnv
           let selectEntries = fmap SQL.entityVal <$> SQL.selectList [] []
           dbEntries <- SQL.runSqlPool selectEntries siPool
-          dbEntries `shouldBe` [entry]
+          dbEntries `shouldBe` [SyncRequest.toServerEntry syncRequest]

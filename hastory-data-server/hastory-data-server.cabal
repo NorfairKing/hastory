@@ -1,0 +1,35 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: cda74c5825b94ade6e6ecd386ce87acb2c0d2ef7175fc4611f691efa289b4bb2
+
+name:           hastory-data-server
+version:        0.0.0.0
+category:       Command Line
+homepage:       https://github.com/NorfairKing/hastory
+author:         Tom Sydney Kerckhove
+maintainer:     syd.kerckhove@gmail.com
+copyright:      2020 Tom Sydney Kerckhove
+license:        AllRightsReserved
+license-file:   LICENSE
+build-type:     Simple
+
+library
+  exposed-modules:
+      Data.Hastory.Types.Server
+  other-modules:
+      Paths_hastory_data_server
+  hs-source-dirs:
+      src/
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -fhide-source-paths
+  build-depends:
+      base >=4.9 && <=5
+    , hastory-path
+    , path
+    , persistent-template
+    , text
+    , time
+  default-language: Haskell2010

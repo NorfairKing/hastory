@@ -1,0 +1,31 @@
+name:                hastory-data-server
+version:             0.0.0.0
+homepage:            https://github.com/NorfairKing/hastory
+license:             AllRightsReserved
+author:              Tom Sydney Kerckhove
+maintainer:          syd.kerckhove@gmail.com
+copyright:           2020 Tom Sydney Kerckhove
+category:            Command Line
+
+dependencies:
+  - base >=4.9 && <=5
+
+library:
+  source-dirs: src/
+  dependencies:
+    - hastory-path
+    - path
+    - persistent-template
+    - text
+    - time
+  exposed-modules:
+    - Data.Hastory.Types.Server
+  ghc-options:
+    - -Wall
+    - -Wcompat
+    - -Widentities
+    - -Wincomplete-record-updates
+    - -Wincomplete-uni-patterns
+    - -Wpartial-fields
+    - -Wredundant-constraints
+    - -fhide-source-paths

@@ -75,16 +75,8 @@ prepareEntries i = do
         t <- genValid
         d <- elements absDirs
         zt <- genValid
-        s <- genValid
         u <- genValid
-        pure
-          Entry
-            { entryText = t
-            , entryWorkingDir = d
-            , entryDateTime = zt
-            , entryHostName = s
-            , entryUser = u
-            }
+        pure Entry {entryText = t, entryWorkingDir = d, entryDateTime = zt, entryUser = u}
     storeHistory entry
 
 getSomeAbsDirs :: (MonadIO m, MonadThrow m) => m [Path Abs Dir]
