@@ -31,13 +31,20 @@ library:
   - conduit
   - deepseq
   - exceptions
+  - genvalidity
+  - genvalidity-path
+  - genvalidity-text
+  - genvalidity-time
   - hashable
   - hashable-time
+  - hastory-data-cli
+  - hastory-data-server
+  - hastory-path
   - hostname
+  - hspec
   - http-client
   - lifted-base
   - monad-control
-  - hspec
   - monad-logger
   - mtl
   - path
@@ -58,7 +65,3 @@ library:
   - validity-path
   - validity-text
   - validity-time
-  - genvalidity
-  - genvalidity-time
-  - genvalidity-path
-  - genvalidity-text

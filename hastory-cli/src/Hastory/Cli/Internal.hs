@@ -5,6 +5,7 @@
 module Hastory.Cli.Internal where
 
 import Data.Hastory
+import Data.Hastory.Types.Cli (migrateAll)
 import Hastory.Cli.OptParse.Types
 
 import Control.Monad.Catch

@@ -16,9 +16,11 @@ import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import qualified Database.Persist.Sqlite as SQL
+import Network.HostName (getHostName)
 
 import Data.Hastory
 import Data.Hastory.API
+import Data.Hastory.Types (toSyncRequest)
 import Hastory.Cli.Internal
 import Hastory.Cli.OptParse.Types
 
@@ -37,7 +39,9 @@ sendEntryToStorageServer entry (RemoteStorageClientInfo url token) =
   runExceptT (mkHastoryClient url token) >>= \case
     Left err -> logWarn $ "Couldn't create the remote storage client: " <> err
     Right client -> do
-      resp <- liftIO $ runHastoryClientM client $ \t -> appendCommand t entry
+      hostName <- liftIO getHostName
+      let syncReq = toSyncRequest entry hostName
+      resp <- liftIO $ runHastoryClientM client $ \t -> appendCommand t syncReq
       case resp of
         Left err ->
           logWarn $ "Saving command in remote storage server has failed: " <> T.pack (show err)

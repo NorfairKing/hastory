@@ -6,3 +6,4 @@ result*
 *.js
 .tool-versions
 stack.yaml.lock
+notes.txt

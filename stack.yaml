@@ -2,7 +2,10 @@ resolver: lts-14.7
 packages:
 - hastory-cli
 - hastory-data
+- hastory-data-cli
 - hastory-data-gen
+- hastory-data-server
+- hastory-path
 - hastory-server
 extra-deps:
 - github: NorfairKing/validity

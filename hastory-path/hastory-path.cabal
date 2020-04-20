@@ -1,0 +1,34 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: afa360e05851d9acebc0ab269a7b1aca7d71f844c34cd50181a932eaaf8e1ac5
+
+name:           hastory-path
+version:        0.0.0.0
+category:       Command Line
+homepage:       https://github.com/NorfairKing/hastory
+author:         Tom Sydney Kerckhove
+maintainer:     syd.kerckhove@gmail.com
+copyright:      2020 Tom Sydney Kerckhove
+license:        AllRightsReserved
+license-file:   LICENSE
+build-type:     Simple
+
+library
+  exposed-modules:
+      Data.Hastory.Types.Path
+  other-modules:
+      Paths_hastory_path
+  hs-source-dirs:
+      src/
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -fhide-source-paths
+  build-depends:
+      base >=4.9 && <=5
+    , path
+    , persistent
+    , persistent-sqlite
+    , text
+  default-language: Haskell2010

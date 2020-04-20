@@ -17,9 +17,12 @@ with final.haskell.lib;
           );
     in
       final.lib.genAttrs [
-        "hastory-data"
-        "hastory-data-gen"
         "hastory-cli"
+        "hastory-data"
+        "hastory-data-cli"
+        "hastory-data-gen"
+        "hastory-path"
+        "hastory-data-server"
         "hastory-server"
       ] hastoryPkg;
   haskellPackages =
