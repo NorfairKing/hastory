@@ -10,7 +10,9 @@ module Data.Hastory.Server.TestUtils
 import Control.Monad
 import Control.Monad.IO.Class
 import Control.Monad.Logger (runNoLoggingT)
-import Data.Hastory.Types (migrateAll)
+import Data.Hastory.API (Token(..))
+import Data.Hastory.Server (Options(..), ServerSettings(..), app, generateToken)
+import Data.Hastory.Types.Server (migrateAll)
 import Data.Pool (Pool)
 import qualified Data.Text as T
 import Database.Persist.Sqlite
@@ -29,9 +31,6 @@ import Path.IO (resolveFile, withSystemTempDir)
 import Servant.Client (BaseUrl(..), ClientEnv, Scheme(Http), mkClientEnv)
 import Test.Hspec
 import Test.Hspec.QuickCheck (modifyMaxShrinks, modifyMaxSuccess)
-
-import Data.Hastory.API (Token(..))
-import Data.Hastory.Server (Options(..), ServerSettings(..), app, generateToken)
 
 data ServerInfo =
   ServerInfo
