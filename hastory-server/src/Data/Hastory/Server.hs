@@ -6,11 +6,10 @@
 
 module Data.Hastory.Server where
 
-import Control.Monad
 import Conduit (MonadUnliftIO)
+import Control.Monad
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Control.Monad.Logger (MonadLogger)
-import Lens.Micro
 import Control.Monad.Logger.CallStack (logInfo)
 import Data.Hastory.API
 import Data.Hastory.Types (ServerEntry(..), SyncRequest, toServerEntry)
@@ -21,6 +20,7 @@ import Data.Semigroup ((<>))
 import qualified Data.Text as T
 import Database.Persist.Sql (SqlBackend)
 import qualified Database.Persist.Sqlite as SQL
+import Lens.Micro
 import qualified Network.HTTP.Types as HTTP
 import qualified Network.Wai as Wai
 import qualified Network.Wai.Handler.Warp as Warp
@@ -116,9 +116,10 @@ hastoryServer = do
   token <- generateToken
   dbFile <- resolveFile' "hastory.sqlite3"
   ensureDir (parent dbFile)
-  SQL.withSqlitePoolInfo (SQL.mkSqliteConnectionInfo (T.pack $ fromAbsFile dbFile) & SQL.fkEnabled .~ False ) 1 $ \pool -> do
+  SQL.withSqlitePoolInfo
+    (SQL.mkSqliteConnectionInfo (T.pack $ fromAbsFile dbFile) & SQL.fkEnabled .~ False)
+    1 $ \pool -> do
     void $ SQL.runSqlPool (SQL.runMigrationSilent migrateAll) pool
     let (Token token') = token
     logInfo $ "Token: " <> token'
     liftIO $ Warp.runSettings (mkWarpSettings options) (app options (ServerSettings token pool))
-

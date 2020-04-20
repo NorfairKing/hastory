@@ -7,14 +7,21 @@ module Data.Hastory.Server.TestUtils
   , withTestServer
   ) where
 
+import Control.Monad
 import Control.Monad.IO.Class
 import Control.Monad.Logger (runNoLoggingT)
-import qualified Data.Text as T
+import Data.Hastory.Types (migrateAll)
 import Data.Pool (Pool)
-import Data.Hastory.Types(migrateAll)
-import Control.Monad
+import qualified Data.Text as T
+import Database.Persist.Sqlite
+  ( SqlBackend
+  , fkEnabled
+  , mkSqliteConnectionInfo
+  , runMigrationSilent
+  , runSqlPool
+  , withSqlitePoolInfo
+  )
 import Lens.Micro
-import Database.Persist.Sqlite (SqlBackend, runSqlPool, runMigrationSilent, fkEnabled, mkSqliteConnectionInfo, withSqlitePoolInfo)
 import Network.HTTP.Client (defaultManagerSettings, newManager)
 import Network.Wai.Handler.Warp (testWithApplication)
 import Path
@@ -43,7 +50,9 @@ withTestServer func = do
   withSystemTempDir "hastory-server-test" $ \tmpDir -> do
     dbFile <- resolveFile tmpDir "server.db"
     runNoLoggingT $
-      withSqlitePoolInfo (mkSqliteConnectionInfo (T.pack $ fromAbsFile dbFile) & fkEnabled .~ False ) 1 $ \siPool ->
+      withSqlitePoolInfo
+        (mkSqliteConnectionInfo (T.pack $ fromAbsFile dbFile) & fkEnabled .~ False)
+        1 $ \siPool ->
         liftIO $ do
           void $ runSqlPool (runMigrationSilent migrateAll) siPool
           let mkApp = pure $ app opts settings
