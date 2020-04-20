@@ -6,10 +6,11 @@
 
 module Data.Hastory.Server where
 
+import Control.Monad
 import Conduit (MonadUnliftIO)
-import Control.Monad.Catch (MonadThrow)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Control.Monad.Logger (MonadLogger)
+import Lens.Micro
 import Control.Monad.Logger.CallStack (logInfo)
 import Data.Hastory.API
 import Data.Hastory.Types (ServerEntry(..), SyncRequest, toServerEntry)
@@ -24,8 +25,8 @@ import qualified Network.HTTP.Types as HTTP
 import qualified Network.Wai as Wai
 import qualified Network.Wai.Handler.Warp as Warp
 import qualified Options.Applicative as A
-import Path (Abs, File, Path, (</>), parent, parseRelFile, toFilePath)
-import Path.IO (ensureDir, getAppUserDataDir)
+import Path
+import Path.IO
 import Prelude
 import Servant
 import System.Random (newStdGen, randomRs)
@@ -108,21 +109,16 @@ reportPort :: MonadLogger m => Options -> m ()
 reportPort Options {..} = logInfo $ "Starting server on port " <> T.pack (show _oPort)
 
 -- | Starts a webserver by reading command line flags.
-hastoryServer :: (MonadIO m, MonadLogger m, MonadUnliftIO m, MonadThrow m) => m ()
+hastoryServer :: (MonadIO m, MonadLogger m, MonadUnliftIO m) => m ()
 hastoryServer = do
   options@Options {..} <- liftIO $ A.execParser optParser
   reportPort options
   token <- generateToken
-  dir <- getAppUserDataDir "hastory-server"
-  relFile <- parseRelFile "server.db"
-  dbPool <- prepareDb (dir </> relFile)
-  let (Token token') = token
-  logInfo $ "Token: " <> token'
-  liftIO $ Warp.runSettings (mkWarpSettings options) (app options (ServerSettings token dbPool))
+  dbFile <- resolveFile' "hastory.sqlite3"
+  ensureDir (parent dbFile)
+  SQL.withSqlitePoolInfo (SQL.mkSqliteConnectionInfo (T.pack $ fromAbsFile dbFile) & SQL.fkEnabled .~ False ) 1 $ \pool -> do
+    void $ SQL.runSqlPool (SQL.runMigrationSilent migrateAll) pool
+    let (Token token') = token
+    logInfo $ "Token: " <> token'
+    liftIO $ Warp.runSettings (mkWarpSettings options) (app options (ServerSettings token pool))
 
-prepareDb :: (MonadIO m, MonadLogger m, MonadUnliftIO m) => Path Abs File -> m (Pool SqlBackend)
-prepareDb file = do
-  _ <- ensureDir (parent file)
-  pool <- SQL.createSqlitePool (T.pack $ toFilePath file) 10
-  _ <- SQL.runSqlPool (SQL.runMigrationSilent migrateAll) pool
-  return pool
