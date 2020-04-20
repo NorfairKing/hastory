@@ -4,5 +4,6 @@ result*
 *.html
 *.css
 *.js
+*.sqlite3
 .tool-versions
 stack.yaml.lock

@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.31.2.
+-- This file has been generated from package.yaml by hpack version 0.33.0.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b6c7ed6bffe9d49f42880cb70ebb2428460db457508308af0a3fc94d57f932fe
+-- hash: bbaaaa8b259cc4c90fe812f1b93637ba602cce6917e2aef915191465584c5d01
 
 name:           hastory-server
 version:        0.0.0.0
@@ -41,6 +41,7 @@ library
     , hspec
     , http-client
     , http-types
+    , microlens
     , monad-logger
     , mtl
     , optparse-applicative
@@ -95,6 +96,7 @@ test-suite hastory-server-test
     , hastory-server
     , hspec
     , http-types
+    , microlens
     , persistent-sqlite
     , servant-client
   default-language: Haskell2010

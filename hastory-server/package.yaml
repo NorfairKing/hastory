@@ -18,13 +18,8 @@ ghc-options:
 - -Wpartial-fields
 - -Wredundant-constraints
 - -fhide-source-paths
-
 library:
   source-dirs: src/
-  exposed-modules:
-  - Data.Hastory.Server
-  - Data.Hastory.Server.TestUtils
-
   dependencies:
   - aeson
   - aeson-pretty
@@ -33,6 +28,7 @@ library:
   - conduit
   - deepseq
   - exceptions
+  - microlens
   - hashable
   - hashable-time
   - hastory-data
@@ -94,3 +90,4 @@ tests:
     - http-types
     - persistent-sqlite
     - servant-client
+    - microlens
