@@ -38,7 +38,7 @@ library:
   - hashable
   - hashable-time
   - hastory-data-cli
-  - hastory-data-server
+  - hastory-server-data
   - hastory-path
   - hostname
   - hspec

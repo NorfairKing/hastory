@@ -1,4 +1,4 @@
-name:                hastory-data-server
+name:                hastory-server-data
 version:             0.0.0.0
 homepage:            https://github.com/NorfairKing/hastory
 license:             AllRightsReserved
@@ -19,7 +19,7 @@ library:
     - text
     - time
   exposed-modules:
-    - Data.Hastory.Types.Server
+    - Hastory.Server.Data
   ghc-options:
     - -Wall
     - -Wcompat

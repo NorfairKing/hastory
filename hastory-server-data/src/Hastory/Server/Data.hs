@@ -6,7 +6,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module Data.Hastory.Types.Server where
+module Hastory.Server.Data where
 
 import Data.Text (Text)
 import Data.Time (UTCTime)

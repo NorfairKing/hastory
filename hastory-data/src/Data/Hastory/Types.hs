@@ -3,5 +3,5 @@ module Data.Hastory.Types
   ) where
 
 import Data.Hastory.Types.Cli as X hiding (migrateAll)
-import Data.Hastory.Types.Server as X hiding (migrateAll)
 import Data.Hastory.Types.SyncRequest as X
+import Hastory.Server.Data as X hiding (migrateAll)

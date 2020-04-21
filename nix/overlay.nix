@@ -22,8 +22,8 @@ with final.haskell.lib;
         "hastory-data-cli"
         "hastory-data-gen"
         "hastory-path"
-        "hastory-data-server"
         "hastory-server"
+        "hastory-server-data"
       ] hastoryPkg;
   haskellPackages =
     previous.haskellPackages.override (

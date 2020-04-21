@@ -13,13 +13,13 @@ import Control.Monad.Logger (MonadLogger)
 import Control.Monad.Logger.CallStack (logInfo)
 import Data.Hastory.API
 import Data.Hastory.Types (ServerEntry(..), SyncRequest, toServerEntry)
-import Data.Hastory.Types.Server (migrateAll)
 import Data.Pool (Pool)
 import Data.Proxy (Proxy(..))
 import Data.Semigroup ((<>))
 import qualified Data.Text as T
 import Database.Persist.Sql (SqlBackend)
 import qualified Database.Persist.Sqlite as SQL
+import Hastory.Server.Data (migrateAll)
 import Lens.Micro
 import qualified Network.HTTP.Types as HTTP
 import qualified Network.Wai as Wai

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 53ae5754bf0a65c709bb5462a8fe283cfe6f14fc5e1f2be9c1920defb776adeb
+-- hash: 25eac35a040e2be6b2b8b49dd9b74b37176ca33ee39f78d805cc91564a05106e
 
 name:           hastory-data
 version:        0.0.0.0
@@ -43,8 +43,8 @@ library
     , hashable
     , hashable-time
     , hastory-data-cli
-    , hastory-data-server
     , hastory-path
+    , hastory-server-data
     , hostname
     , hspec
     , http-client

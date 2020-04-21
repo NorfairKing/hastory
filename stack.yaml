@@ -4,7 +4,7 @@ packages:
 - hastory-data
 - hastory-data-cli
 - hastory-data-gen
-- hastory-data-server
+- hastory-server-data
 - hastory-path
 - hastory-server
 extra-deps:
