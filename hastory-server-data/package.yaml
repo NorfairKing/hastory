@@ -1,4 +1,4 @@
-name:                hastory-data-cli
+name:                hastory-server-data
 version:             0.0.0.0
 homepage:            https://github.com/NorfairKing/hastory
 license:             AllRightsReserved
@@ -13,19 +13,13 @@ dependencies:
 library:
   source-dirs: src/
   dependencies:
-    - aeson
-    - deepseq
-    - genvalidity-path
-    - genvalidity-text
-    - genvalidity-time
     - hastory-path
     - path
     - persistent-template
     - text
     - time
-    - validity
   exposed-modules:
-    - Data.Hastory.Types.Cli
+    - Hastory.Server.Data
   ghc-options:
     - -Wall
     - -Wcompat

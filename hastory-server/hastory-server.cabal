@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.31.2.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 974c2071388c8f2d2769fc17fb26e03afeea12dcb089258a20713a1642c94d89
+-- hash: 13e55357045446c2e9b7e4024f3e2e5fc6ff8350df00180395a8babdf1567dc9
 
 name:           hastory-server
 version:        0.0.0.0
@@ -37,7 +37,7 @@ library
     , hashable
     , hashable-time
     , hastory-data
-    , hastory-data-server
+    , hastory-server-data
     , hostname
     , hspec
     , http-client

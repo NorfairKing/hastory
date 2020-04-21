@@ -14,8 +14,8 @@ import Conduit (MonadUnliftIO)
 import Control.Monad.IO.Class (liftIO)
 import Control.Monad.Logger (runNoLoggingT)
 import Control.Monad.Reader (ReaderT)
-import Data.Hastory.Types.Cli (migrateAll)
 import Database.Persist.Sqlite (SqlBackend, runMigrationSilent, runSqlConn, withSqliteConn)
+import Hastory.Cli.Data (migrateAll)
 import Test.Hspec (ActionWith, Spec, SpecWith, around)
 
 doCountsWith :: (Eq b, Hashable b) => (a -> b) -> (a -> Double) -> [a] -> HashMap b Double

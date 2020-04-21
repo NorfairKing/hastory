@@ -12,7 +12,6 @@ import Control.Monad.IO.Class
 import Control.Monad.Logger (runNoLoggingT)
 import Data.Hastory.API (Token(..))
 import Data.Hastory.Server (Options(..), ServerSettings(..), app, generateToken)
-import Data.Hastory.Types.Server (migrateAll)
 import Data.Pool (Pool)
 import qualified Data.Text as T
 import Database.Persist.Sqlite
@@ -23,6 +22,7 @@ import Database.Persist.Sqlite
   , runSqlPool
   , withSqlitePoolInfo
   )
+import Hastory.Server.Data (migrateAll)
 import Lens.Micro
 import Network.HTTP.Client (defaultManagerSettings, newManager)
 import Network.Wai.Handler.Warp (testWithApplication)

@@ -8,7 +8,7 @@ license: AllRightsReserved
 homepage: https://github.com/NorfairKing/hastory
 dependencies:
 - base >=4.9 && <=5
-- hastory-data-cli
+- hastory-cli-data
 
 library:
   source-dirs: src/

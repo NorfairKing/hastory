@@ -32,7 +32,7 @@ library:
   - hashable
   - hashable-time
   - hastory-data
-  - hastory-data-server
+  - hastory-server-data
   - hostname
   - hspec
   - http-client

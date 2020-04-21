@@ -18,12 +18,12 @@ with final.haskell.lib;
     in
       final.lib.genAttrs [
         "hastory-cli"
+        "hastory-cli-data"
         "hastory-data"
-        "hastory-data-cli"
         "hastory-data-gen"
         "hastory-path"
-        "hastory-data-server"
         "hastory-server"
+        "hastory-server-data"
       ] hastoryPkg;
   haskellPackages =
     previous.haskellPackages.override (
