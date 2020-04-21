@@ -2,7 +2,7 @@
 
 module Data.Hastory.Types.SyncRequest where
 
-import Data.Hastory.Types.Cli (Entry(..))
+import Hastory.Cli.Data (Entry(..))
 import Hastory.Server.Data (ServerEntry(..))
 
 import Data.Aeson

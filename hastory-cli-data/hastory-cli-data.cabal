@@ -4,9 +4,9 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 7df212a0cb6cd8f9cad5c9bda905c4470620dd14a44009d1a0d89201acfdc78a
+-- hash: ae0cdc4d43a8761fa2903da4307933aea9d305f3faab5fce6fbf2c9c63e04851
 
-name:           hastory-data-cli
+name:           hastory-cli-data
 version:        0.0.0.0
 category:       Command Line
 homepage:       https://github.com/NorfairKing/hastory
@@ -19,9 +19,9 @@ build-type:     Simple
 
 library
   exposed-modules:
-      Data.Hastory.Types.Cli
+      Hastory.Cli.Data
   other-modules:
-      Paths_hastory_data_cli
+      Paths_hastory_cli_data
   hs-source-dirs:
       src/
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -fhide-source-paths

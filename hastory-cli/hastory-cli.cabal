@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 6acb31d4ba1c76ae9a8d8ca4d633901c2d43228a4099c47e17b85282747c9266
+-- hash: 8870a69b7f24e510fb383dba38767d843ecfdc75211fd9bdd3d5e197e5258e1a
 
 name:           hastory-cli
 version:        0.0.0.0
@@ -46,8 +46,8 @@ library
     , extra
     , hashable
     , hashable-time
+    , hastory-cli-data
     , hastory-data
-    , hastory-data-cli
     , hostname
     , monad-logger
     , mtl
@@ -80,7 +80,7 @@ executable hastory
   build-depends:
       base >=4.9 && <=5
     , hastory-cli
-    , hastory-data-cli
+    , hastory-cli-data
   default-language: Haskell2010
 
 test-suite hastory-cli-test
@@ -103,8 +103,8 @@ test-suite hastory-cli-test
     , genvalidity-text
     , genvalidity-time
     , hastory-cli
+    , hastory-cli-data
     , hastory-data
-    , hastory-data-cli
     , hastory-data-gen
     , hspec
     , path
@@ -132,8 +132,8 @@ benchmark hastory-cli-bench
     , exceptions
     , genvalidity
     , hastory-cli
+    , hastory-cli-data
     , hastory-data
-    , hastory-data-cli
     , hastory-data-gen
     , mtl
     , path

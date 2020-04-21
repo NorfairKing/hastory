@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 25eac35a040e2be6b2b8b49dd9b74b37176ca33ee39f78d805cc91564a05106e
+-- hash: 8135c188e97dd87ae9efe99c484a28d56e07031b3a0e0e0acaaacc2bbdc430ed
 
 name:           hastory-data
 version:        0.0.0.0
@@ -42,7 +42,7 @@ library
     , genvalidity-time
     , hashable
     , hashable-time
-    , hastory-data-cli
+    , hastory-cli-data
     , hastory-path
     , hastory-server-data
     , hostname

@@ -6,7 +6,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module Data.Hastory.Types.Cli where
+module Hastory.Cli.Data where
 
 import Control.DeepSeq
 import Data.Aeson

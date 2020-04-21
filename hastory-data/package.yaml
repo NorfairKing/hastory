@@ -37,7 +37,7 @@ library:
   - genvalidity-time
   - hashable
   - hashable-time
-  - hastory-data-cli
+  - hastory-cli-data
   - hastory-server-data
   - hastory-path
   - hostname

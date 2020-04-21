@@ -2,7 +2,7 @@ resolver: lts-14.7
 packages:
 - hastory-cli
 - hastory-data
-- hastory-data-cli
+- hastory-cli-data
 - hastory-data-gen
 - hastory-server-data
 - hastory-path

@@ -1,4 +1,4 @@
-name:                hastory-data-cli
+name:                hastory-cli-data
 version:             0.0.0.0
 homepage:            https://github.com/NorfairKing/hastory
 license:             AllRightsReserved
@@ -25,7 +25,7 @@ library:
     - time
     - validity
   exposed-modules:
-    - Data.Hastory.Types.Cli
+    - Hastory.Cli.Data
   ghc-options:
     - -Wall
     - -Wcompat
