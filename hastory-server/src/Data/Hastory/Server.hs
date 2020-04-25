@@ -12,7 +12,8 @@ import Control.Monad.IO.Class (MonadIO, liftIO)
 import Control.Monad.Logger (MonadLogger)
 import Control.Monad.Logger.CallStack (logInfo)
 import Data.Hastory.API
-import Data.Hastory.Types (ServerEntry(..), SyncRequest, toServerEntry)
+import Data.Hastory.Server.Utils (toServerEntry)
+import Data.Hastory.Types (ServerEntry(..), SyncRequest(..), Unique(UniqueContentHash))
 import Data.Pool (Pool)
 import Data.Proxy (Proxy(..))
 import Data.Semigroup ((<>))
@@ -71,11 +72,18 @@ server Options {..} ServerSettings {..} = sAppendCommand
   where
     sAppendCommand :: Token -> SyncRequest -> Handler ()
     sAppendCommand token syncRequest
-      | token == _ssToken = liftIO $ persistServerEntry (toServerEntry syncRequest) _ssDbPool
+      | token == _ssToken =
+        liftIO $ persistServerEntry (toServerEntry syncRequest) _ssDbPool >> pure ()
       | otherwise = throwError $ err403 {errBody = "Invalid Token provided."}
 
-persistServerEntry :: (MonadUnliftIO m) => ServerEntry -> Pool SqlBackend -> m ()
-persistServerEntry = SQL.runSqlPool . SQL.insert_
+-- | Persist the given @ServerEntry@ provided that the contentHash does not
+-- already exists in the database.
+persistServerEntry ::
+     (MonadUnliftIO m) => ServerEntry -> Pool SqlBackend -> m (SQL.Entity ServerEntry)
+persistServerEntry serverEntry = SQL.runSqlPool updateIfNotExists
+  where
+    updateIfNotExists =
+      SQL.upsertBy (UniqueContentHash $ serverEntryContentHash serverEntry) serverEntry []
 
 -- | Proxy for Hastory API.
 myApi :: Proxy HastoryAPI

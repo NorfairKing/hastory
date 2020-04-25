@@ -8,6 +8,7 @@
 
 module Hastory.Server.Data where
 
+import Crypto.Hash (Digest, SHA256)
 import Data.Text (Text)
 import Data.Time (UTCTime)
 import Database.Persist.TH (mkMigrate, mkPersist, persistLowerCase, share, sqlSettings)
@@ -15,6 +16,7 @@ import GHC.Generics (Generic)
 import Path (Abs, Dir, Path)
 
 import Data.Hastory.Types.Path ()
+import Hastory.Server.Digest ()
 
 share
   [mkPersist sqlSettings, mkMigrate "migrateAll"]
@@ -25,5 +27,7 @@ ServerEntry
     dateTime UTCTime
     user Text
     hostName Text
+    contentHash (Digest SHA256)
+    UniqueContentHash contentHash
     deriving Show Eq Generic
 |]
