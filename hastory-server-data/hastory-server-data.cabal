@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 9f748170294c1a3375032be3371864d01056971f5a75891474ec84c51b885c95
+-- hash: 7f8108f040825d6196c9ac7ee96398bb84fa1317e05ce2481a72741fca263618
 
 name:           hastory-server-data
 version:        0.0.0.0
@@ -21,14 +21,19 @@ library
   exposed-modules:
       Hastory.Server.Data
   other-modules:
+      Hastory.Server.Digest
       Paths_hastory_server_data
   hs-source-dirs:
       src/
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -fhide-source-paths
   build-depends:
       base >=4.9 && <=5
+    , bytestring
+    , cryptonite
     , hastory-path
+    , memory
     , path
+    , persistent
     , persistent-template
     , text
     , time

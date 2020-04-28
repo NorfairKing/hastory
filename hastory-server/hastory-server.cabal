@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 13e55357045446c2e9b7e4024f3e2e5fc6ff8350df00180395a8babdf1567dc9
+-- hash: 74c1d37f0c16ca83a1a96c7878b9546b214777ab58720013da0df9bb482100ec
 
 name:           hastory-server
 version:        0.0.0.0
@@ -21,6 +21,7 @@ library
   exposed-modules:
       Data.Hastory.Server
       Data.Hastory.Server.TestUtils
+      Data.Hastory.Server.Utils
   other-modules:
       Paths_hastory_server
   hs-source-dirs:
@@ -32,6 +33,7 @@ library
     , base
     , bytestring
     , conduit
+    , cryptonite
     , deepseq
     , exceptions
     , hashable

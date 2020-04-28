@@ -26,9 +26,9 @@ library:
   - base
   - bytestring
   - conduit
+  - cryptonite
   - deepseq
   - exceptions
-  - microlens
   - hashable
   - hashable-time
   - hastory-data
@@ -37,6 +37,7 @@ library:
   - hspec
   - http-client
   - http-types
+  - microlens
   - monad-logger
   - mtl
   - optparse-applicative

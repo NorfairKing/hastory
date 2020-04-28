@@ -13,8 +13,12 @@ dependencies:
 library:
   source-dirs: src/
   dependencies:
+    - bytestring
+    - cryptonite
     - hastory-path
+    - memory
     - path
+    - persistent
     - persistent-template
     - text
     - time
