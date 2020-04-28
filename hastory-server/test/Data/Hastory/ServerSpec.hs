@@ -37,9 +37,18 @@ spec =
           let selectEntries = fmap SQL.entityVal <$> SQL.selectList [] []
           dbEntries <- SQL.runSqlPool selectEntries siPool
           dbEntries `shouldBe` [toServerEntry syncRequest]
-      it "is idempotent" $ \ServerInfo {..} ->
-        forAllValid $ \syncRequest -> do
-          replicateM_ 2 $ runClientM (appendCommand siToken syncRequest) siClientEnv
-          let selectEntries = fmap SQL.entityVal <$> SQL.selectList [] []
-          dbEntries <- SQL.runSqlPool selectEntries siPool
-          length (dbEntries :: [ServerEntry]) `shouldBe` 1
+      context "when same entry is sync'd twice" $ do
+        it "the db does not change between the first sync and the second sync" $ \ServerInfo {..} ->
+          forAllValid $ \syncRequest -> do
+            _ <- runClientM (appendCommand siToken syncRequest) siClientEnv
+            let selectEntries = SQL.selectList [] [SQL.Asc ServerEntryId]
+            entriesAfterFirstSync <- SQL.runSqlPool selectEntries siPool
+            _ <- runClientM (appendCommand siToken syncRequest) siClientEnv
+            entriesAfterSecondSync <- SQL.runSqlPool selectEntries siPool
+            entriesAfterFirstSync `shouldBe` (entriesAfterSecondSync :: [SQL.Entity ServerEntry])
+        it "db only persists one entry" $ \ServerInfo {..} ->
+          forAllValid $ \syncRequest -> do
+            replicateM_ 2 $ runClientM (appendCommand siToken syncRequest) siClientEnv
+            let selectEntries = fmap SQL.entityVal <$> SQL.selectList [] []
+            dbEntries <- SQL.runSqlPool selectEntries siPool
+            length (dbEntries :: [ServerEntry]) `shouldBe` 1

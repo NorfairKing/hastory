@@ -14,7 +14,9 @@ import Database.Persist.Types (PersistValue(PersistByteString))
 instance HashAlgorithm a => PersistField (Digest a) where
   toPersistValue = toPersistValue . B.pack . BA.unpack
   fromPersistValue (PersistByteString rawDigest) =
-    maybe (Left "Unable to reify Digest from ByteString") Right (digestFromByteString rawDigest)
+    case digestFromByteString rawDigest of
+      Nothing -> Left "Unable to reify Digest from ByteString"
+      Just reifiedDigest -> Right reifiedDigest
   fromPersistValue _ = Left "Digest values must be convered from PersistByteString"
 
 instance HashAlgorithm a => PersistFieldSql (Digest a) where
