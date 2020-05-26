@@ -1,54 +1,35 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
 
 module Data.Hastory.ServerSpec
   ( spec
   ) where
 
-import Control.Monad (replicateM_)
-import qualified Database.Persist.Sqlite as SQL
-import Network.HTTP.Types (status403)
-import Servant.Client (ClientError(FailureResponse), responseBody, responseStatusCode, runClientM)
 import Test.Hspec
-import Test.Validity (forAllValid)
 
-import Data.Hastory.API (Token(..), appendCommand)
 import Data.Hastory.Gen ()
-import Data.Hastory.Server.TestUtils (ServerInfo(..), serverSpec)
-import Data.Hastory.Server.Utils (toServerEntry)
-import Data.Hastory.Types as SyncRequest
+import Data.Hastory.Server.TestUtils (serverSpec)
 
 spec :: Spec
 spec =
-  serverSpec $
-  describe "POST /commands/append" $ do
-    context "incorrect token" $
-      it "is a 403 error with invalid token msg" $ \ServerInfo {..} ->
-        forAllValid $ \syncRequest -> do
-          let req = appendCommand incorrectToken syncRequest
-              incorrectToken = Token (unToken siToken <> "badSuffix")
-          Left (FailureResponse _ resp) <- runClientM req siClientEnv
-          responseBody resp `shouldBe` "Invalid Token provided."
-          responseStatusCode resp `shouldBe` status403
-    context "with correct token" $ do
-      it "saves entry to database" $ \ServerInfo {..} ->
-        forAllValid $ \syncRequest -> do
-          _ <- runClientM (appendCommand siToken syncRequest) siClientEnv
-          let selectEntries = fmap SQL.entityVal <$> SQL.selectList [] []
-          dbEntries <- SQL.runSqlPool selectEntries siPool
-          dbEntries `shouldBe` [toServerEntry syncRequest]
+  serverSpec $ do
+  describe "POST /users" $ do
+    context "email address is not unique" $
+      it "is a 422" (const pending)
+    context "valid user" $
+      it "is a 201" (const pending)
+  describe "POST /sessions" $ do
+    context "incorrect login" $
+      it "is a 401" (const pending)
+    context "correct login" $ do
+      it "is a 200" (const pending)
+      it "includes the JWT header" (const pending)
+  describe "POST /entries" $ do
+    context "no Authentication header" $
+      it "is a 401" (const pending)
+    context "incorrect Authentication header" $
+      it "is a 401" (const pending)
+    context "correct JWT authentication" $ do
+      it "saves entry to database" (const pending)
       context "when same entry is sync'd twice" $ do
-        it "the db does not change between the first sync and the second sync" $ \ServerInfo {..} ->
-          forAllValid $ \syncRequest -> do
-            _ <- runClientM (appendCommand siToken syncRequest) siClientEnv
-            let selectEntries = SQL.selectList [] [SQL.Asc ServerEntryId]
-            entriesAfterFirstSync <- SQL.runSqlPool selectEntries siPool
-            _ <- runClientM (appendCommand siToken syncRequest) siClientEnv
-            entriesAfterSecondSync <- SQL.runSqlPool selectEntries siPool
-            entriesAfterFirstSync `shouldBe` (entriesAfterSecondSync :: [SQL.Entity ServerEntry])
-        it "db only persists one entry" $ \ServerInfo {..} ->
-          forAllValid $ \syncRequest -> do
-            replicateM_ 2 $ runClientM (appendCommand siToken syncRequest) siClientEnv
-            let selectEntries = fmap SQL.entityVal <$> SQL.selectList [] []
-            dbEntries <- SQL.runSqlPool selectEntries siPool
-            length (dbEntries :: [ServerEntry]) `shouldBe` 1
+        it "the db does not change between the first sync and the second sync" (const pending)
+        it "db only persists one entry" (const pending)
