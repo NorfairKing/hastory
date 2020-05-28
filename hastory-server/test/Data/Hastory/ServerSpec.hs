@@ -1,22 +1,36 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards   #-}
 
 module Data.Hastory.ServerSpec
   ( spec
   ) where
 
+import Database.Persist.Sql as SQL
+import Network.HTTP.Types (status400)
+import Servant.Client (ClientError (FailureResponse), responseStatusCode, runClientM)
 import Test.Hspec
 
+import Data.Hastory.API (createUserClient)
 import Data.Hastory.Gen ()
-import Data.Hastory.Server.TestUtils (serverSpec)
+import Data.Hastory.Server.TestUtils (ServerInfo (..), serverSpec)
+import Data.Hastory.Types (User (userName), mkUserForm, mkUsername)
 
 spec :: Spec
 spec =
   serverSpec $ do
   describe "POST /users" $ do
-    context "email address is not unique" $
-      it "is a 422" (const pending)
     context "valid user" $
-      it "is a 201" (const pending)
+      it "creates the user" $ \ServerInfo{..} -> do
+        let req = createUserClient (mkUserForm "Steven" "Passw0rd")
+        _ <- runClientM req siClientEnv
+        [dbUser] <- fmap SQL.entityVal <$> SQL.runSqlPool (SQL.selectList [] []) siPool
+        userName dbUser `shouldBe` mkUsername "Steven"
+    context "email address is not unique" $
+      it "is a 400" $ \ServerInfo{..} -> do
+        let req = createUserClient (mkUserForm "Paul" "SecretPassword")
+        Right _ <- runClientM req siClientEnv
+        Left (FailureResponse _requestF resp) <- runClientM req siClientEnv
+        responseStatusCode resp `shouldBe` status400
   describe "POST /sessions" $ do
     context "incorrect login" $
       it "is a 401" (const pending)

@@ -13,10 +13,15 @@ dependencies:
 library:
   source-dirs: src/
   dependencies:
+    - aeson
+    - base64
     - bytestring
+    - case-insensitive
     - cryptonite
     - hastory-path
     - memory
+    - password
+    - password-instances
     - path
     - persistent
     - persistent-template
@@ -24,6 +29,8 @@ library:
     - time
   exposed-modules:
     - Hastory.Server.Data
+    - Hastory.Server.Data.UserForm
+    - Hastory.Server.Data.Username
   ghc-options:
     - -Wall
     - -Wcompat

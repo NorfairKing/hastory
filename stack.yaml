@@ -8,6 +8,10 @@ packages:
 - hastory-path
 - hastory-server
 extra-deps:
+- base64-0.4.2
+- ghc-byteorder-4.11.0.0.10
+- password-2.0.1.1
+- password-instances-2.0.0.1
 - github: NorfairKing/validity
   commit: 04ef274e8be3595f5846645f5922791292653e03
   subdirs:
@@ -47,4 +51,3 @@ nix:
   add-gc-roots: true
   packages:
   - zlib
-

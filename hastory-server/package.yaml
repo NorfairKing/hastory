@@ -84,12 +84,13 @@ tests:
     - -with-rtsopts=-N
     - -Wall
     dependencies:
+    - genvalidity-hspec
     - hastory-data
     - hastory-data-gen
     - hastory-server
-    - genvalidity-hspec
+    - hastory-server-data
     - hspec
     - http-types
-    - persistent-sqlite
-    - servant-client
     - microlens
+    - persistent
+    - servant-client
