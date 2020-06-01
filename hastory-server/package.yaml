@@ -21,11 +21,13 @@ ghc-options:
 library:
   source-dirs: src/
   dependencies:
+  - QuickCheck
   - aeson
   - aeson-pretty
   - base
   - bytestring
   - conduit
+  - cookie
   - cryptonite
   - deepseq
   - exceptions
@@ -37,10 +39,10 @@ library:
   - hspec
   - http-client
   - http-types
+  - jose
   - microlens
   - monad-logger
   - mtl
-  - optparse-applicative
   - optparse-applicative
   - path
   - path-io
@@ -50,6 +52,8 @@ library:
   - resource-pool
   - safe
   - servant
+  - servant-auth-client
+  - servant-auth-server
   - servant-client
   - servant-server
   - text
@@ -84,13 +88,18 @@ tests:
     - -with-rtsopts=-N
     - -Wall
     dependencies:
+    - bytestring
+    - case-insensitive
     - genvalidity-hspec
     - hastory-data
     - hastory-data-gen
     - hastory-server
     - hastory-server-data
     - hspec
+    - http-conduit
     - http-types
     - microlens
     - persistent
+    - servant
+    - servant-auth-client
     - servant-client

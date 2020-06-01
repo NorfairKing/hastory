@@ -2,13 +2,14 @@
 
 module Data.Hastory.Server.Utils where
 
-import Crypto.Hash (Digest, SHA256(..), hashWith)
-import qualified Data.ByteString as B
-import Data.Hastory.Types (Entry(..), ServerEntry(..), SyncRequest(..))
-import qualified Data.Text as T
+import           Crypto.Hash        (Digest, SHA256 (..), hashWith)
+import qualified Data.ByteString    as B
+import           Data.Hastory.Types
+import qualified Data.Text          as T
 import qualified Data.Text.Encoding as T
-import Data.Time.Format (defaultTimeLocale, formatTime, iso8601DateFormat)
-import Path (fromAbsDir)
+import           Data.Time.Format   (defaultTimeLocale, formatTime,
+                                     iso8601DateFormat)
+import           Path               (fromAbsDir)
 
 hashEntry :: Entry -> T.Text -> Digest SHA256
 hashEntry Entry {..} host = hashWith SHA256 (unifiedData :: B.ByteString)
@@ -25,13 +26,13 @@ hashEntry Entry {..} host = hashWith SHA256 (unifiedData :: B.ByteString)
     formatIso8601 = formatTime defaultTimeLocale formatString
     formatString = iso8601DateFormat (Just "%H:%M:%S")
 
-toServerEntry :: SyncRequest -> ServerEntry
-toServerEntry syncRequest = ServerEntry {..}
+toServerEntry :: SyncRequest -> UserId -> ServerEntry
+toServerEntry syncRequest serverEntryUser = ServerEntry {..}
   where
     entry@Entry {..} = syncRequestEntry syncRequest
     serverEntryText = entryText
     serverEntryWorkingDir = entryWorkingDir
     serverEntryDateTime = entryDateTime
-    serverEntryUser = entryUser
+    serverEntryHostUser = entryUser
     serverEntryHostName = syncRequestHostName syncRequest
     serverEntryContentHash = hashEntry entry (syncRequestHostName syncRequest)

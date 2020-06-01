@@ -2,12 +2,12 @@
 
 module Hastory.Server.Data.UserForm where
 
-import Data.Aeson (FromJSON (parseJSON), ToJSON (toJSON), object, withObject, (.:), (.=))
-import Data.Password (Password, mkPassword, unsafeShowPassword)
+import Data.Aeson
+import Data.Password
 import Data.Password.Instances ()
 import qualified Data.Text as T
 
-import Hastory.Server.Data.Username (Username, mkUsername)
+import Hastory.Server.Data.Username
 
 data UserForm = UserForm { userFormUserName :: Username, userFormPassword :: Password } deriving Show
 

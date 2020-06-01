@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.31.2.
+-- This file has been generated from package.yaml by hpack version 0.33.0.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 83b5eee93e93ab89e6cabc997812f7d4af27b9a40864bb807dc7f44590151c29
+-- hash: 1577f47a9f7a1834fe642c3b785d2c130682612b72a71e18822e005af42b7cb1
 
 name:           hastory-server
 version:        0.0.0.0
@@ -28,11 +28,13 @@ library
       src/
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -fhide-source-paths
   build-depends:
-      aeson
+      QuickCheck
+    , aeson
     , aeson-pretty
     , base
     , bytestring
     , conduit
+    , cookie
     , cryptonite
     , deepseq
     , exceptions
@@ -44,6 +46,7 @@ library
     , hspec
     , http-client
     , http-types
+    , jose
     , microlens
     , monad-logger
     , mtl
@@ -56,6 +59,8 @@ library
     , resource-pool
     , safe
     , servant
+    , servant-auth-client
+    , servant-auth-server
     , servant-client
     , servant-server
     , text
@@ -93,14 +98,19 @@ test-suite hastory-server-test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -fhide-source-paths -threaded -rtsopts -with-rtsopts=-N -Wall
   build-depends:
       base >=4.9 && <=5
+    , bytestring
+    , case-insensitive
     , genvalidity-hspec
     , hastory-data
     , hastory-data-gen
     , hastory-server
     , hastory-server-data
     , hspec
+    , http-conduit
     , http-types
     , microlens
     , persistent
+    , servant
+    , servant-auth-client
     , servant-client
   default-language: Haskell2010

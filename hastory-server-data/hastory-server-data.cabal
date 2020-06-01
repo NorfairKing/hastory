@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 1684df289a591a6e2c1389c51275a9a9d8e1a1693b1c4a5684a8ac53b28c5c2d
+-- hash: fb7e1f05f1d42641ec60d70cbc87f919ddc75c67fc83d9407d5f6179ed7b6644
 
 name:           hastory-server-data
 version:        0.0.0.0
@@ -22,6 +22,7 @@ library
       Hastory.Server.Data
       Hastory.Server.Data.UserForm
       Hastory.Server.Data.Username
+      Hastory.Server.Data.Password
   other-modules:
       Hastory.Server.Digest
       Paths_hastory_server_data

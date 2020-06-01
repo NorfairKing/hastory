@@ -38,8 +38,8 @@ library:
   - hashable
   - hashable-time
   - hastory-cli-data
-  - hastory-server-data
   - hastory-path
+  - hastory-server-data
   - hostname
   - hspec
   - http-client
@@ -54,6 +54,8 @@ library:
   - persistent-template
   - safe
   - servant
+  - servant-auth-client
+  - servant-auth-server
   - servant-client
   - servant-client-core
   - servant-server
