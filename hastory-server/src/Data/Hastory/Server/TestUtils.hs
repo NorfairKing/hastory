@@ -6,6 +6,7 @@ module Data.Hastory.Server.TestUtils
   , serverSpec
   , withNewUser
   , withTestServer
+  , extractJWTCookie
   ) where
 
 import           Control.Monad

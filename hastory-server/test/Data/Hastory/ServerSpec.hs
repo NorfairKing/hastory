@@ -7,6 +7,8 @@ module Data.Hastory.ServerSpec
   ) where
 
 import           Control.Monad
+import           Data.Maybe
+import           Data.Pool
 import           Database.Persist.Sql          as SQL
 import           Network.HTTP.Types
 import           Servant.API
@@ -25,72 +27,100 @@ spec :: Spec
 spec =
   serverSpec $ do
   describe "POST /users" $ do
-    context "valid user" $
-      it "the user" $ \ServerInfo{..} -> do
-        let req = createUserClient (mkUserForm "Steven" "Passw0rd")
-        _ <- runClientM req siClientEnv
-        [dbUser] <- fmap SQL.entityVal <$> SQL.runSqlPool (SQL.selectList [] []) siPool
-        userName dbUser `shouldBe` mkUsername "Steven"
+    context "valid new user request" $
+      it "creates the user" $ \ServerInfo{..} -> do
+        let userForm = mkUserForm "Steven" "Passw0rd"
+
+        Right _ <- createUser siClientEnv userForm
+
+        [Entity _ newUser] <- getUsers siPool
+
+        userName newUser `shouldBe` mkUsername "Steven"
     context "username already exists" $
       it "is a 400" $ \ServerInfo{..} -> do
-        let req = createUserClient (mkUserForm "Paul" "SecretPassword")
-        Right _ <- runClientM req siClientEnv
-        Left (FailureResponse _requestF resp) <- runClientM req siClientEnv
+        let userForm = mkUserForm "Steven" "Passw0rd"
+
+        Right _ <- createUser siClientEnv userForm
+
+        Left (FailureResponse _requestF resp) <-
+          createUser siClientEnv userForm
+
         responseStatusCode resp `shouldBe` status400
   describe "POST /sessions" $ do
     context "incorrect login" $
       it "is a 401" $ \ServerInfo{..} -> do
-        let createUserReq = createUserClient (mkUserForm "Paul" "SecretPassword")
-        Right _ <- runClientM createUserReq siClientEnv
+        let userForm = mkUserForm "Paul" "Passw0rd"
 
-        let createSessionReq = createSessionClient (mkUserForm "Paul" "incorrect password")
-        Left (FailureResponse _requestF resp) <- runClientM createSessionReq siClientEnv
+        Right _ <- createUser siClientEnv userForm
+
+        let incorrectPasswordForm = mkUserForm "Paul" "baddPassw0rd"
+
+        Left (FailureResponse _requestF resp) <-
+          loginUser siClientEnv incorrectPasswordForm
+
         responseStatusCode resp `shouldBe` status401
     context "correct login" $
       it "returns a cookie" $ \ServerInfo{..} -> do
-        let userForm = mkUserForm "Paul" "SecretPassword"
-            createUserReq = createUserClient userForm
-        Right _ <- runClientM createUserReq siClientEnv
+        let userForm = mkUserForm "Paul" "Passw0rd"
 
-        let createSessionReq = createSessionClient userForm
-        Right resp <- runClientM createSessionReq siClientEnv
-        let headers = getHeaders resp
-        fmap fst headers `shouldContain` ["Set-Cookie"]
+        Right _ <- createUser siClientEnv userForm
+
+        Right resp <- loginUser siClientEnv userForm
+
+        extractJWTCookie resp `shouldSatisfy` isJust
   describe "POST /entries" $ do
     context "incorrect token" $
       it "is a 401" $ \ServerInfo{..} ->
         forAllValid $ \syncReq -> do
-          let createEntryReq = createEntryClient incorrectToken syncReq
-              incorrectToken = Token "badToken"
-          Left (FailureResponse _requestF resp) <- runClientM createEntryReq siClientEnv
+          let incorrectToken = Token "badToken"
+
+          Left (FailureResponse _requestF resp) <-
+            createEntry siClientEnv incorrectToken syncReq
+
           responseStatusCode resp `shouldBe` status401
     context "correct token" $ do
       it "saves entry to database" $ \ServerInfo{..} ->
         forAllValid $ \syncReq ->
           withNewUser siClientEnv $ \(userId, token) -> do
-            let createEntryReq = createEntryClient token syncReq
-            Right _ <- runClientM createEntryReq siClientEnv
+            Right _ <- createEntry siClientEnv token syncReq
 
-            let getEntries = fmap entityVal <$> selectList [] []
-            entries <- runSqlPool getEntries siPool
-            entries `shouldBe` [toServerEntry syncReq userId]
+            [Entity _ entry] <- getEntries siPool
+
+            entry `shouldBe` toServerEntry syncReq userId
       context "when same entry is sync'd twice" $ do
         it "the db does not change between the first sync and the second sync" $ \ServerInfo{..} ->
           forAllValid $ \syncReq ->
             withNewUser siClientEnv $ \(_, token) -> do
-              let createEntryReq = createEntryClient token syncReq
-              _ <- runClientM createEntryReq siClientEnv
+              Right _ <- createEntry siClientEnv token syncReq
 
-              entriesAfterFirstSync <- runSqlPool (selectList [] []) siPool
+              entriesAfterFirstSync <- getEntries siPool
 
-              _ <- runClientM createEntryReq siClientEnv
-              entriesAfterSecondSync <- runSqlPool (selectList [] []) siPool
+              Right _ <- createEntry siClientEnv token syncReq
 
-              (entriesAfterSecondSync :: [Entity ServerEntry]) `shouldBe` entriesAfterFirstSync
+              entriesAfterSecondSync <- getEntries siPool
+
+              entriesAfterSecondSync  `shouldBe` entriesAfterFirstSync
         it "db only persists one entry" $ \ServerInfo{..} ->
           forAllValid $ \syncReq ->
             withNewUser siClientEnv $ \(_, token) -> do
-              let createEntryReq = createEntryClient token syncReq
-              replicateM_ 2 (runClientM createEntryReq siClientEnv)
-              dbEntries <- runSqlPool (selectList [] []) siPool
-              length (dbEntries :: [Entity ServerEntry]) `shouldBe` 1
+              replicateM_ 2 (createEntry siClientEnv token syncReq)
+
+              dbEntries <- getEntries siPool
+
+              length dbEntries `shouldBe` 1
+
+
+createEntry :: ClientEnv -> Token -> SyncRequest -> IO (Either ClientError NoContent)
+createEntry clientEnv token syncReq = runClientM (createEntryClient token syncReq) clientEnv
+
+createUser :: ClientEnv -> UserForm -> IO (Either ClientError UserId)
+createUser clientEnv userForm = runClientM (createUserClient userForm) clientEnv
+
+getEntries :: Pool SqlBackend -> IO [Entity ServerEntry]
+getEntries = runSqlPool (selectList [] [])
+
+getUsers :: Pool SqlBackend -> IO [Entity User]
+getUsers = runSqlPool (selectList [] [])
+
+loginUser :: ClientEnv -> UserForm -> IO (Either ClientError (Headers AuthCookies NoContent))
+loginUser clientEnv userForm = runClientM (createSessionClient userForm) clientEnv

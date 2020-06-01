@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 1577f47a9f7a1834fe642c3b785d2c130682612b72a71e18822e005af42b7cb1
+-- hash: 386694e9c0b8bc26a369ff758f2bd77ef7aeff3e8a6c7058e1749a3a12fb78fc
 
 name:           hastory-server
 version:        0.0.0.0
@@ -110,6 +110,7 @@ test-suite hastory-server-test
     , http-types
     , microlens
     , persistent
+    , resource-pool
     , servant
     , servant-auth-client
     , servant-client
