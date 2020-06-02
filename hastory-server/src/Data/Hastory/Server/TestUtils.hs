@@ -11,36 +11,36 @@ module Data.Hastory.Server.TestUtils
 
 import           Control.Monad
 import           Control.Monad.IO.Class
-import           Control.Monad.Logger     (runNoLoggingT)
-import qualified Data.ByteString.Char8    as B
-import           Data.Hastory.Server      (Options (..), ServerSettings (..),
-                                           app)
+import           Control.Monad.Logger      (runNoLoggingT)
+import qualified Data.ByteString.Char8     as B
 import           Data.List
-import           Data.Pool                (Pool)
-import qualified Data.Text                as T
-import           Database.Persist.Sqlite  (SqlBackend, fkEnabled,
-                                           mkSqliteConnectionInfo,
-                                           runMigrationSilent, runSqlPool,
-                                           withSqlitePoolInfo)
-import           Hastory.Server.Data      (migrateAll)
+import           Data.Pool                 (Pool)
+import qualified Data.Text                 as T
+import           Database.Persist.Sqlite   (SqlBackend, fkEnabled,
+                                            mkSqliteConnectionInfo,
+                                            runMigrationSilent, runSqlPool,
+                                            withSqlitePoolInfo)
 import           Lens.Micro
-import           Network.HTTP.Client      (defaultManagerSettings, newManager)
-import           Network.Wai.Handler.Warp (testWithApplication)
+import           Network.HTTP.Client       (defaultManagerSettings, newManager)
+import           Network.Wai.Handler.Warp  (testWithApplication)
 import           Path
-import           Path.IO                  (resolveFile, withSystemTempDir)
+import           Path.IO                   (resolveFile, withSystemTempDir)
 import           Servant.API
-import           Servant.Auth.Client      (Token (Token))
-import           Servant.Auth.Server      (defaultCookieSettings,
-                                           defaultJWTSettings, generateKey)
-import           Servant.Client           (BaseUrl (..), ClientEnv,
-                                           Scheme (Http), mkClientEnv,
-                                           runClientM)
+import           Servant.Auth.Client       (Token (Token))
+import           Servant.Auth.Server       (defaultCookieSettings,
+                                            defaultJWTSettings, generateKey)
+import           Servant.Client            (BaseUrl (..), ClientEnv,
+                                            Scheme (Http), mkClientEnv,
+                                            runClientM)
 import           Test.Hspec
-import           Test.Hspec.QuickCheck    (modifyMaxShrinks, modifyMaxSuccess)
+import           Test.Hspec.QuickCheck     (modifyMaxShrinks, modifyMaxSuccess)
 import           Test.QuickCheck
 
 import           Data.Hastory.API
+import           Data.Hastory.Server       (Options (..), app)
+import           Data.Hastory.Server.Utils
 import           Data.Hastory.Types
+import           Hastory.Server.Data       (migrateAll)
 
 data ServerInfo =
   ServerInfo
