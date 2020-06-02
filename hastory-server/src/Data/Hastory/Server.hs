@@ -11,13 +11,9 @@ import           Control.Monad
 import           Control.Monad.IO.Class         (MonadIO, liftIO)
 import           Control.Monad.Logger           (MonadLogger)
 import           Control.Monad.Logger.CallStack (logInfo)
-import           Data.Hastory.API
-import           Data.Hastory.Server.Utils
-import           Data.Proxy                     (Proxy (..))
 import           Data.Semigroup                 ((<>))
 import qualified Data.Text                      as T
 import qualified Database.Persist.Sqlite        as SQL
-import           Hastory.Server.Data            (migrateAll)
 import           Lens.Micro
 import qualified Network.HTTP.Types             as HTTP
 import qualified Network.Wai                    as Wai
@@ -29,7 +25,9 @@ import           Prelude
 import           Servant                        hiding (BadPassword, NoSuchUser)
 import           Servant.Auth.Server
 
+import           Data.Hastory.API
 import           Data.Hastory.Server.Handler
+import           Hastory.Server.Data            (migrateAll)
 
 data Options =
   Options
@@ -53,13 +51,9 @@ optParser =
 server :: Options -> ServerSettings -> Server HastoryAPI
 server Options {..} serverSettings = createUserHandler serverSettings :<|> createSessionHandler serverSettings :<|> createEntryHandler serverSettings
 
--- | Proxy for Hastory API.
-myApi :: Proxy HastoryAPI
-myApi = Proxy
-
 -- | Main warp application. Consumes requests and produces responses.
 app :: Options -> ServerSettings -> Application
-app options serverSettings@ServerSettings{..} = serveWithContext myApi context (server options serverSettings)
+app options serverSettings@ServerSettings{..} = serveWithContext api context (server options serverSettings)
   where context = _ssCookieSettings :. _ssJWTSettings :. EmptyContext
 
 -- | Logging action that will be executed with every request.

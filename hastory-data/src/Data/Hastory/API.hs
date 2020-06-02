@@ -27,6 +27,7 @@ type SessionsAPI = "sessions" :> ReqBody '[JSON] UserForm :> Verb 'POST 204 '[JS
 type HastoryAPI
    = UsersAPI :<|> SessionsAPI :<|> (ProtectedAPI :> EntriesAPI)
 
+-- | Proxy for Hastory API.
 api :: Proxy HastoryAPI
 api = Proxy
 
