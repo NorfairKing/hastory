@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 10e869061992bcb594820156822e80c3ba5dbfe477fa2b6f84e4780d44f10fac
+-- hash: a9ff241b14b276aa63938dc57de533a099feba48a90b4e47b8b83e01a46d254e
 
 name:           hastory-server
 version:        0.0.0.0
@@ -96,7 +96,9 @@ test-suite hastory-server-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      Data.Hastory.ServerSpec
+      Data.Hastory.Handler.EntriesSpec
+      Data.Hastory.Handler.SessionsSpec
+      Data.Hastory.Handler.UsersSpec
       Paths_hastory_server
   hs-source-dirs:
       test

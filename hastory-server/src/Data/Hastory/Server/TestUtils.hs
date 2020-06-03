@@ -7,6 +7,14 @@ module Data.Hastory.Server.TestUtils
   , withNewUser
   , withTestServer
   , extractJWTCookie
+  , createEntry
+  , createUser
+  , getEntries
+  , getUsers
+  , loginUser
+  , module Network.HTTP.Types
+  , module Data.Hastory.Types
+  , module SQL
   ) where
 
 import           Control.Monad
@@ -16,12 +24,14 @@ import qualified Data.ByteString.Char8     as B
 import           Data.List
 import           Data.Pool                 (Pool)
 import qualified Data.Text                 as T
+import           Database.Persist.Sql      as SQL
 import           Database.Persist.Sqlite   (SqlBackend, fkEnabled,
                                             mkSqliteConnectionInfo,
                                             runMigrationSilent, runSqlPool,
                                             withSqlitePoolInfo)
 import           Lens.Micro
 import           Network.HTTP.Client       (defaultManagerSettings, newManager)
+import           Network.HTTP.Types
 import           Network.Wai.Handler.Warp  (testWithApplication)
 import           Path
 import           Path.IO                   (resolveFile, withSystemTempDir)
@@ -29,9 +39,7 @@ import           Servant.API
 import           Servant.Auth.Client       (Token (Token))
 import           Servant.Auth.Server       (defaultCookieSettings,
                                             defaultJWTSettings, generateKey)
-import           Servant.Client            (BaseUrl (..), ClientEnv,
-                                            Scheme (Http), mkClientEnv,
-                                            runClientM)
+import           Servant.Client
 import           Test.Hspec
 import           Test.Hspec.QuickCheck     (modifyMaxShrinks, modifyMaxSuccess)
 import           Test.QuickCheck
@@ -88,5 +96,21 @@ extractJWTCookie headerList = do
   pure . B.takeWhile (/= ';') $ B.drop 11 cookie
   where jwtCookie (headerName, headerValue) = headerName == "Set-Cookie" && B.take 11 headerValue == "JWT-Cookie="
 
+createEntry :: ClientEnv -> Token -> SyncRequest -> IO (Either ClientError NoContent)
+createEntry clientEnv token syncReq = runClientM (createEntryClient token syncReq) clientEnv
+
+createUser :: ClientEnv -> UserForm -> IO (Either ClientError UserId)
+createUser clientEnv userForm = runClientM (createUserClient userForm) clientEnv
+
+getEntries :: Pool SqlBackend -> IO [Entity ServerEntry]
+getEntries = runSqlPool (selectList [] [])
+
+getUsers :: Pool SqlBackend -> IO [Entity User]
+getUsers = runSqlPool (selectList [] [])
+
+loginUser :: ClientEnv -> UserForm -> IO (Either ClientError (Headers AuthCookies NoContent))
+loginUser clientEnv userForm = runClientM (createSessionClient userForm) clientEnv
+
 randomUserForm :: IO UserForm
 randomUserForm = generate $ UserForm <$> (mkUsername <$> arbitrary) <*> (mkPassword <$> arbitrary)
+
