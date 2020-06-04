@@ -1,42 +1,42 @@
-{-# LANGUAGE DataKinds           #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE RecordWildCards     #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeOperators       #-}
+{-# LANGUAGE TypeOperators #-}
 
 module Data.Hastory.Server where
 
-import           Conduit                        (MonadUnliftIO)
-import           Control.Monad
-import           Control.Monad.IO.Class         (MonadIO, liftIO)
-import           Control.Monad.Logger           (MonadLogger)
-import           Control.Monad.Logger.CallStack (logInfo)
-import           Crypto.JOSE.JWK
-import           Data.Aeson                     (eitherDecode)
-import qualified Data.ByteString.Lazy.Char8     as C
-import           Data.Semigroup                 ((<>))
-import qualified Data.Text                      as T
-import qualified Database.Persist.Sqlite        as SQL
-import           Lens.Micro
-import qualified Network.HTTP.Types             as HTTP
-import qualified Network.Wai                    as Wai
-import qualified Network.Wai.Handler.Warp       as Warp
-import qualified Options.Applicative            as A
-import           Path
-import           Path.IO
-import           Prelude
-import           Servant                        hiding (BadPassword, NoSuchUser)
-import           Servant.Auth.Server
-import           System.Environment
-import           System.Exit
+import Conduit (MonadUnliftIO)
+import Control.Monad
+import Control.Monad.IO.Class (MonadIO, liftIO)
+import Control.Monad.Logger (MonadLogger)
+import Control.Monad.Logger.CallStack (logInfo)
+import Crypto.JOSE.JWK
+import Data.Aeson (eitherDecode)
+import qualified Data.ByteString.Lazy.Char8 as C
+import Data.Semigroup ((<>))
+import qualified Data.Text as T
+import qualified Database.Persist.Sqlite as SQL
+import Lens.Micro
+import qualified Network.HTTP.Types as HTTP
+import qualified Network.Wai as Wai
+import qualified Network.Wai.Handler.Warp as Warp
+import qualified Options.Applicative as A
+import Path
+import Path.IO
+import Prelude
+import Servant hiding (BadPassword, NoSuchUser)
+import Servant.Auth.Server
+import System.Environment
+import System.Exit
 
-import           Data.Hastory.API
-import           Data.Hastory.Server.Handler
-import           Hastory.Server.Data            (migrateAll)
+import Data.Hastory.API
+import Data.Hastory.Server.Handler
+import Hastory.Server.Data (migrateAll)
 
 data Options =
   Options
-    { _oPort    :: Int
+    { _oPort :: Int
     -- ^ Port that will be used by the server.
     , _oLogFile :: Maybe String
       -- ^ If provided, server will log to this file. If not provided, server
@@ -54,12 +54,16 @@ optParser =
 
 -- | Main server logic for Hastory Server.
 server :: Options -> ServerSettings -> Server HastoryAPI
-server Options {..} serverSettings = createUserHandler serverSettings :<|> createSessionHandler serverSettings :<|> createEntryHandler serverSettings
+server Options {..} serverSettings =
+  createUserHandler serverSettings :<|> createSessionHandler serverSettings :<|>
+  createEntryHandler serverSettings
 
 -- | Main warp application. Consumes requests and produces responses.
 app :: Options -> ServerSettings -> Application
-app options serverSettings@ServerSettings{..} = serveWithContext api context (server options serverSettings)
-  where context = _ssCookieSettings :. _ssJWTSettings :. EmptyContext
+app options serverSettings@ServerSettings {..} =
+  serveWithContext api context (server options serverSettings)
+  where
+    context = _ssCookieSettings :. _ssJWTSettings :. EmptyContext
 
 -- | Logging action that will be executed with every request.
 mkWarpLogger :: FilePath -> Wai.Request -> HTTP.Status -> Maybe Integer -> IO ()
@@ -90,7 +94,7 @@ hastoryServer = do
     (SQL.mkSqliteConnectionInfo (T.pack $ fromAbsFile dbFile) & SQL.fkEnabled .~ False)
     1 $ \_ssDbPool -> do
     void $ SQL.runSqlPool (SQL.runMigrationSilent migrateAll) _ssDbPool
-    liftIO $ Warp.runSettings (mkWarpSettings options) (app options ServerSettings{..})
+    liftIO $ Warp.runSettings (mkWarpSettings options) (app options ServerSettings {..})
 
 -- | Reads the signing key for json web tokens from the HASTORY_SERVER_JWK
 -- environmental variable.
@@ -98,8 +102,9 @@ getSigningKey :: IO JWK
 getSigningKey = do
   rawJwk <- lookupEnv envKey >>= ensureEnv
   ensureDecode (eitherDecode . C.pack $ rawJwk)
-  where ensureEnv Nothing = die $ envKey <> " environmental variable not found"
-        ensureEnv (Just jwk) = pure jwk
-        ensureDecode (Left err)  = die $ "Unable to decode JWK: " <> err
-        ensureDecode (Right jwk) = pure jwk
-        envKey = "HASTORY_SERVER_JWK"
+  where
+    ensureEnv Nothing = die $ envKey <> " environmental variable not found"
+    ensureEnv (Just jwk) = pure jwk
+    ensureDecode (Left err) = die $ "Unable to decode JWK: " <> err
+    ensureDecode (Right jwk) = pure jwk
+    envKey = "HASTORY_SERVER_JWK"

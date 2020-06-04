@@ -8,10 +8,16 @@ import Servant.Auth.Server
 
 import Hastory.Server.Data.Username
 
-newtype AuthCookie = AuthCookie { unAuthCookie :: Username } deriving Generic
+newtype AuthCookie =
+  AuthCookie
+    { unAuthCookie :: Username
+    }
+  deriving (Generic)
 
 instance ToJSON AuthCookie
+
 instance FromJSON AuthCookie
 
 instance ToJWT AuthCookie
+
 instance FromJWT AuthCookie

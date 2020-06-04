@@ -2,34 +2,33 @@
 
 module Data.Hastory.Server.Utils where
 
-import           Control.Monad.Except
-import           Control.Monad.Reader as X
-import           Crypto.Hash          (Digest, SHA256 (..), hashWith)
-import qualified Data.ByteString      as B
-import           Data.Hastory.Types
-import           Data.Pool            (Pool)
-import qualified Data.Text            as T
-import qualified Data.Text.Encoding   as T
-import           Data.Time.Format     (defaultTimeLocale, formatTime,
-                                       iso8601DateFormat)
-import           Database.Persist.Sql
-import           Path                 (fromAbsDir)
-import           Servant.Auth.Server
-import           Servant.Server
+import Control.Monad.Except
+import Control.Monad.Reader as X
+import Crypto.Hash (Digest, SHA256(..), hashWith)
+import qualified Data.ByteString as B
+import Data.Hastory.Types
+import Data.Pool (Pool)
+import qualified Data.Text as T
+import qualified Data.Text.Encoding as T
+import Data.Time.Format (defaultTimeLocale, formatTime, iso8601DateFormat)
+import Database.Persist.Sql
+import Path (fromAbsDir)
+import Servant.Auth.Server
+import Servant.Server
 
 data ServerSettings =
   ServerSettings
-    { _ssDbPool         :: Pool SqlBackend
+    { _ssDbPool :: Pool SqlBackend
       -- ^ A pool of database connections.
         --
         -- Curently, the database file is located at "~/hastory-data/hastory.db"
-    , _ssJWTSettings    :: JWTSettings
+    , _ssJWTSettings :: JWTSettings
     , _ssCookieSettings :: CookieSettings
     }
 
 ensureWith :: MonadError e m => e -> Maybe a -> m a
 ensureWith _ (Just a) = pure a
-ensureWith e Nothing  = throwError e
+ensureWith e Nothing = throwError e
 
 hashEntry :: Entry -> T.Text -> Digest SHA256
 hashEntry Entry {..} host = hashWith SHA256 (unifiedData :: B.ByteString)

@@ -1,31 +1,31 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
-{-# LANGUAGE DataKinds           #-}
-{-# LANGUAGE FlexibleContexts    #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeOperators       #-}
+{-# LANGUAGE TypeOperators #-}
 
 module Data.Hastory.API where
 
-import           Servant
-import           Servant.Auth.Client
-import           Servant.Auth.Server hiding (BasicAuth)
-import           Servant.Client
+import Servant
+import Servant.Auth.Client
+import Servant.Auth.Server hiding (BasicAuth)
+import Servant.Client
 
-import           Data.Hastory.Types
+import Data.Hastory.Types
 
-type AuthCookies = '[Header "Set-Cookie" SetCookie, Header "Set-Cookie" SetCookie]
+type AuthCookies = '[ Header "Set-Cookie" SetCookie, Header "Set-Cookie" SetCookie]
 
-type EntriesAPI = "entries" :> ReqBody '[JSON] SyncRequest :> PostCreated '[JSON] NoContent
+type EntriesAPI = "entries" :> ReqBody '[ JSON] SyncRequest :> PostCreated '[ JSON] NoContent
 
-type ProtectedAPI = Auth '[JWT] AuthCookie
+type ProtectedAPI = Auth '[ JWT] AuthCookie
 
-type UsersAPI = "users" :> ReqBody '[JSON] UserForm :> PostCreated '[JSON] UserId
+type UsersAPI = "users" :> ReqBody '[ JSON] UserForm :> PostCreated '[ JSON] UserId
 
-type SessionsAPI = "sessions" :> ReqBody '[JSON] UserForm :> Verb 'POST 204 '[JSON] (Headers AuthCookies NoContent)
+type SessionsAPI
+   = "sessions" :> ReqBody '[ JSON] UserForm :> Verb 'POST 204 '[ JSON] (Headers AuthCookies NoContent)
 
 -- | Main Hastory API specification.
-type HastoryAPI
-   = UsersAPI :<|> SessionsAPI :<|> (ProtectedAPI :> EntriesAPI)
+type HastoryAPI = UsersAPI :<|> SessionsAPI :<|> (ProtectedAPI :> EntriesAPI)
 
 -- | Proxy for Hastory API.
 api :: Proxy HastoryAPI

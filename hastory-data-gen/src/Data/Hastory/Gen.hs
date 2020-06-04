@@ -2,11 +2,11 @@
 
 module Data.Hastory.Gen where
 
-import qualified Data.Text        as T
-import           Test.QuickCheck
+import qualified Data.Text as T
+import Test.QuickCheck
 
-import           Data.GenValidity
-import           Data.Hastory
+import Data.GenValidity
+import Data.Hastory
 
 instance GenValid Entry where
   genValid = genValidStructurally
@@ -30,5 +30,6 @@ instance GenValid UserForm where
 
 instance GenValid Username where
   genValid = mkUsername <$> (genValid `suchThat` notNull)
-    where notNull = not . T.null
+    where
+      notNull = not . T.null
   shrinkValid = map mkUsername . filter (not . T.null) . shrinkValid . rawUserName

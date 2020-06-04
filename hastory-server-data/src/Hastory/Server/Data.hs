@@ -1,16 +1,16 @@
-{-# LANGUAGE DeriveGeneric              #-}
-{-# LANGUAGE GADTs                      #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE GADTs #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE MultiParamTypeClasses      #-}
-{-# LANGUAGE OverloadedStrings          #-}
-{-# LANGUAGE QuasiQuotes                #-}
-{-# LANGUAGE TemplateHaskell            #-}
-{-# LANGUAGE TypeFamilies               #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TypeFamilies #-}
 
 module Hastory.Server.Data where
 
 import Crypto.Hash (Digest, SHA256)
-import Data.Aeson (ToJSON (toJSON), object, (.=))
+import Data.Aeson (ToJSON(toJSON), (.=), object)
 import Data.Text (Text)
 import Data.Time (UTCTime)
 import Database.Persist.TH (mkMigrate, mkPersist, persistLowerCase, share, sqlSettings)
@@ -21,7 +21,6 @@ import Data.Hastory.Types.Path ()
 import Hastory.Server.Data.Password (Bcrypt, PasswordHash)
 import Hastory.Server.Data.Username (Username)
 import Hastory.Server.Digest ()
-
 
 share
   [mkPersist sqlSettings, mkMigrate "migrateAll"]
