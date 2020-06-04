@@ -11,6 +11,9 @@ import           Control.Monad
 import           Control.Monad.IO.Class         (MonadIO, liftIO)
 import           Control.Monad.Logger           (MonadLogger)
 import           Control.Monad.Logger.CallStack (logInfo)
+import           Crypto.JOSE.JWK
+import           Data.Aeson                     (eitherDecode)
+import qualified Data.ByteString.Lazy.Char8     as C
 import           Data.Semigroup                 ((<>))
 import qualified Data.Text                      as T
 import qualified Database.Persist.Sqlite        as SQL
@@ -24,6 +27,8 @@ import           Path.IO
 import           Prelude
 import           Servant                        hiding (BadPassword, NoSuchUser)
 import           Servant.Auth.Server
+import           System.Environment
+import           System.Exit
 
 import           Data.Hastory.API
 import           Data.Hastory.Server.Handler
@@ -70,11 +75,13 @@ mkWarpSettings Options {..} =
 reportPort :: MonadLogger m => Options -> m ()
 reportPort Options {..} = logInfo $ "Starting server on port " <> T.pack (show _oPort)
 
--- | Starts a webserver by reading command line flags.
+-- | Starts a webserver by reading command line flags and the HASTORY_SERVER_JWK
+-- environmental variable.
 hastoryServer :: (MonadIO m, MonadLogger m, MonadUnliftIO m) => m ()
 hastoryServer = do
   options@Options {..} <- liftIO $ A.execParser optParser
-  let _ssJWTSettings = undefined
+  signingKey <- liftIO getSigningKey
+  let _ssJWTSettings = defaultJWTSettings signingKey
       _ssCookieSettings = defaultCookieSettings
   reportPort options
   dbFile <- resolveFile' "hastory.sqlite3"
@@ -84,3 +91,15 @@ hastoryServer = do
     1 $ \_ssDbPool -> do
     void $ SQL.runSqlPool (SQL.runMigrationSilent migrateAll) _ssDbPool
     liftIO $ Warp.runSettings (mkWarpSettings options) (app options ServerSettings{..})
+
+-- | Reads the signing key for json web tokens from the HASTORY_SERVER_JWK
+-- environmental variable.
+getSigningKey :: IO JWK
+getSigningKey = do
+  rawJwk <- lookupEnv envKey >>= ensureEnv
+  ensureDecode (eitherDecode . C.pack $ rawJwk)
+  where ensureEnv Nothing = die $ envKey <> " environmental variable not found"
+        ensureEnv (Just jwk) = pure jwk
+        ensureDecode (Left err)  = die $ "Unable to decode JWK: " <> err
+        ensureDecode (Right jwk) = pure jwk
+        envKey = "HASTORY_SERVER_JWK"
