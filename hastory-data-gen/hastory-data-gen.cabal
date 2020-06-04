@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.31.2.
+-- This file has been generated from package.yaml by hpack version 0.33.0.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f449039d9e7dd550e27e60c7c98abe35f5b192521c59e89109f0cd6f69d4f54d
+-- hash: 4d2a2a6ee14b0db507e417665a04ef98746e490b2180ba3c9e79e06c413495f5
 
 name:           hastory-data-gen
 version:        0.0.0.0
@@ -38,6 +38,7 @@ library
     , hspec
     , path
     , path-io
+    , text
     , validity
     , validity-path
     , validity-text

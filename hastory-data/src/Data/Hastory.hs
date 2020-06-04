@@ -1,9 +1,6 @@
 module Data.Hastory
-  ( Entry(..)
-  , gatherEntryWith
-  , EntityField(EntryDateTime)
-  , SyncRequest
+  ( module X
   ) where
 
-import Data.Hastory.Gather
-import Data.Hastory.Types
+import           Data.Hastory.Gather as X
+import           Data.Hastory.Types  as X

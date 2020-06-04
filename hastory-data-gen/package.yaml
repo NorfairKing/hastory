@@ -30,6 +30,7 @@ library:
   - validity
   - validity-path
   - validity-text
+  - text
 
 tests:
   hastory-data-test:

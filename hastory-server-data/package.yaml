@@ -27,6 +27,7 @@ library:
     - persistent-template
     - text
     - time
+    - validity
   exposed-modules:
     - Hastory.Server.Data
     - Hastory.Server.Data.UserForm
