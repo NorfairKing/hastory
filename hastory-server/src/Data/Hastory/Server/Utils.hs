@@ -19,9 +19,6 @@ import Servant.Server
 data ServerSettings =
   ServerSettings
     { _ssDbPool :: Pool SqlBackend
-      -- ^ A pool of database connections.
-        --
-        -- Curently, the database file is located at "~/hastory-data/hastory.db"
     , _ssJWTSettings :: JWTSettings
     , _ssCookieSettings :: CookieSettings
     }

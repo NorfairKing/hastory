@@ -28,6 +28,7 @@ library:
     - text
     - time
     - validity
+    - validity-text
   exposed-modules:
     - Hastory.Server.Data
     - Hastory.Server.Data.UserForm

@@ -27,17 +27,17 @@ share
   [persistLowerCase|
 
 User
-    name Username sql=citext
+    name Username sqltype="VARCHAR COLLATE NOCASE"
     hashedPassword (PasswordHash Bcrypt)
     UniqueUsername name
 
 ServerEntry
+    user UserId
     text Text
     workingDir (Path Abs Dir)
     dateTime UTCTime
     hostUser Text
     hostName Text
-    user UserId
     contentHash (Digest SHA256)
     UniqueContentHash contentHash
     deriving Show Eq Generic

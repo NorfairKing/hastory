@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 6f52ad5b393ef6cf37cb6fbe1b0b738a3855ce4c16c3f4e300d9c1b4b687aebd
+-- hash: d2aa4ff9000d0647929dcfddfe9aec7b3eb6fca76dd023b74875ce4f4b77ec26
 
 name:           hastory-server-data
 version:        0.0.0.0
@@ -46,4 +46,5 @@ library
     , text
     , time
     , validity
+    , validity-text
   default-language: Haskell2010

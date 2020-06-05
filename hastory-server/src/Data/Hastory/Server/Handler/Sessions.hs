@@ -8,11 +8,9 @@ createSessionHandler :: ServerSettings -> UserForm -> Handler (Headers AuthCooki
 createSessionHandler ServerSettings {..} UserForm {..} = do
   user <-
     entityVal <$> (runDB (getBy $ UniqueUsername userFormUserName) _ssDbPool >>= ensureWith err401)
-  let passwordAccepted =
-        checkPassword userFormPassword (userHashedPassword user) == PasswordCheckSuccess
-  if passwordAccepted
-    then setLoggedIn
-    else unAuthenticated
+  case checkPassword (mkPassword userFormPassword) (userHashedPassword user) of
+    PasswordCheckSuccess -> setLoggedIn
+    PasswordCheckFail -> unAuthenticated
   where
     setLoggedIn = do
       let cookie = AuthCookie userFormUserName

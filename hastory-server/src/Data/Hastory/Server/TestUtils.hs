@@ -117,4 +117,4 @@ loginUser :: ClientEnv -> UserForm -> IO (Either ClientError (Headers AuthCookie
 loginUser clientEnv userForm = runClientM (createSessionClient userForm) clientEnv
 
 randomUserForm :: IO UserForm
-randomUserForm = generate $ UserForm <$> (mkUsername <$> arbitrary) <*> (mkPassword <$> arbitrary)
+randomUserForm = generate $ UserForm <$> (mkUsername <$> arbitrary) <*> arbitrary

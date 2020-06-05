@@ -56,7 +56,7 @@ optParser =
 server :: Options -> ServerSettings -> Server HastoryAPI
 server Options {..} serverSettings =
   createUserHandler serverSettings :<|> createSessionHandler serverSettings :<|>
-  createEntryHandler serverSettings
+  withAuthenticated (createEntryHandler serverSettings) (const unAuthenticated)
 
 -- | Main warp application. Consumes requests and produces responses.
 app :: Options -> ServerSettings -> Application
@@ -108,3 +108,9 @@ getSigningKey = do
     ensureDecode (Left err) = die $ "Unable to decode JWK: " <> err
     ensureDecode (Right jwk) = pure jwk
     envKey = "HASTORY_SERVER_JWK"
+
+withAuthenticated :: (b -> a) -> a -> AuthResult b -> a
+withAuthenticated whenAuthenticated whenNotAuthenticated authRes =
+  case authRes of
+    Authenticated res -> whenAuthenticated res
+    _ -> whenNotAuthenticated

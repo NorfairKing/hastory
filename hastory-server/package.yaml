@@ -104,3 +104,4 @@ tests:
     - servant
     - servant-auth-client
     - servant-client
+    - text
