@@ -43,6 +43,3 @@ ServerEntry
     deriving Show Eq Generic
 
 |]
-
-instance ToJSON User where
-  toJSON user = object ["userName" .= userName user]
