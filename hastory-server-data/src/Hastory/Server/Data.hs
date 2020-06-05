@@ -10,7 +10,6 @@
 module Hastory.Server.Data where
 
 import Crypto.Hash (Digest, SHA256)
-import Data.Aeson (ToJSON(toJSON), (.=), object)
 import Data.Text (Text)
 import Data.Time (UTCTime)
 import Database.Persist.TH (mkMigrate, mkPersist, persistLowerCase, share, sqlSettings)
