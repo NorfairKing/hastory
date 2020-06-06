@@ -5,6 +5,7 @@ module Hastory.Server.Data.UserForm where
 
 import Data.Aeson
 import qualified Data.Text as T
+import Data.Text (Text)
 import Data.Validity
 import Data.Validity.Text ()
 import GHC.Generics
@@ -14,7 +15,7 @@ import Hastory.Server.Data.Username
 data UserForm =
   UserForm
     { userFormUserName :: Username
-    , userFormPassword :: T.Text
+    , userFormPassword :: Text
     }
   deriving (Show, Generic)
 
