@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE GADTs #-}
 
 module Data.Hastory.Server.TestUtils
   ( ServerInfo(..)
@@ -21,7 +22,6 @@ import Control.Monad
 import Control.Monad.IO.Class
 import Control.Monad.Logger (runNoLoggingT)
 import qualified Data.ByteString.Char8 as B
-import Data.List
 import Data.Pool (Pool)
 import qualified Data.Text as T
 import Database.Persist.Sql as SQL
@@ -46,6 +46,7 @@ import Servant.Client
 import Test.Hspec
 import Test.Hspec.QuickCheck (modifyMaxShrinks, modifyMaxSuccess)
 import Test.QuickCheck
+import Web.Cookie
 
 import Data.Hastory.API
 import Data.Hastory.Server (Options(..), app)
@@ -93,14 +94,20 @@ withNewUser clientEnv func = do
     Nothing -> expectationFailure "JWT Cookie not found"
     Just cookie -> func (userId, Token cookie)
 
+-- type AuthCookies = '[ Header "Set-Cookie" SetCookie, Header "Set-Cookie" SetCookie]
 extractJWTCookie :: Headers AuthCookies NoContent -> Maybe B.ByteString
-extractJWTCookie headerList = do
-  (_, cookie) <- find jwtCookie (getHeaders headerList)
-  pure . B.takeWhile (/= ';') $ B.drop 11 cookie
-  where
-    jwtCookie (headerName, headerValue) =
-      headerName == "Set-Cookie" && B.take 11 headerValue == "JWT-Cookie="
+extractJWTCookie headersList =
+  case getHeadersHList headersList of
+    HCons (Header a) _ -> pure (setCookieValue a)
+    _ -> Nothing
 
+-- extractJWTCookie :: Headers AuthCookies NoContent -> Maybe B.ByteString
+-- extractJWTCookie headerList = do
+--   (_, cookie) <- find jwtCookie (getHeaders headerList)
+--   pure . B.takeWhile (/= ';') $ B.drop 11 cookie
+--   where
+--     jwtCookie (headerName, headerValue) =
+--       headerName == "Set-Cookie" && B.take 11 headerValue == "JWT-Cookie="
 createEntry :: ClientEnv -> Token -> SyncRequest -> IO (Either ClientError NoContent)
 createEntry clientEnv token syncReq = runClientM (createEntryClient token syncReq) clientEnv
 
