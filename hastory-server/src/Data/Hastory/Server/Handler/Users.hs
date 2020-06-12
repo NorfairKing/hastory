@@ -2,7 +2,7 @@
 
 module Data.Hastory.Server.Handler.Users where
 
-import           Data.Hastory.Server.Handler.Import
+import Data.Hastory.Server.Handler.Import
 
 createUserHandler :: ServerSettings -> UserForm -> Handler UserId
 createUserHandler ServerSettings {..} userForm@UserForm {..} = do

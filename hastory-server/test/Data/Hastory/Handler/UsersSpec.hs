@@ -1,17 +1,17 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module Data.Hastory.Handler.UsersSpec
   ( spec
   ) where
 
-import qualified Data.Text                     as T
-import           Servant.Client
-import           Test.Hspec
-import           Test.Validity
+import qualified Data.Text as T
+import Servant.Client
+import Test.Hspec
+import Test.Validity
 
-import           Data.Hastory.Gen              ()
-import           Data.Hastory.Server.TestUtils
+import Data.Hastory.Gen ()
+import Data.Hastory.Server.TestUtils
 
 spec :: Spec
 spec =
@@ -25,13 +25,11 @@ spec =
           userName newUser `shouldBe` userFormUserName userForm
     context "userForm is invalid" $
       it "does not create the user" $ \ServerInfo {..} -> do
-        let invalidUserName = "\192400\440428\904918\344036\355\177961\879579\1046203\470521\1025773"
+        let invalidUserName =
+              "\192400\440428\904918\344036\355\177961\879579\1046203\470521\1025773"
             userForm = mkUserForm invalidUserName "Password"
-
         Left (FailureResponse _requestF resp) <- createUser siClientEnv userForm
-
         responseStatusCode resp `shouldBe` status400
-
         users <- getUsers siPool
         length users `shouldBe` 0
     context "username already exists" $ do
