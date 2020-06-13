@@ -7,10 +7,9 @@ import Data.Hastory.Server.Handler.Import
 createUserHandler :: ServerSettings -> UserForm -> Handler UserId
 createUserHandler ServerSettings {..} userForm@UserForm {..} = do
   mUser <- runDB (getBy $ UniqueUsername userFormUserName) _ssDbPool
-  let validForm = isNothing mUser || isValid userForm
-  if validForm
-    then throwError err400
-    else buildAndInsertUser userFormUserName userFormPassword
+  if isNothing mUser && isValid userForm
+    then buildAndInsertUser userFormUserName userFormPassword
+    else throwError err400
   where
     buildAndInsertUser name password = do
       user <- User name <$> liftIO (hashPassword . mkPassword $ password)

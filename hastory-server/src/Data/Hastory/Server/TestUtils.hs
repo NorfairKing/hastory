@@ -1,6 +1,6 @@
+{-# LANGUAGE GADTs #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE GADTs #-}
 
 module Data.Hastory.Server.TestUtils
   ( ServerInfo(..)
@@ -45,7 +45,6 @@ import Servant.Auth.Server (defaultCookieSettings, defaultJWTSettings, generateK
 import Servant.Client
 import Test.Hspec
 import Test.Hspec.QuickCheck (modifyMaxShrinks, modifyMaxSuccess)
-import Test.QuickCheck
 import Web.Cookie
 
 import Data.Hastory.API
@@ -85,9 +84,8 @@ withTestServer func = do
 
 type RegistrationData = (UserId, Token)
 
-withNewUser :: ClientEnv -> (RegistrationData -> Expectation) -> Expectation
-withNewUser clientEnv func = do
-  userForm <- randomUserForm
+withNewUser :: ClientEnv -> UserForm -> (RegistrationData -> Expectation) -> Expectation
+withNewUser clientEnv userForm func = do
   Right userId <- runClientM (createUserClient userForm) clientEnv
   Right resp <- runClientM (createSessionClient userForm) clientEnv
   case extractJWTCookie resp of
@@ -101,13 +99,6 @@ extractJWTCookie headersList =
     HCons (Header a) _ -> pure (setCookieValue a)
     _ -> Nothing
 
--- extractJWTCookie :: Headers AuthCookies NoContent -> Maybe B.ByteString
--- extractJWTCookie headerList = do
---   (_, cookie) <- find jwtCookie (getHeaders headerList)
---   pure . B.takeWhile (/= ';') $ B.drop 11 cookie
---   where
---     jwtCookie (headerName, headerValue) =
---       headerName == "Set-Cookie" && B.take 11 headerValue == "JWT-Cookie="
 createEntry :: ClientEnv -> Token -> SyncRequest -> IO (Either ClientError NoContent)
 createEntry clientEnv token syncReq = runClientM (createEntryClient token syncReq) clientEnv
 
@@ -122,6 +113,3 @@ getUsers = runSqlPool (selectList [] [])
 
 loginUser :: ClientEnv -> UserForm -> IO (Either ClientError (Headers AuthCookies NoContent))
 loginUser clientEnv userForm = runClientM (createSessionClient userForm) clientEnv
-
-randomUserForm :: IO UserForm
-randomUserForm = generate $ UserForm <$> (mkUsername <$> arbitrary) <*> arbitrary

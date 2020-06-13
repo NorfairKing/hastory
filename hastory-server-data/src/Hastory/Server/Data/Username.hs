@@ -4,6 +4,7 @@ module Hastory.Server.Data.Username where
 
 import Data.Aeson (FromJSON(parseJSON), ToJSON(toJSON), withText)
 import qualified Data.CaseInsensitive as CI
+import Data.Char
 import Data.Proxy (Proxy(Proxy))
 import qualified Data.Text as T
 import Data.Validity
@@ -34,9 +35,12 @@ instance ToJSON Username where
   toJSON = toJSON . rawUserName
 
 instance Validity Username where
-  validate userName = check notNull "Username cannot be null"
+  validate userName =
+    mconcat
+      [check notNull "Username cannot be null", check allAlphaNum "Username must be alphanumeric"]
     where
       notNull = not . T.null . rawUserName $ userName
+      allAlphaNum = T.all isAlphaNum (rawUserName userName)
 
 mkUsername :: T.Text -> Username
 mkUsername = Username . CI.mk

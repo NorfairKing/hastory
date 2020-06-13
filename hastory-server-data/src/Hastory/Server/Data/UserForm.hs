@@ -4,8 +4,8 @@
 module Hastory.Server.Data.UserForm where
 
 import Data.Aeson
-import qualified Data.Text as T
 import Data.Text (Text)
+import qualified Data.Text as T
 import Data.Validity
 import Data.Validity.Text ()
 import GHC.Generics
@@ -26,7 +26,8 @@ instance ToJSON UserForm where
   toJSON userForm =
     object ["userName" .= userFormUserName userForm, "password" .= userFormPassword userForm]
 
-instance Validity UserForm
+instance Validity UserForm where
+  validate = delve "userFormUserName" . userFormUserName
 
 mkUserForm :: T.Text -> T.Text -> UserForm
 mkUserForm userName = UserForm (mkUsername userName)

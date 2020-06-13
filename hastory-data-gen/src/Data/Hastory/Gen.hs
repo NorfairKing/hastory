@@ -2,6 +2,7 @@
 
 module Data.Hastory.Gen where
 
+import Data.Char
 import qualified Data.Text as T
 import Test.QuickCheck
 
@@ -29,7 +30,9 @@ instance GenValid UserForm where
   shrinkValid = shrinkValidStructurallyWithoutExtraFiltering
 
 instance GenValid Username where
-  genValid = mkUsername <$> (genValid `suchThat` notNull)
+  genValid =
+    mkUsername <$>
+    (genValid `suchThat` \rawUsername -> notNull rawUsername && T.all isAlphaNum rawUsername)
     where
       notNull = not . T.null
   shrinkValid = map mkUsername . filter (not . T.null) . shrinkValid . rawUserName

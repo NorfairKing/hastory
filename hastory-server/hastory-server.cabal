@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: aa655b2b8dddd21d69340a6e4308ffd14b275565bffe39ed774002483bd8e0e3
+-- hash: 2c3f51c41bd065d044c6230ddbbb2db6afcbe2f0d87f4e3f9f64db5108b8cada
 
 name:           hastory-server
 version:        0.0.0.0
@@ -104,7 +104,8 @@ test-suite hastory-server-test
       test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -fhide-source-paths -threaded -rtsopts -with-rtsopts=-N -Wall
   build-depends:
-      base >=4.9 && <=5
+      QuickCheck
+    , base >=4.9 && <=5
     , bytestring
     , case-insensitive
     , genvalidity-hspec

@@ -9,6 +9,7 @@ import Control.Monad
 import Servant.Auth.Client
 import Servant.Client
 import Test.Hspec
+import Test.QuickCheck
 import Test.Validity
 
 import Data.Hastory.Gen ()
@@ -27,23 +28,26 @@ spec =
           responseStatusCode resp `shouldBe` status401
     context "correct token" $ do
       it "saves entry to database" $ \ServerInfo {..} ->
-        forAllValid $ \syncReq ->
-          withNewUser siClientEnv $ \(userId, token) -> do
+        forAllValid $ \syncReq -> do
+          userForm <- generate genValid
+          withNewUser siClientEnv userForm $ \(userId, token) -> do
             Right _ <- createEntry siClientEnv token syncReq
             [Entity _ entry] <- getEntries siPool
             entry `shouldBe` toServerEntry syncReq userId
       context "when same entry is sync'd twice" $ do
         it "the db does not change between the first sync and the second sync" $ \ServerInfo {..} ->
-          forAllValid $ \syncReq ->
-            withNewUser siClientEnv $ \(_, token) -> do
+          forAllValid $ \syncReq -> do
+            userForm <- generate genValid
+            withNewUser siClientEnv userForm $ \(_, token) -> do
               Right _ <- createEntry siClientEnv token syncReq
               entriesAfterFirstSync <- getEntries siPool
               Right _ <- createEntry siClientEnv token syncReq
               entriesAfterSecondSync <- getEntries siPool
               entriesAfterSecondSync `shouldBe` entriesAfterFirstSync
         it "db only persists one entry" $ \ServerInfo {..} ->
-          forAllValid $ \syncReq ->
-            withNewUser siClientEnv $ \(_, token) -> do
+          forAllValid $ \syncReq -> do
+            userForm <- generate genValid
+            withNewUser siClientEnv userForm $ \(_, token) -> do
               replicateM_ 2 (createEntry siClientEnv token syncReq)
               dbEntries <- getEntries siPool
               length dbEntries `shouldBe` 1
