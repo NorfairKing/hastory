@@ -22,6 +22,7 @@ import Control.Monad
 import Control.Monad.IO.Class
 import Control.Monad.Logger (runNoLoggingT)
 import qualified Data.ByteString.Char8 as B
+import Data.Hastory.Server.HastoryHandler
 import Data.Pool (Pool)
 import qualified Data.Text as T
 import Database.Persist.Sql as SQL
@@ -49,7 +50,6 @@ import Web.Cookie
 
 import Data.Hastory.API
 import Data.Hastory.Server (Options(..), app)
-import Data.Hastory.Server.Utils
 import Data.Hastory.Types
 import Hastory.Server.Data (migrateAll)
 
