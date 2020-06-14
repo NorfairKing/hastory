@@ -10,8 +10,6 @@ module Data.Hastory.Server.TestUtils
   , extractJWTCookie
   , createEntry
   , createUser
-  , getEntries
-  , getUsers
   , loginUser
   , module Network.HTTP.Types
   , module Data.Hastory.Types
@@ -104,12 +102,6 @@ createEntry clientEnv token syncReq = runClientM (createEntryClient token syncRe
 
 createUser :: ClientEnv -> UserForm -> IO (Either ClientError UserId)
 createUser clientEnv userForm = runClientM (createUserClient userForm) clientEnv
-
-getEntries :: Pool SqlBackend -> IO [Entity ServerEntry]
-getEntries = runSqlPool (selectList [] [])
-
-getUsers :: Pool SqlBackend -> IO [Entity User]
-getUsers = runSqlPool (selectList [] [])
 
 loginUser :: ClientEnv -> UserForm -> IO (Either ClientError (Headers AuthCookies NoContent))
 loginUser clientEnv userForm = runClientM (createSessionClient userForm) clientEnv

@@ -32,7 +32,7 @@ spec =
           userForm <- generate genValid
           withNewUser siClientEnv userForm $ \(userId, token) -> do
             Right _ <- createEntry siClientEnv token syncReq
-            [Entity _ entry] <- getEntries siPool
+            [Entity _ entry] <- runSqlPool (selectList [] []) siPool :: IO [Entity ServerEntry]
             entry `shouldBe` toServerEntry syncReq userId
       context "when same entry is sync'd twice" $ do
         it "the db does not change between the first sync and the second sync" $ \ServerInfo {..} ->
@@ -40,14 +40,16 @@ spec =
             userForm <- generate genValid
             withNewUser siClientEnv userForm $ \(_, token) -> do
               Right _ <- createEntry siClientEnv token syncReq
-              entriesAfterFirstSync <- getEntries siPool
+              entriesAfterFirstSync <-
+                runSqlPool (selectList [] []) siPool :: IO [Entity ServerEntry]
               Right _ <- createEntry siClientEnv token syncReq
-              entriesAfterSecondSync <- getEntries siPool
+              entriesAfterSecondSync <-
+                runSqlPool (selectList [] []) siPool :: IO [Entity ServerEntry]
               entriesAfterSecondSync `shouldBe` entriesAfterFirstSync
         it "db only persists one entry" $ \ServerInfo {..} ->
           forAllValid $ \syncReq -> do
             userForm <- generate genValid
             withNewUser siClientEnv userForm $ \(_, token) -> do
               replicateM_ 2 (createEntry siClientEnv token syncReq)
-              dbEntries <- getEntries siPool
+              dbEntries <- runSqlPool (selectList [] []) siPool :: IO [Entity ServerEntry]
               length dbEntries `shouldBe` 1

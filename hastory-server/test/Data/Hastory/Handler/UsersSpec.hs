@@ -21,7 +21,7 @@ spec =
       it "creates the user" $ \ServerInfo {..} ->
         forAllValid $ \userForm -> do
           Right _ <- createUser siClientEnv userForm
-          [Entity _ newUser] <- getUsers siPool
+          [Entity _ newUser] <- runSqlPool (selectList [] []) siPool
           userName newUser `shouldBe` userFormUserName userForm
     context "userForm is invalid" $
       it "does not create the user" $ \ServerInfo {..} -> do
@@ -30,7 +30,7 @@ spec =
             userForm = mkUserForm invalidUserName "Password"
         Left (FailureResponse _requestF resp) <- createUser siClientEnv userForm
         responseStatusCode resp `shouldBe` status400
-        users <- getUsers siPool
+        users <- runSqlPool (selectList [] []) siPool :: IO [Entity User]
         length users `shouldBe` 0
     context "username already exists" $ do
       it "is a 400" $ \ServerInfo {..} ->
