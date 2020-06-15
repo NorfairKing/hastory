@@ -19,10 +19,11 @@ module Data.Hastory.Server.TestUtils
 import Control.Monad
 import Control.Monad.IO.Class
 import Control.Monad.Logger (runNoLoggingT)
-import qualified Data.ByteString.Char8 as B
+import qualified Data.ByteString as B
 import Data.Hastory.Server.HastoryHandler
 import Data.Pool (Pool)
 import qualified Data.Text as T
+import Data.Text.Encoding
 import Database.Persist.Sql as SQL
 import Database.Persist.Sqlite
   ( SqlBackend
@@ -90,11 +91,11 @@ withNewUser clientEnv userForm func = do
     Nothing -> expectationFailure "JWT Cookie not found"
     Just cookie -> func (userId, Token cookie)
 
--- type AuthCookies = '[ Header "Set-Cookie" SetCookie, Header "Set-Cookie" SetCookie]
+-- type AuthCookies = '[ Header "Set-Cookie" Text]
 extractJWTCookie :: Headers AuthCookies NoContent -> Maybe B.ByteString
 extractJWTCookie headersList =
   case getHeadersHList headersList of
-    HCons (Header a) _ -> pure (setCookieValue a)
+    HCons (Header a) _ -> pure . setCookieValue . parseSetCookie . encodeUtf8 $ a
     _ -> Nothing
 
 createEntry :: ClientEnv -> Token -> SyncRequest -> IO (Either ClientError NoContent)

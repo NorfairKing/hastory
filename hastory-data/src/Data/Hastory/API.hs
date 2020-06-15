@@ -6,6 +6,8 @@
 
 module Data.Hastory.API where
 
+import Data.Text (Text)
+
 import Servant
 import Servant.Auth.Client
 import Servant.Auth.Server hiding (BasicAuth)
@@ -13,7 +15,7 @@ import Servant.Client
 
 import Data.Hastory.Types
 
-type AuthCookies = '[ Header "Set-Cookie" SetCookie, Header "Set-Cookie" SetCookie]
+type AuthCookies = '[ Header "Set-Cookie" Text]
 
 type EntriesAPI = "entries" :> ReqBody '[ JSON] SyncRequest :> PostCreated '[ JSON] NoContent
 

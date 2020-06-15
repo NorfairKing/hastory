@@ -13,5 +13,6 @@ import Data.Hastory.Server.HastoryHandler as X
 import Data.Hastory.Server.Utils as X
 import Data.Hastory.Types as X
 import Data.Maybe as X
+import Data.Text.Encoding as X (decodeUtf8)
 import Data.Validity as X
 import Hastory.Server.Data as X
