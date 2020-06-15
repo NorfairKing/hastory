@@ -8,3 +8,4 @@ result*
 .tool-versions
 stack.yaml.lock
 notes.txt
+.pre-commit-config.yaml
