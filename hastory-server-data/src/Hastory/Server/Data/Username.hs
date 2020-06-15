@@ -35,12 +35,11 @@ instance ToJSON Username where
   toJSON = toJSON . rawUserName
 
 instance Validity Username where
-  validate userName =
-    mconcat
-      [check notNull "Username cannot be null", check allAlphaNum "Username must be alphanumeric"]
+  validate userName = mconcat [check notNull "Username cannot be null", allAlphaNum]
     where
       notNull = not . T.null . rawUserName $ userName
-      allAlphaNum = T.all isAlphaNum (rawUserName userName)
+      allAlphaNum =
+        decorateList (T.unpack . rawUserName $ userName) (declare "is alpha-numeric" . isAlphaNum)
 
 mkUsername :: T.Text -> Username
 mkUsername = Username . CI.mk
