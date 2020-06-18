@@ -1,13 +1,13 @@
 module Hastory.Cli.OptParse.Types where
 
-import Data.Hastory.API (Token)
-import qualified Data.Text as T
+import Data.Hastory.Types
+import Data.Text (Text)
 import Path (Abs, Dir, Path)
 import Servant.Client.Core.Reexport (BaseUrl)
 
 data Arguments =
   Arguments Command Flags
-  deriving (Show, Eq)
+  deriving (Show)
 
 data Instructions =
   Instructions Dispatch Settings
@@ -31,10 +31,11 @@ newtype ListRecentDirArgs =
 data Flags =
   Flags
     { flagCacheDir :: Maybe FilePath
-    , flagStorageServer :: Maybe T.Text
-    , flagStorageToken :: Maybe T.Text
+    , flagStorageServer :: Maybe Text
+    , flagStorageUsername :: Maybe Username
+    , flagStoragePassword :: Maybe Text
     }
-  deriving (Show, Eq)
+  deriving (Show)
 
 data Configuration =
   Configuration
@@ -60,8 +61,8 @@ data Settings =
     { setCacheDir :: Path Abs Dir
     , remoteStorageClientInfo :: Maybe RemoteStorageClientInfo
     }
-  deriving (Show, Eq)
+  deriving (Show)
 
 data RemoteStorageClientInfo =
-  RemoteStorageClientInfo BaseUrl Token
-  deriving (Show, Eq)
+  RemoteStorageClientInfo BaseUrl Username Text
+  deriving (Show)

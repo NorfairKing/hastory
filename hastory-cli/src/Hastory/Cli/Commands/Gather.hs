@@ -1,6 +1,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module Hastory.Cli.Commands.Gather where
 
@@ -35,16 +36,16 @@ gatherFrom text = do
   storeHistory entry
 
 sendEntryToStorageServer :: (MonadIO m, MonadLogger m) => Entry -> RemoteStorageClientInfo -> m ()
-sendEntryToStorageServer entry (RemoteStorageClientInfo url token) =
-  runExceptT (mkHastoryClient url token) >>= \case
-    Left err -> logWarn $ "Couldn't create the remote storage client: " <> err
-    Right client -> do
+sendEntryToStorageServer entry (RemoteStorageClientInfo url username password) =
+  runExceptT (mkHastoryClient url username password) >>= \case
+    Left e -> logWarn e
+    Right HastoryClient {..} -> do
       hostName <- liftIO getHostName
       let syncReq = toSyncRequest entry hostName
-      resp <- liftIO $ runHastoryClientM client $ \t -> appendCommand t syncReq
-      case resp of
-        Left err ->
-          logWarn $ "Saving command in remote storage server has failed: " <> T.pack (show err)
+      res <-
+        liftIO $ runHastoryClient (createEntryClient hastoryClientToken syncReq) hastoryClientEnv
+      case res of
+        Left err -> logWarn $ "Saving entry to remote server has failed: " <> T.pack (show err)
         Right _ -> pure ()
 
 storeHistory :: (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => Entry -> m ()

@@ -29,6 +29,7 @@ library:
   dependencies:
   - aeson
   - conduit
+  - cookie
   - deepseq
   - exceptions
   - genvalidity

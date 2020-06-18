@@ -19,11 +19,9 @@ module Data.Hastory.Server.TestUtils
 import Control.Monad
 import Control.Monad.IO.Class
 import Control.Monad.Logger (runNoLoggingT)
-import qualified Data.ByteString as B
 import Data.Hastory.Server.HastoryHandler
 import Data.Pool (Pool)
 import qualified Data.Text as T
-import Data.Text.Encoding
 import Database.Persist.Sql as SQL
 import Database.Persist.Sqlite
   ( SqlBackend
@@ -40,12 +38,11 @@ import Network.Wai.Handler.Warp (testWithApplication)
 import Path
 import Path.IO (resolveFile, withSystemTempDir)
 import Servant.API
-import Servant.Auth.Client (Token(Token))
+import Servant.Auth.Client
 import Servant.Auth.Server (defaultCookieSettings, defaultJWTSettings, generateKey)
 import Servant.Client
 import Test.Hspec
 import Test.Hspec.QuickCheck (modifyMaxShrinks, modifyMaxSuccess)
-import Web.Cookie
 
 import Data.Hastory.API
 import Data.Hastory.Server (Options(..), app)
@@ -89,14 +86,7 @@ withNewUser clientEnv userForm func = do
   Right resp <- runClientM (createSessionClient userForm) clientEnv
   case extractJWTCookie resp of
     Nothing -> expectationFailure "JWT Cookie not found"
-    Just cookie -> func (userId, Token cookie)
-
--- type AuthCookies = '[ Header "Set-Cookie" Text]
-extractJWTCookie :: Headers AuthCookies NoContent -> Maybe B.ByteString
-extractJWTCookie headersList =
-  case getHeadersHList headersList of
-    HCons (Header a) _ -> pure . setCookieValue . parseSetCookie . encodeUtf8 $ a
-    _ -> Nothing
+    Just cookie -> func (userId, cookie)
 
 createEntry :: ClientEnv -> Token -> SyncRequest -> IO (Either ClientError NoContent)
 createEntry clientEnv token syncReq = runClientM (createEntryClient token syncReq) clientEnv

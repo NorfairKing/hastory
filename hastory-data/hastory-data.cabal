@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 887288c90b5d15702637510cc4bac3f88465fcdda822acd78d204e65640a61c2
+-- hash: cf288614c2e34b64609b603e4e661d9e00128da5402b24c677897d899362fc8b
 
 name:           hastory-data
 version:        0.0.0.0
@@ -35,6 +35,7 @@ library
       aeson
     , base >=4.9 && <=5
     , conduit
+    , cookie
     , deepseq
     , exceptions
     , genvalidity

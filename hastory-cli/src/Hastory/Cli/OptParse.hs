@@ -15,7 +15,7 @@ import Path.IO (getHomeDir, resolveDir, resolveDir')
 import Servant.Client.Core.Reexport (parseBaseUrl)
 import System.Environment (getArgs)
 
-import Data.Hastory.API (Token(..))
+import Data.Hastory.Types
 import Hastory.Cli.OptParse.Types
 
 getInstructions :: IO Instructions
@@ -43,9 +43,9 @@ combineToInstructions cmd Flags {..} Configuration = Instructions d <$> sets
         case flagCacheDir of
           Nothing -> resolveDir home ".hastory"
           Just fcd -> resolveDir' fcd
-      let baseUrl = parseBaseUrl . T.unpack =<< flagStorageServer
+      let mbBaseUrl = parseBaseUrl . T.unpack =<< flagStorageServer
       let mbRemoteStorageClientInfo =
-            liftA2 RemoteStorageClientInfo baseUrl (Token <$> flagStorageToken)
+            RemoteStorageClientInfo <$> mbBaseUrl <*> flagStorageUsername <*> flagStoragePassword
       pure Settings {setCacheDir = cacheDir, remoteStorageClientInfo = mbRemoteStorageClientInfo}
 
 getConfiguration :: Command -> Flags -> IO Configuration
@@ -150,10 +150,18 @@ parseFlags =
        , help "URL of the central storage server"
        ]) <*>
   option
+    (Just . mkUsername . T.pack <$> str)
+    (mconcat
+       [ long "storage-server-username"
+       , metavar "USERNAME"
+       , value Nothing
+       , help "Username for the central storage server"
+       ]) <*>
+  option
     (Just . T.pack <$> str)
     (mconcat
-       [ long "storage-server-token"
-       , metavar "TOKEN"
+       [ long "storage-server-password"
+       , metavar "PASSWORD"
        , value Nothing
-       , help "Token for the central storage server"
+       , help "Password for the central storage server"
        ])
