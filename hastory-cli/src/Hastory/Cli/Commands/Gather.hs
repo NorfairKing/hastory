@@ -1,12 +1,10 @@
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 
 module Hastory.Cli.Commands.Gather where
 
 import Control.Monad.Catch
-import Control.Monad.Except (runExceptT)
 import Control.Monad.Extra (whenJustM)
 import Control.Monad.IO.Unlift (MonadUnliftIO)
 import Control.Monad.Logger (MonadLogger)
@@ -36,9 +34,10 @@ gatherFrom text = do
   storeHistory entry
 
 sendEntryToStorageServer :: (MonadIO m, MonadLogger m) => Entry -> RemoteStorageClientInfo -> m ()
-sendEntryToStorageServer entry (RemoteStorageClientInfo url username password) =
-  runExceptT (mkHastoryClient url username password) >>= \case
-    Left e -> logWarn e
+sendEntryToStorageServer entry (RemoteStorageClientInfo url username password) = do
+  eHastoryClient <- mkHastoryClient url username password
+  case eHastoryClient of
+    Left err -> logWarn . T.pack . show $ err
     Right HastoryClient {..} -> do
       hostName <- liftIO getHostName
       let syncReq = toSyncRequest entry hostName

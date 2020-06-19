@@ -2,7 +2,6 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GADTs #-}
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeOperators #-}
 
@@ -44,6 +43,12 @@ data HastoryClient =
     , hastoryClientToken :: Token
     }
 
+-- | An ADT that encodes possible failures for mkHastoryClient
+data ClientEnvFailure
+  = UnableToLogin
+  | NoJWTTokenFound
+  deriving (Show)
+
 -- | Creates a hastory client type.
 --
 -- This type is needed for two reasons. First, because creating and destroying
@@ -51,18 +56,19 @@ data HastoryClient =
 -- successfully once.
 --
 -- Once a user gets a HastoryClient, it's being used throughout the entire life of the user.
-mkHastoryClient :: (MonadError Text m, MonadIO m) => BaseUrl -> Username -> Text -> m HastoryClient
+mkHastoryClient ::
+     MonadIO m => BaseUrl -> Username -> Text -> m (Either ClientEnvFailure HastoryClient)
 mkHastoryClient url username password = do
   manager <- liftIO $ newManager defaultManagerSettings
   let clientEnv = mkClientEnv manager url
       userForm = mkUserForm (rawUserName username) password
   res <- liftIO $ runClientM (createSessionClient userForm) clientEnv
   case res of
-    Left _ -> throwError "Unable to log in"
+    Left _ -> pure $ Left UnableToLogin
     Right headers ->
       case extractJWTCookie headers of
-        Nothing -> throwError "Unable to find JWT Cookie"
-        Just token -> pure $ HastoryClient clientEnv token
+        Nothing -> pure $ Left NoJWTTokenFound
+        Just token -> pure $ Right (HastoryClient clientEnv token)
 
 -- | Extract token after successful login.
 extractJWTCookie :: MonadError () m => Headers AuthCookies NoContent -> m Token
