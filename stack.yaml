@@ -1,4 +1,4 @@
-resolver: lts-14.7
+resolver: lts-14.23
 packages:
 - hastory-cli
 - hastory-data
