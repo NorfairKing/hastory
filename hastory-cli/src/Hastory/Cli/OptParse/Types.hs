@@ -64,5 +64,9 @@ data Settings =
   deriving (Show)
 
 data RemoteStorageClientInfo =
-  RemoteStorageClientInfo BaseUrl Username Text
+  RemoteStorageClientInfo
+    { remoteStorageClientInfoBaseUrl :: BaseUrl
+    , remoteStorageClientInfoUsername :: Username
+    , remoteStorageClientInfoPassword :: Text
+    }
   deriving (Show)
