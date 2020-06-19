@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.31.2.
+-- This file has been generated from package.yaml by hpack version 0.33.0.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8870a69b7f24e510fb383dba38767d843ecfdc75211fd9bdd3d5e197e5258e1a
+-- hash: 7c38df38419900fdc22d659c4b270b5673e2ef35c8c2e88e3a6a756a3e979381
 
 name:           hastory-cli
 version:        0.0.0.0
@@ -35,7 +35,7 @@ library
       Paths_hastory_cli
   hs-source-dirs:
       src/
-  ghc-options: -Wall -Wincomplete-uni-patterns -Wincomplete-record-updates -Wredundant-constraints
+  ghc-options: -optP-Wno-nonportable-include-path -Wall -Wincomplete-uni-patterns -Wincomplete-record-updates -Wredundant-constraints
   build-depends:
       aeson
     , aeson-pretty
@@ -76,7 +76,7 @@ executable hastory
       Paths_hastory_cli
   hs-source-dirs:
       app/
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -optP-Wno-nonportable-include-path -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.9 && <=5
     , hastory-cli
@@ -92,7 +92,7 @@ test-suite hastory-cli-test
       Paths_hastory_cli
   hs-source-dirs:
       test/
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
+  ghc-options: -optP-Wno-nonportable-include-path -threaded -rtsopts -with-rtsopts=-N -Wall
   build-depends:
       QuickCheck
     , base >=4.9 && <=5
@@ -124,7 +124,7 @@ benchmark hastory-cli-bench
       Paths_hastory_cli
   hs-source-dirs:
       bench
-  ghc-options: -threaded -rtsopts -with-rtsopts=-T -Wall
+  ghc-options: -optP-Wno-nonportable-include-path -threaded -rtsopts -with-rtsopts=-T -Wall
   build-depends:
       QuickCheck
     , base

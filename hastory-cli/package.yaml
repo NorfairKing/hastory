@@ -1,3 +1,4 @@
+ghc-options: ["-optP-Wno-nonportable-include-path"]
 name: hastory-cli
 version: '0.0.0.0'
 category: Command Line
