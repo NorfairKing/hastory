@@ -12,6 +12,7 @@ import Test.Hspec
 import Test.QuickCheck
 import Test.Validity
 
+import Data.Hastory.API
 import Data.Hastory.Gen ()
 import Data.Hastory.Server.TestUtils
 import Data.Hastory.Server.Utils
@@ -24,14 +25,15 @@ spec =
       it "is a 401" $ \ServerInfo {..} ->
         forAllValid $ \syncReq -> do
           let incorrectToken = Token "badToken"
-          Left (FailureResponse _requestF resp) <- createEntry siClientEnv incorrectToken syncReq
+          Left (FailureResponse _requestF resp) <-
+            runClientM (createEntryClient incorrectToken syncReq) siClientEnv
           responseStatusCode resp `shouldBe` status401
     context "correct token" $ do
       it "saves entry to database" $ \ServerInfo {..} ->
         forAllValid $ \syncReq -> do
           userForm <- generate genValid
           withNewUser siClientEnv userForm $ \(userId, token) -> do
-            Right _ <- createEntry siClientEnv token syncReq
+            Right _ <- runClientM (createEntryClient token syncReq) siClientEnv
             [Entity _ entry] <- runSqlPool (selectList [] []) siPool :: IO [Entity ServerEntry]
             entry `shouldBe` toServerEntry syncReq userId
       context "when same entry is sync'd twice" $ do
@@ -39,10 +41,10 @@ spec =
           forAllValid $ \syncReq -> do
             userForm <- generate genValid
             withNewUser siClientEnv userForm $ \(_, token) -> do
-              Right _ <- createEntry siClientEnv token syncReq
+              Right _ <- runClientM (createEntryClient token syncReq) siClientEnv
               entriesAfterFirstSync <-
                 runSqlPool (selectList [] []) siPool :: IO [Entity ServerEntry]
-              Right _ <- createEntry siClientEnv token syncReq
+              Right _ <- runClientM (createEntryClient token syncReq) siClientEnv
               entriesAfterSecondSync <-
                 runSqlPool (selectList [] []) siPool :: IO [Entity ServerEntry]
               entriesAfterSecondSync `shouldBe` entriesAfterFirstSync
@@ -50,6 +52,6 @@ spec =
           forAllValid $ \syncReq -> do
             userForm <- generate genValid
             withNewUser siClientEnv userForm $ \(_, token) -> do
-              replicateM_ 2 (createEntry siClientEnv token syncReq)
+              replicateM_ 2 $ runClientM (createEntryClient token syncReq) siClientEnv
               dbEntries <- runSqlPool (selectList [] []) siPool :: IO [Entity ServerEntry]
               length dbEntries `shouldBe` 1

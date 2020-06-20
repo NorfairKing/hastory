@@ -11,6 +11,7 @@ import Servant.Client
 import Test.Hspec
 import Test.Validity
 
+import Data.Hastory.API
 import Data.Hastory.Server.TestUtils
 
 spec :: Spec
@@ -21,13 +22,14 @@ spec =
       it "is a 401" $ \ServerInfo {..} ->
         forAllValid $ \(username, password) -> do
           let userForm = UserForm username password
-          Right _ <- createUser siClientEnv userForm
+          Right _ <- runClientM (createUserClient userForm) siClientEnv
           let incorrectPasswordForm = UserForm username (password <> "badsuffix")
-          Left (FailureResponse _requestF resp) <- loginUser siClientEnv incorrectPasswordForm
+          Left (FailureResponse _requestF resp) <-
+            runClientM (createSessionClient incorrectPasswordForm) siClientEnv
           responseStatusCode resp `shouldBe` status401
     context "correct login" $
       it "returns a cookie" $ \ServerInfo {..} -> do
         let userForm = UserForm (Username "Paul") "Passw0rd"
-        Right _ <- createUser siClientEnv userForm
-        Right resp <- loginUser siClientEnv userForm
+        Right _ <- runClientM (createUserClient userForm) siClientEnv
+        Right resp <- runClientM (createSessionClient userForm) siClientEnv
         extractJWTCookie resp `shouldSatisfy` isRight

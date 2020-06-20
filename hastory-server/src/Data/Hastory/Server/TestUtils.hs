@@ -8,9 +8,6 @@ module Data.Hastory.Server.TestUtils
   , withNewUser
   , withTestServer
   , extractJWTCookie
-  , createEntry
-  , createUser
-  , loginUser
   , module Network.HTTP.Types
   , module Data.Hastory.Types
   , module SQL
@@ -37,7 +34,6 @@ import Network.HTTP.Types
 import Network.Wai.Handler.Warp (testWithApplication)
 import Path
 import Path.IO (resolveFile, withSystemTempDir)
-import Servant.API
 import Servant.Auth.Client
 import Servant.Auth.Server (defaultCookieSettings, defaultJWTSettings, generateKey)
 import Servant.Client
@@ -87,12 +83,3 @@ withNewUser clientEnv userForm func = do
   case extractJWTCookie resp of
     Left err -> expectationFailure (show err)
     Right cookie -> func (userId, cookie)
-
-createEntry :: ClientEnv -> Token -> SyncRequest -> IO (Either ClientError NoContent)
-createEntry clientEnv token syncReq = runClientM (createEntryClient token syncReq) clientEnv
-
-createUser :: ClientEnv -> UserForm -> IO (Either ClientError UserId)
-createUser clientEnv userForm = runClientM (createUserClient userForm) clientEnv
-
-loginUser :: ClientEnv -> UserForm -> IO (Either ClientError (Headers AuthCookies NoContent))
-loginUser clientEnv userForm = runClientM (createSessionClient userForm) clientEnv
