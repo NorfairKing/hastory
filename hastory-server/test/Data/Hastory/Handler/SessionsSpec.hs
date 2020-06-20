@@ -5,7 +5,7 @@ module Data.Hastory.Handler.SessionsSpec
   ( spec
   ) where
 
-import Data.Maybe
+import Data.Either
 import Servant.Client
 import Test.Hspec
 
@@ -27,4 +27,4 @@ spec =
         let userForm = mkUserForm "Paul" "Passw0rd"
         Right _ <- createUser siClientEnv userForm
         Right resp <- loginUser siClientEnv userForm
-        extractJWTCookie resp `shouldSatisfy` isJust
+        extractJWTCookie resp `shouldSatisfy` isRight

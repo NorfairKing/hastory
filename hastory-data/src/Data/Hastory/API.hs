@@ -67,15 +67,15 @@ mkHastoryClient url username password = do
     Left _ -> pure $ Left UnableToLogin
     Right headers ->
       case extractJWTCookie headers of
-        Nothing -> pure $ Left NoJWTTokenFound
-        Just token -> pure $ Right (HastoryClient clientEnv token)
+        Left err -> pure $ Left err
+        Right token -> pure $ Right (HastoryClient clientEnv token)
 
 -- | Extract token after successful login.
-extractJWTCookie :: MonadError () m => Headers AuthCookies NoContent -> m Token
+extractJWTCookie :: Headers AuthCookies NoContent -> Either ClientEnvFailure Token
 extractJWTCookie headersList =
   case getHeadersHList headersList of
     HCons (Header a) _ -> pure . Token . setCookieValue . parseSetCookie . encodeUtf8 $ a
-    _ -> throwError ()
+    _ -> Left NoJWTTokenFound
 
 -- | Hastory API client.
 --

@@ -85,8 +85,8 @@ withNewUser clientEnv userForm func = do
   Right userId <- runClientM (createUserClient userForm) clientEnv
   Right resp <- runClientM (createSessionClient userForm) clientEnv
   case extractJWTCookie resp of
-    Nothing -> expectationFailure "JWT Cookie not found"
-    Just cookie -> func (userId, cookie)
+    Left err -> expectationFailure (show err)
+    Right cookie -> func (userId, cookie)
 
 createEntry :: ClientEnv -> Token -> SyncRequest -> IO (Either ClientError NoContent)
 createEntry clientEnv token syncReq = runClientM (createEntryClient token syncReq) clientEnv
