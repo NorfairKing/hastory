@@ -20,16 +20,16 @@ spec =
   describe "POST /sessions" $ do
     context "incorrect login" $
       it "is a 401" $ \ServerInfo {..} ->
-        forAllValid $ \(username, password) -> do
-          let userForm = UserForm username password
+        forAllValid $ \userForm -> do
           Right _ <- runClientM (createUserClient userForm) siClientEnv
-          let incorrectPasswordForm = UserForm username (password <> "badsuffix")
+          let incorrectPasswordForm =
+                userForm {userFormPassword = userFormPassword userForm <> "badsuffix"}
           Left (FailureResponse _requestF resp) <-
             runClientM (createSessionClient incorrectPasswordForm) siClientEnv
           responseStatusCode resp `shouldBe` status401
     context "correct login" $
-      it "returns a cookie" $ \ServerInfo {..} -> do
-        let userForm = UserForm (Username "Paul") "Passw0rd"
-        Right _ <- runClientM (createUserClient userForm) siClientEnv
-        Right resp <- runClientM (createSessionClient userForm) siClientEnv
-        extractJWTCookie resp `shouldSatisfy` isRight
+      it "returns a cookie" $ \ServerInfo {..} ->
+        forAllValid $ \userForm -> do
+          Right _ <- runClientM (createUserClient userForm) siClientEnv
+          Right resp <- runClientM (createSessionClient userForm) siClientEnv
+          extractJWTCookie resp `shouldSatisfy` isRight
