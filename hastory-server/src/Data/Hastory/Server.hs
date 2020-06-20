@@ -68,7 +68,7 @@ app :: Options -> ServerSettings -> Application
 app options serverSettings@ServerSettings {..} =
   serveWithContext api context (server options serverSettings)
   where
-    context = _ssCookieSettings :. _ssJWTSettings :. EmptyContext
+    context = serverSetCookieSettings :. serverSetJWTSettings :. EmptyContext
 
 -- | Logging action that will be executed with every request.
 mkWarpLogger :: FilePath -> Wai.Request -> HTTP.Status -> Maybe Integer -> IO ()
@@ -90,15 +90,15 @@ hastoryServer :: (MonadIO m, MonadLogger m, MonadUnliftIO m) => m ()
 hastoryServer = do
   options@Options {..} <- liftIO $ A.execParser optParser
   signingKey <- liftIO getSigningKey
-  let _ssJWTSettings = defaultJWTSettings signingKey
-      _ssCookieSettings = defaultCookieSettings
+  let serverSetCookieSettings = defaultCookieSettings
+      serverSetJWTSettings = defaultJWTSettings signingKey
   reportPort options
   dbFile <- resolveFile' "hastory.sqlite3"
   ensureDir (parent dbFile)
   SQL.withSqlitePoolInfo
     (SQL.mkSqliteConnectionInfo (T.pack $ fromAbsFile dbFile) & SQL.fkEnabled .~ False)
-    1 $ \_ssDbPool -> do
-    void $ SQL.runSqlPool (SQL.runMigrationSilent migrateAll) _ssDbPool
+    1 $ \serverSetPool -> do
+    void $ SQL.runSqlPool (SQL.runMigrationSilent migrateAll) serverSetPool
     liftIO $ Warp.runSettings (mkWarpSettings options) (app options ServerSettings {..})
 
 -- | Reads the signing key for json web tokens from the HASTORY_SERVER_JWK

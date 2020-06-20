@@ -13,8 +13,8 @@ createSessionHandler UserForm {..} = do
   where
     setLoggedIn = do
       let cookie = AuthCookie userFormUserName
-      cookieSettings <- asks _ssCookieSettings
-      jwtSettings <- asks _ssJWTSettings
+      cookieSettings <- asks serverSetCookieSettings
+      jwtSettings <- asks serverSetJWTSettings
       setCookie <-
         liftIO (makeSessionCookieBS cookieSettings jwtSettings cookie) >>= ensureWith err401
       pure $ addHeader (decodeUtf8 setCookie) NoContent

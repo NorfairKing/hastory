@@ -13,16 +13,16 @@ type HastoryHandler a = ReaderT ServerSettings Handler a
 
 data ServerSettings =
   ServerSettings
-    { _ssDbPool :: Pool SqlBackend
-    , _ssJWTSettings :: JWTSettings
-    , _ssCookieSettings :: CookieSettings
+    { serverSetPool :: Pool SqlBackend
+    , serverSetJWTSettings :: JWTSettings
+    , serverSetCookieSettings :: CookieSettings
     }
 
 type Query a = ReaderT SqlBackend IO a
 
 runDB :: Query a -> HastoryHandler a
 runDB query = do
-  pool <- asks _ssDbPool
+  pool <- asks serverSetPool
   liftIO $ runSqlPool query pool
 
 unAuthenticated :: HastoryHandler a

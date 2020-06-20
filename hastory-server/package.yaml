@@ -99,7 +99,6 @@ tests:
     - hspec
     - http-conduit
     - http-types
-    - microlens
     - persistent
     - resource-pool
     - servant
