@@ -30,9 +30,7 @@ instance GenValid UserForm where
   shrinkValid = shrinkValidStructurallyWithoutExtraFiltering
 
 instance GenValid Username where
-  genValid =
-    mkUsername <$>
-    (genValid `suchThat` \rawUsername -> notNull rawUsername && T.all isAlphaNum rawUsername)
+  genValid = Username <$> (genValid `suchThat` \text -> notNull text && T.all isAlphaNum text)
     where
       notNull = not . T.null
-  shrinkValid = map mkUsername . filter (not . T.null) . shrinkValid . rawUserName
+  shrinkValid = map Username . filter (not . T.null) . shrinkValid . usernameText

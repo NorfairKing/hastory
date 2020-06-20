@@ -61,7 +61,7 @@ mkHastoryClient ::
 mkHastoryClient url username password = do
   manager <- liftIO $ newManager defaultManagerSettings
   let clientEnv = mkClientEnv manager url
-      userForm = mkUserForm (rawUserName username) password
+      userForm = UserForm username password
   res <- liftIO $ runClientM (createSessionClient userForm) clientEnv
   case res of
     Left _ -> pure $ Left UnableToLogin

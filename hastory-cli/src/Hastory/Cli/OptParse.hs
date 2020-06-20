@@ -150,7 +150,7 @@ parseFlags =
        , help "URL of the central storage server"
        ]) <*>
   option
-    (Just . mkUsername . T.pack <$> str)
+    (Just . Username . T.pack <$> str)
     (mconcat
        [ long "storage-server-username"
        , metavar "USERNAME"

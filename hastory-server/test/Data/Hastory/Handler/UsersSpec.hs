@@ -5,7 +5,6 @@ module Data.Hastory.Handler.UsersSpec
   ( spec
   ) where
 
-import qualified Data.Text as T
 import Servant.Client
 import Test.Hspec
 import Test.Validity
@@ -27,23 +26,14 @@ spec =
       it "does not create the user" $ \ServerInfo {..} -> do
         let invalidUserName =
               "\192400\440428\904918\344036\355\177961\879579\1046203\470521\1025773"
-            userForm = mkUserForm invalidUserName "Password"
+            userForm = UserForm (Username invalidUserName) "Password"
         Left (FailureResponse _requestF resp) <- createUser siClientEnv userForm
         responseStatusCode resp `shouldBe` status400
         users <- runSqlPool (selectList [] []) siPool :: IO [Entity User]
         length users `shouldBe` 0
-    context "username already exists" $ do
+    context "username already exists" $
       it "is a 400" $ \ServerInfo {..} ->
         forAllValid $ \userForm -> do
           Right _ <- createUser siClientEnv userForm
           Left (FailureResponse _requestF resp) <- createUser siClientEnv userForm
-          responseStatusCode resp `shouldBe` status400
-      it "equality for a user's name is case insensitive" $ \ServerInfo {..} ->
-        forAllValid $ \userName -> do
-          let formAllLowerCase = mkUserForm lowercasedUsername "password"
-              lowercasedUsername = T.toLower . rawUserName $ userName
-          Right _ <- createUser siClientEnv formAllLowerCase
-          let formAllUpperCase = mkUserForm uppercasedUsername "password"
-              uppercasedUsername = T.toUpper . rawUserName $ userName
-          Left (FailureResponse _requestF resp) <- createUser siClientEnv formAllUpperCase
           responseStatusCode resp `shouldBe` status400

@@ -17,14 +17,14 @@ spec =
   describe "POST /sessions" $ do
     context "incorrect login" $
       it "is a 401" $ \ServerInfo {..} -> do
-        let userForm = mkUserForm "Paul" "Passw0rd"
+        let userForm = UserForm (Username "Paul") "Passw0rd"
         Right _ <- createUser siClientEnv userForm
-        let incorrectPasswordForm = mkUserForm "Paul" "baddPassw0rd"
+        let incorrectPasswordForm = UserForm (Username "Paul") "baddPassw0rd"
         Left (FailureResponse _requestF resp) <- loginUser siClientEnv incorrectPasswordForm
         responseStatusCode resp `shouldBe` status401
     context "correct login" $
       it "returns a cookie" $ \ServerInfo {..} -> do
-        let userForm = mkUserForm "Paul" "Passw0rd"
+        let userForm = UserForm (Username "Paul") "Passw0rd"
         Right _ <- createUser siClientEnv userForm
         Right resp <- loginUser siClientEnv userForm
         extractJWTCookie resp `shouldSatisfy` isRight

@@ -16,7 +16,6 @@ library:
     - aeson
     - base64
     - bytestring
-    - case-insensitive
     - cryptonite
     - hastory-path
     - memory

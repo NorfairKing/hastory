@@ -26,7 +26,7 @@ share
   [persistLowerCase|
 
 User
-    name Username sqltype="VARCHAR COLLATE NOCASE"
+    name Username
     hashedPassword (PasswordHash Bcrypt)
     UniqueUsername name
 
