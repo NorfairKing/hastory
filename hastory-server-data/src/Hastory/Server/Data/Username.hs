@@ -4,6 +4,9 @@
 
 module Hastory.Server.Data.Username where
 
+import Control.Monad.Fail (MonadFail)
+import qualified Control.Monad.Fail as Fail
+
 import Data.Aeson (FromJSON(parseJSON), ToJSON(toJSON), withText)
 import Data.Char
 import Data.Text (Text)
@@ -30,3 +33,12 @@ instance Validity Username where
       notNull = not . T.null . usernameText $ userName
       allAlphaNum =
         decorateList (T.unpack . usernameText $ userName) (declare "is alpha-numeric" . isAlphaNum)
+
+parseUsername :: MonadFail m => Text -> m Username
+parseUsername input =
+  case parseUsernameWithError input of
+    Left err -> Fail.fail err
+    Right validatedUsername -> pure validatedUsername
+
+parseUsernameWithError :: Text -> Either String Username
+parseUsernameWithError = prettyValidate . Username
