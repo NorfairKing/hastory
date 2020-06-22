@@ -28,11 +28,10 @@ instance ToJSON Username where
   toJSON = toJSON . usernameText
 
 instance Validity Username where
-  validate userName = mconcat [check notNull "Username cannot be null", allAlphaNum]
+  validate userName = mconcat [check notNull "Username cannot be null", allValidUsernameChar]
     where
       notNull = not . T.null . usernameText $ userName
-      allAlphaNum =
-        decorateList (T.unpack . usernameText $ userName) (declare "is alpha-numeric" . isAlphaNum)
+      allValidUsernameChar = decorateList (T.unpack . usernameText $ userName) validUsernameChar
 
 parseUsername :: MonadFail m => Text -> m Username
 parseUsername input =
@@ -42,3 +41,10 @@ parseUsername input =
 
 parseUsernameWithError :: Text -> Either String Username
 parseUsernameWithError = prettyValidate . Username
+
+validUsernameChar :: Char -> Validation
+validUsernameChar c =
+  mconcat
+    [ declare "The char is not ascii" (isAscii c)
+    , declare "The char is not a digit or letter" (isDigit c || isLetter c)
+    ]

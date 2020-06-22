@@ -2,11 +2,11 @@
 
 module Data.Hastory.Gen where
 
-import Data.Char
+import Data.GenValidity
+import Data.GenValidity.Text (genTextBy)
 import qualified Data.Text as T
 import Test.QuickCheck
 
-import Data.GenValidity
 import Data.Hastory
 
 instance GenValid Entry where
@@ -30,7 +30,9 @@ instance GenValid UserForm where
   shrinkValid = shrinkValidStructurallyWithoutExtraFiltering
 
 instance GenValid Username where
-  genValid = Username <$> (genValid `suchThat` \text -> notNull text && T.all isAlphaNum text)
+  genValid = Username <$> validUsernameText
     where
-      notNull = not . T.null
+      validUsernameText = genTextBy asciiDigitOrLetter `suchThat` (not . T.null)
+      asciiDigitOrLetter = ascii `suchThat` (validationIsValid . validUsernameChar)
+      ascii = choose ('\0', '\127')
   shrinkValid = map Username . filter (not . T.null) . shrinkValid . usernameText
