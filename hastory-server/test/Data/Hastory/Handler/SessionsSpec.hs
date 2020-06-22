@@ -23,7 +23,7 @@ spec =
         forAllValid $ \userForm -> do
           Right _ <- runClientM (createUserClient userForm) siClientEnv
           let incorrectPasswordForm =
-                userForm {userFormPassword = userFormPassword userForm <> "badsuffix"}
+                userForm {userFormPassword = "badPrefix" <> userFormPassword userForm}
           Left (FailureResponse _requestF resp) <-
             runClientM (createSessionClient incorrectPasswordForm) siClientEnv
           responseStatusCode resp `shouldBe` status401
