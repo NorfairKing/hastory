@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}
@@ -6,6 +7,7 @@ module Hastory.Server.Data.Username where
 
 import Control.Monad.Fail (MonadFail)
 import qualified Control.Monad.Fail as Fail
+import GHC.Generics
 
 import Data.Aeson (FromJSON(parseJSON), ToJSON(toJSON), withText)
 import Data.Char
@@ -18,7 +20,7 @@ newtype Username =
   Username
     { usernameText :: Text
     }
-  deriving (Eq)
+  deriving (Eq, Generic)
   deriving newtype (Show, PersistField, PersistFieldSql)
 
 instance FromJSON Username where
@@ -31,7 +33,8 @@ instance Validity Username where
   validate userName = mconcat [check notNull "Username cannot be null", allValidUsernameChar]
     where
       notNull = not . T.null . usernameText $ userName
-      allValidUsernameChar = decorateList (T.unpack . usernameText $ userName) validUsernameChar
+      allValidUsernameChar =
+        decorateList (map UsernameChar $ T.unpack (usernameText userName)) validate
 
 parseUsername :: MonadFail m => Text -> m Username
 parseUsername input =
@@ -48,3 +51,16 @@ validUsernameChar c =
     [ declare "The char is not ascii" (isAscii c)
     , declare "The char is not a digit or letter" (isDigit c || isLetter c)
     ]
+
+newtype UsernameChar =
+  UsernameChar
+    { unUsernameChar :: Char
+    }
+  deriving (Generic)
+
+instance Validity UsernameChar where
+  validate (UsernameChar c) =
+    mconcat
+      [ check (isAscii c) "The character is not ASCII"
+      , check (isLetter c || isDigit c) "The character is not a letter or digit"
+      ]

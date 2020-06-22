@@ -3,7 +3,6 @@
 module Data.Hastory.Gen where
 
 import Data.GenValidity
-import Data.GenValidity.Text (genTextBy)
 import qualified Data.Text as T
 import Test.QuickCheck
 
@@ -26,13 +25,15 @@ instance GenValid SyncRequest where
   shrinkValid = shrinkValidStructurally
 
 instance GenValid UserForm where
-  genValid = genValidStructurallyWithoutExtraChecking
-  shrinkValid = shrinkValidStructurallyWithoutExtraFiltering
+  genValid = genValidStructurally
+  shrinkValid = shrinkValidStructurally
 
 instance GenValid Username where
   genValid = Username <$> validUsernameText
     where
-      validUsernameText = genTextBy asciiDigitOrLetter `suchThat` (not . T.null)
-      asciiDigitOrLetter = ascii `suchThat` (validationIsValid . validUsernameChar)
-      ascii = choose ('\0', '\127')
-  shrinkValid = map Username . filter (not . T.null) . shrinkValid . usernameText
+      validUsernameText = T.pack . map unUsernameChar <$> vectorOf 4 genValid
+  shrinkValid = shrinkValidStructurally
+
+instance GenValid UsernameChar where
+  genValid = UsernameChar <$> choose ('\0', '\127') `suchThat` isValid
+  shrinkValid = shrinkValidStructurally
