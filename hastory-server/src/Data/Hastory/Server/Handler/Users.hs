@@ -1,26 +1,22 @@
+{-# LANGUAGE FlexibleContexts #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE RecordWildCards #-}
 
 module Data.Hastory.Server.Handler.Users where
+
+import qualified Data.ByteString.Lazy.Char8 as C
 
 import Data.Hastory.Server.Handler.Import
 
 createUserHandler :: UserForm -> HastoryHandler UserId
 createUserHandler userForm@UserForm {..} = do
   mUser <- runDB . getBy $ UniqueUsername userFormUserName
-  if isNothing mUser && isValid userForm
-    then buildAndInsertUser userFormUserName userFormPassword
-    else throwError err400
+  case mUser of
+    Nothing -> either respondWithErr buildAndInsertUser (prettyValidate userForm)
+    Just _ -> throwError err400
   where
-    buildAndInsertUser name password = do
-      user <- User name <$> liftIO (hashPassword . mkPassword $ password)
-      runDB (insert user)
--- createUserHandler :: ServerSettings -> UserForm -> Handler UserId
--- createUserHandler ServerSettings {..} userForm@UserForm {..} = do
---   mUser <- runDB (getBy $ UniqueUsername userFormUserName) _ssDbPool
---   if isNothing mUser && isValid userForm
---     then buildAndInsertUser userFormUserName userFormPassword
---     else throwError err400
---   where
---     buildAndInsertUser name password = do
---       user <- User name <$> liftIO (hashPassword . mkPassword $ password)
---       runDB (insert user) _ssDbPool
+    respondWithErr err = throwError $ err400 {errBody = C.pack err}
+
+buildAndInsertUser :: UserForm -> HastoryHandler UserId
+buildAndInsertUser UserForm {..} =
+  User userFormUserName <$> liftIO (hashPassword . mkPassword $ userFormPassword) >>= runDB . insert
