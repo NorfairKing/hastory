@@ -6,6 +6,8 @@ module Data.Hastory.Server.Handler.Users where
 
 import qualified Data.ByteString.Lazy.Char8 as C
 
+import Hastory.Server.Data.PasswordDifficulty
+
 import Data.Hastory.Server.Handler.Import
 
 createUserHandler :: UserForm -> HastoryHandler UserId
@@ -18,5 +20,9 @@ createUserHandler userForm@UserForm {..} = do
     respondWithErr err = throwError $ err400 {errBody = C.pack err}
 
 buildAndInsertUser :: UserForm -> HastoryHandler UserId
-buildAndInsertUser UserForm {..} =
-  User userFormUserName <$> liftIO (hashPassword . mkPassword $ userFormPassword) >>= runDB . insert
+buildAndInsertUser UserForm {..} = do
+  difficulty <- asks (unPasswordDifficulty . serverSetPwDifficulty)
+  user <-
+    User userFormUserName <$>
+    liftIO (hashPasswordWithParams difficulty . mkPassword $ userFormPassword)
+  runDB $ insert user

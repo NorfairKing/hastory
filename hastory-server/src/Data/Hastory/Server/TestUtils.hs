@@ -44,6 +44,7 @@ import Data.Hastory.API
 import Data.Hastory.Server (Options(..), app)
 import Data.Hastory.Types
 import Hastory.Server.Data (migrateAll)
+import Hastory.Server.Data.PasswordDifficulty
 
 data ServerInfo =
   ServerInfo
@@ -60,6 +61,7 @@ withTestServer func = do
   withSystemTempDir "hastory-server-test" $ \tmpDir -> do
     dbFile <- resolveFile tmpDir "server.db"
     jwk <- generateKey
+    pwDifficulty <- passwordDifficultyOrExit 4
     let jwtSettings = defaultJWTSettings jwk
     runNoLoggingT $
       withSqlitePoolInfo
@@ -69,7 +71,7 @@ withTestServer func = do
           void $ runSqlPool (runMigrationSilent migrateAll) siPool
           let mkApp = pure $ app opts settings
               opts = Options 10 Nothing
-              settings = ServerSettings siPool jwtSettings defaultCookieSettings
+              settings = ServerSettings siPool jwtSettings defaultCookieSettings pwDifficulty
           testWithApplication mkApp $ \p ->
             let siClientEnv = mkClientEnv manager (BaseUrl Http "127.0.0.1" p "")
              in func (ServerInfo {..})

@@ -30,9 +30,10 @@ library:
     - validity-text
   exposed-modules:
     - Hastory.Server.Data
+    - Hastory.Server.Data.Password
+    - Hastory.Server.Data.PasswordDifficulty
     - Hastory.Server.Data.UserForm
     - Hastory.Server.Data.Username
-    - Hastory.Server.Data.Password
   ghc-options:
     - -Wall
     - -Wcompat

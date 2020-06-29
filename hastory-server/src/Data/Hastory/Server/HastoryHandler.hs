@@ -9,6 +9,8 @@ import Database.Persist.Sql
 import Servant
 import Servant.Auth.Server
 
+import Hastory.Server.Data.PasswordDifficulty
+
 type HastoryHandler a = ReaderT ServerSettings Handler a
 
 data ServerSettings =
@@ -16,6 +18,7 @@ data ServerSettings =
     { serverSetPool :: Pool SqlBackend
     , serverSetJWTSettings :: JWTSettings
     , serverSetCookieSettings :: CookieSettings
+    , serverSetPwDifficulty :: PasswordDifficulty
     }
 
 type Query a = ReaderT SqlBackend IO a

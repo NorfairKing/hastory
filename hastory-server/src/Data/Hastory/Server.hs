@@ -33,6 +33,7 @@ import System.Exit
 import Data.Hastory.API
 import Data.Hastory.Server.Handler
 import Hastory.Server.Data (migrateAll)
+import Hastory.Server.Data.PasswordDifficulty
 
 data Options =
   Options
@@ -90,6 +91,7 @@ hastoryServer :: (MonadIO m, MonadLogger m, MonadUnliftIO m) => m ()
 hastoryServer = do
   options@Options {..} <- liftIO $ A.execParser optParser
   signingKey <- liftIO getSigningKey
+  serverSetPwDifficulty <- liftIO (passwordDifficultyOrExit 10)
   let serverSetCookieSettings = defaultCookieSettings
       serverSetJWTSettings = defaultJWTSettings signingKey
   reportPort options
