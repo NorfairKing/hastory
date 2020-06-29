@@ -3,6 +3,7 @@
 module Data.Hastory.Gen where
 
 import Data.GenValidity
+import Data.GenValidity.Text
 import qualified Data.Text as T
 import Test.QuickCheck
 
@@ -29,11 +30,13 @@ instance GenValid UserForm where
   shrinkValid = shrinkValidStructurally
 
 instance GenValid Username where
-  genValid = Username <$> validUsernameText
+  genValid = Username <$> userNameTextGen
     where
-      validUsernameText = T.pack . map unUsernameChar <$> vectorOf 4 genValid
-  shrinkValid = shrinkValidStructurally
-
-instance GenValid UsernameChar where
-  genValid = UsernameChar <$> choose ('\0', '\127') `suchThat` isValid
+      userNameTextGen = oneof [lengthFourText, arbitraryLengthText]
+      lengthFourText = T.pack <$> vectorOf 4 asciiLetterOrDigitGen
+      arbitraryLengthText = genTextBy asciiLetterOrDigitGen
+      asciiLetterOrDigitGen = oneof [asciiUppercaseGen, asciiLowercaseGen, asciiDigitGen]
+      asciiDigitGen = choose ('0', '9')
+      asciiUppercaseGen = choose ('A', 'Z')
+      asciiLowercaseGen = choose ('a', 'z')
   shrinkValid = shrinkValidStructurally

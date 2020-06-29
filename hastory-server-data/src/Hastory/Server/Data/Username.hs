@@ -30,11 +30,16 @@ instance ToJSON Username where
   toJSON = toJSON . usernameText
 
 instance Validity Username where
-  validate userName = mconcat [check notNull "Username cannot be null", allValidUsernameChar]
+  validate userName =
+    mconcat [check (notNull userName) "Username is not null", allAsciiLetterOrDigit]
     where
-      notNull = not . T.null . usernameText $ userName
-      allValidUsernameChar =
-        decorateList (map UsernameChar $ T.unpack (usernameText userName)) validate
+      notNull = not . T.null . usernameText
+      allAsciiLetterOrDigit = decorateList (T.unpack . usernameText $ userName) asciiLetterOrDigit
+      asciiLetterOrDigit c =
+        mconcat
+          [ check (isAscii c) "Char is ASCII"
+          , check (isDigit c || isLetter c) "Char is letter or digit"
+          ]
 
 parseUsername :: MonadFail m => Text -> m Username
 parseUsername input =
@@ -44,23 +49,3 @@ parseUsername input =
 
 parseUsernameWithError :: Text -> Either String Username
 parseUsernameWithError = prettyValidate . Username
-
-validUsernameChar :: Char -> Validation
-validUsernameChar c =
-  mconcat
-    [ declare "The char is not ascii" (isAscii c)
-    , declare "The char is not a digit or letter" (isDigit c || isLetter c)
-    ]
-
-newtype UsernameChar =
-  UsernameChar
-    { unUsernameChar :: Char
-    }
-  deriving (Generic)
-
-instance Validity UsernameChar where
-  validate (UsernameChar c) =
-    mconcat
-      [ check (isAscii c) "The character is not ASCII"
-      , check (isLetter c || isDigit c) "The character is not a letter or digit"
-      ]

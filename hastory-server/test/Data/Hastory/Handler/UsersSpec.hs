@@ -39,8 +39,7 @@ spec =
             userForm = UserForm (Username invalidUserName) "Password"
         Left (FailureResponse _requestF resp) <- runClientM (createUserClient userForm) siClientEnv -- Either ClientError UserId
         let errMsg = C.unpack (responseBody resp)
-        print errMsg
-        errMsg `shouldContain` "The character is not a letter or digit"
+        errMsg `shouldContain` "Violated: Char is letter or digit"
     context "username already exists" $
       it "is a 400" $ \ServerInfo {..} ->
         forAllValid $ \userForm -> do
