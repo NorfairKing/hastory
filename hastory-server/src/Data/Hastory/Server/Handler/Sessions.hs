@@ -11,11 +11,6 @@ createSessionHandler UserForm {..} =
       PasswordCheckSuccess -> setLoggedIn
       PasswordCheckFail -> unAuthenticated
   where
-    setLoggedIn = do
-      let cookie = AuthCookie userFormUserName
-          unAuthorized = throwError err401
-          addCookieToHeader setCookie = pure $ addHeader (decodeUtf8 setCookie) NoContent
-      cookieSettings <- asks serverSetCookieSettings
-      jwtSettings <- asks serverSetJWTSettings
-      mSetCookie <- liftIO (makeSessionCookieBS cookieSettings jwtSettings cookie)
-      maybe unAuthorized addCookieToHeader mSetCookie
+    setLoggedIn =
+      withSetCookie userFormUserName $ \setCookie ->
+        pure $ addHeader (decodeUtf8 setCookie) NoContent

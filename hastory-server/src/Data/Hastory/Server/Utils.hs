@@ -4,13 +4,14 @@ module Data.Hastory.Server.Utils where
 
 import Control.Monad.Error.Class
 import Crypto.Hash (Digest, SHA256(..), hashWith)
-import qualified Data.ByteString as B
+import Data.ByteString (ByteString)
 import Data.Hastory.Types
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import Data.Time.Format (defaultTimeLocale, formatTime, iso8601DateFormat)
 import Database.Persist
 import Path (fromAbsDir)
+import Servant.Auth.Server
 import Servant.Server
 
 import Data.Hastory.Server.HastoryHandler
@@ -22,8 +23,18 @@ withUser username k = do
     Nothing -> throwError err401
     Just entityUser -> k entityUser
 
+withSetCookie :: Username -> (ByteString -> HastoryHandler a) -> HastoryHandler a
+withSetCookie userName func = do
+  let cookie = AuthCookie userName
+  cookieSettings <- asks serverSetCookieSettings
+  jwtSettings <- asks serverSetJWTSettings
+  mSetCookie <- liftIO (makeSessionCookieBS cookieSettings jwtSettings cookie)
+  case mSetCookie of
+    Nothing -> throwError err401
+    Just bs -> func bs
+
 hashEntry :: Entry -> T.Text -> Digest SHA256
-hashEntry Entry {..} host = hashWith SHA256 (unifiedData :: B.ByteString)
+hashEntry Entry {..} host = hashWith SHA256 (unifiedData :: ByteString)
   where
     unifiedData =
       mconcat
