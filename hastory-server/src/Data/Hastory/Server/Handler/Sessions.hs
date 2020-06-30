@@ -6,7 +6,7 @@ import Data.Hastory.Server.Handler.Import
 
 createSessionHandler :: UserForm -> HastoryHandler (Headers AuthCookies NoContent)
 createSessionHandler UserForm {..} = do
-  user <- entityVal <$> (runDB (getBy $ UniqueUsername userFormUserName) >>= ensureWith err401)
+  user <- entityVal <$> (runDB (getBy $ UniqueUsername userFormUserName) >>= ensureWithUnauthorized)
   case checkPassword (mkPassword userFormPassword) (userHashedPassword user) of
     PasswordCheckSuccess -> setLoggedIn
     PasswordCheckFail -> unAuthenticated
@@ -16,5 +16,5 @@ createSessionHandler UserForm {..} = do
       cookieSettings <- asks serverSetCookieSettings
       jwtSettings <- asks serverSetJWTSettings
       setCookie <-
-        liftIO (makeSessionCookieBS cookieSettings jwtSettings cookie) >>= ensureWith err401
+        liftIO (makeSessionCookieBS cookieSettings jwtSettings cookie) >>= ensureWithUnauthorized
       pure $ addHeader (decodeUtf8 setCookie) NoContent

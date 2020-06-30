@@ -11,7 +11,7 @@ import Servant.Auth.Server
 
 import Hastory.Server.Data.PasswordDifficulty
 
-type HastoryHandler a = ReaderT ServerSettings Handler a
+type HastoryHandler = ReaderT ServerSettings Handler
 
 data ServerSettings =
   ServerSettings

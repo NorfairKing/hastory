@@ -2,7 +2,7 @@
 
 module Data.Hastory.Server.Utils where
 
-import Control.Monad.Except
+import Control.Monad.Error.Class
 import Crypto.Hash (Digest, SHA256(..), hashWith)
 import qualified Data.ByteString as B
 import Data.Hastory.Types
@@ -10,10 +10,16 @@ import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import Data.Time.Format (defaultTimeLocale, formatTime, iso8601DateFormat)
 import Path (fromAbsDir)
+import Servant.Server
 
-ensureWith :: MonadError e m => e -> Maybe a -> m a
+import Data.Hastory.Server.HastoryHandler
+
+ensureWith :: Handler a -> Maybe a -> HastoryHandler a
 ensureWith _ (Just a) = pure a
-ensureWith e Nothing = throwError e
+ensureWith defaultAction Nothing = lift defaultAction
+
+ensureWithUnauthorized :: Maybe a -> HastoryHandler a
+ensureWithUnauthorized = ensureWith (throwError err401)
 
 hashEntry :: Entry -> T.Text -> Digest SHA256
 hashEntry Entry {..} host = hashWith SHA256 (unifiedData :: B.ByteString)
