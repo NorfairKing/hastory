@@ -9,17 +9,18 @@ import Data.Hastory.Types
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import Data.Time.Format (defaultTimeLocale, formatTime, iso8601DateFormat)
+import Database.Persist
 import Path (fromAbsDir)
 import Servant.Server
 
 import Data.Hastory.Server.HastoryHandler
 
-ensureWith :: Handler a -> Maybe a -> HastoryHandler a
-ensureWith _ (Just a) = pure a
-ensureWith defaultAction Nothing = lift defaultAction
-
-ensureWithUnauthorized :: Maybe a -> HastoryHandler a
-ensureWithUnauthorized = ensureWith (throwError err401)
+withUser :: Username -> (Entity User -> HastoryHandler a) -> HastoryHandler a
+withUser username k = do
+  mUser <- runDB . getBy $ UniqueUsername username
+  case mUser of
+    Nothing -> throwError err401
+    Just entityUser -> k entityUser
 
 hashEntry :: Entry -> T.Text -> Digest SHA256
 hashEntry Entry {..} host = hashWith SHA256 (unifiedData :: B.ByteString)
