@@ -31,9 +31,10 @@ instance ToJSON Username where
 
 instance Validity Username where
   validate userName =
-    mconcat [check (notNull userName) "Username is not null", allAsciiLetterOrDigit]
+    mconcat
+      [check (userNameLength > 2) "Username length is greater than two", allAsciiLetterOrDigit]
     where
-      notNull = not . T.null . usernameText
+      userNameLength = T.length . usernameText $ userName
       allAsciiLetterOrDigit = decorateList (T.unpack . usernameText $ userName) asciiLetterOrDigit
       asciiLetterOrDigit c =
         mconcat

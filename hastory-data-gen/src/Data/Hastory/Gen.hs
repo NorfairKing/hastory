@@ -2,6 +2,7 @@
 
 module Data.Hastory.Gen where
 
+import Control.Applicative
 import Data.GenValidity
 import Data.GenValidity.Text
 import qualified Data.Text as T
@@ -32,8 +33,8 @@ instance GenValid UserForm where
 instance GenValid Username where
   genValid = Username <$> userNameTextGen
     where
-      userNameTextGen = oneof [lengthFourText, arbitraryLengthText]
-      lengthFourText = T.pack <$> vectorOf 4 asciiLetterOrDigitGen
+      userNameTextGen = liftA2 (<>) lengthThreeText arbitraryLengthText
+      lengthThreeText = T.pack <$> vectorOf 3 asciiLetterOrDigitGen
       arbitraryLengthText = genTextBy asciiLetterOrDigitGen
       asciiLetterOrDigitGen = oneof [asciiUppercaseGen, asciiLowercaseGen, asciiDigitGen]
       asciiDigitGen = choose ('0', '9')
