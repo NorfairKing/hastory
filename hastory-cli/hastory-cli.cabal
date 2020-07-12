@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 7c38df38419900fdc22d659c4b270b5673e2ef35c8c2e88e3a6a756a3e979381
+-- hash: 11d6d55df9b5bd0855134089f3f68dbd70cc6e3da64987ff0452ee21c2f0d52f
 
 name:           hastory-cli
 version:        0.0.0.0
@@ -87,6 +87,7 @@ test-suite hastory-cli-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      Hastory.Cli.Commands.GenGatherWrapperSpec
       Hastory.Cli.Commands.SuggestionSpec
       TestImport
       Paths_hastory_cli
@@ -110,6 +111,7 @@ test-suite hastory-cli-test
     , path
     , path-io
     , safe
+    , servant-client-core
     , text
     , validity
     , validity-path
