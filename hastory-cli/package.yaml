@@ -82,9 +82,11 @@ tests:
     - hastory-data
     - hastory-data-gen
     - hspec
+    - optparse-applicative
     - path
     - path-io
     - safe
+    - servant-client
     - servant-client-core
     - text
     - validity

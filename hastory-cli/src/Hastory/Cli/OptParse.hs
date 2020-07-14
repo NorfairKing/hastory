@@ -2,6 +2,7 @@
 
 module Hastory.Cli.OptParse
   ( getInstructions
+  , runArgumentsParser
   , Instructions(..)
   , Dispatch(..)
   , Settings(..)
@@ -30,7 +31,7 @@ combineToInstructions cmd Flags {..} Configuration = Instructions d <$> sets
     d =
       case cmd of
         CommandGather -> DispatchGather
-        CommandGenGatherWrapperScript -> DispatchGenGatherWrapperScript
+        (CommandGenGatherWrapperScript mRemoteInfo) -> DispatchGenGatherWrapperScript mRemoteInfo
         CommandListRecentDirs ListRecentDirArgs {..} ->
           DispatchListRecentDirs
             ListRecentDirSets {lrdSetBypassCache = fromMaybe False lrdArgBypassCache}
@@ -94,7 +95,31 @@ parseCommandGather =
 
 parseGenGatherWrapperScript :: ParserInfo Command
 parseGenGatherWrapperScript =
-  info (pure CommandGenGatherWrapperScript) (progDesc "Generate the wrapper script to use 'gather'")
+  info
+    (CommandGenGatherWrapperScript <$> maybeRemoteStorageParser)
+    (progDesc "Generate the wrapper script to use 'gather'")
+  where
+    maybeRemoteStorageParser = Just <$> remoteStorageParser
+    remoteStorageParser =
+      RemoteStorageClientInfo <$>
+      option
+        (maybeReader parseBaseUrl)
+        (mconcat
+           [long "storage-server-url", metavar "URL", help "URL of the central storage server"]) <*>
+      option
+        (maybeReader $ parseUsername . T.pack)
+        (mconcat
+           [ long "storage-server-username"
+           , metavar "USERNAME"
+           , help "USERNAME of the central storage server"
+           ]) <*>
+      option
+        auto
+        (mconcat
+           [ long "storage-server-password"
+           , metavar "PASSWORD"
+           , help "PASSWORD of the central storage server"
+           ])
 
 parseCommandChangeDir :: ParserInfo Command
 parseCommandChangeDir =

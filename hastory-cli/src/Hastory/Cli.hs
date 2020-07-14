@@ -23,7 +23,7 @@ hastoryCli = do
 
 dispatch :: (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => Dispatch -> m ()
 dispatch DispatchGather = gather
-dispatch DispatchGenGatherWrapperScript = liftIO $ genGatherWrapperScript Nothing
+dispatch (DispatchGenGatherWrapperScript mRemoteInfo) = liftIO (genGatherWrapperScript mRemoteInfo)
 dispatch (DispatchChangeDir ix) = change ix
 dispatch (DispatchListRecentDirs lrds) = listRecentDirs lrds
 dispatch DispatchGenChangeWrapperScript = liftIO genChangeWrapperScript

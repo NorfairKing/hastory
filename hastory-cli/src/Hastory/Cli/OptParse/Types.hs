@@ -15,12 +15,14 @@ data Instructions =
 
 data Command
   = CommandGather
-  | CommandGenGatherWrapperScript
+  | CommandGenGatherWrapperScript GenGatherWrapperScriptFlags
   | CommandListRecentDirs ListRecentDirArgs
   | CommandChangeDir Int
   | CommandGenChangeWrapperScript
   | CommandSuggestAlias
   deriving (Show, Eq)
+
+type GenGatherWrapperScriptFlags = Maybe RemoteStorageClientInfo
 
 newtype ListRecentDirArgs =
   ListRecentDirArgs
@@ -43,12 +45,14 @@ data Configuration =
 
 data Dispatch
   = DispatchGather
-  | DispatchGenGatherWrapperScript
+  | DispatchGenGatherWrapperScript GenGatherWrapperScriptSettings
   | DispatchListRecentDirs ListRecentDirSets
   | DispatchChangeDir Int
   | DispatchGenChangeWrapperScript
   | DispatchSuggestAlias
   deriving (Show, Eq)
+
+type GenGatherWrapperScriptSettings = Maybe RemoteStorageClientInfo
 
 newtype ListRecentDirSets =
   ListRecentDirSets
@@ -69,4 +73,4 @@ data RemoteStorageClientInfo =
     , remoteStorageClientInfoUsername :: Username
     , remoteStorageClientInfoPassword :: Text
     }
-  deriving (Show)
+  deriving (Show, Eq)
