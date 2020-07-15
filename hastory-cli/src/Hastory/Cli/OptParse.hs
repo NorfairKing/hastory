@@ -48,9 +48,9 @@ combineToInstructions cmd Flags {..} Configuration = Instructions d <$> sets
         case flagCacheDir of
           Nothing -> resolveDir home ".hastory"
           Just fcd -> resolveDir' fcd
-      let mbBaseUrl = parseBaseUrl . T.unpack =<< flagStorageServer
       let mbRemoteStorageClientInfo =
-            RemoteStorageClientInfo <$> mbBaseUrl <*> flagStorageUsername <*> flagStoragePassword
+            RemoteStorageClientInfo <$> flagStorageServer <*> flagStorageUsername <*>
+            flagStoragePassword
       pure Settings {setCacheDir = cacheDir, remoteStorageClientInfo = mbRemoteStorageClientInfo}
 
 getConfiguration :: Command -> Flags -> IO Configuration
@@ -146,31 +146,25 @@ parseSuggestAlias =
 parseFlags :: Parser Flags
 parseFlags =
   Flags <$>
-  option
-    (Just <$> str)
-    (mconcat
-       [long "cache-dir", metavar "DIR", value Nothing, help "the cache directory for hastory"]) <*>
-  option
-    (Just . T.pack <$> str)
-    (mconcat
-       [ long "storage-server-url"
-       , metavar "URL"
-       , value Nothing
-       , help "URL of the central storage server"
-       ]) <*>
-  option
-    (Just <$> maybeReader (parseUsername . T.pack))
-    (mconcat
-       [ long "storage-server-username"
-       , metavar "USERNAME"
-       , value Nothing
-       , help "Username for the central storage server"
-       ]) <*>
-  option
-    (Just . T.pack <$> str)
-    (mconcat
-       [ long "storage-server-password"
-       , metavar "PASSWORD"
-       , value Nothing
-       , help "Password for the central storage server"
-       ])
+  optional
+    (option str (mconcat [long "cache-dir", metavar "DIR", help "the cache directory for hastory"])) <*>
+  optional
+    (option
+       (maybeReader parseBaseUrl)
+       (mconcat [long "storage-server-url", metavar "URL", help "URL of the central storage server"])) <*>
+  optional
+    (option
+       (maybeReader (parseUsername . T.pack))
+       (mconcat
+          [ long "storage-server-username"
+          , metavar "USERNAME"
+          , help "Username for the central storage server"
+          ])) <*>
+  optional
+    (option
+       (T.pack <$> str)
+       (mconcat
+          [ long "storage-server-password"
+          , metavar "PASSWORD"
+          , help "Password for the central storage server"
+          ]))

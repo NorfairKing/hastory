@@ -53,7 +53,7 @@ newtype ListRecentDirFlags =
 data Flags =
   Flags
     { flagCacheDir :: Maybe FilePath
-    , flagStorageServer :: Maybe Text
+    , flagStorageServer :: Maybe BaseUrl
     , flagStorageUsername :: Maybe Username
     , flagStoragePassword :: Maybe Text
     }
