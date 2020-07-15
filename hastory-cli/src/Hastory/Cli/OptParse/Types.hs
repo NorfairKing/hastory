@@ -14,18 +14,38 @@ data Instructions =
   deriving (Show)
 
 data Command
-  = CommandGather
+  = CommandGather GatherFlags
   | CommandGenGatherWrapperScript GenGatherWrapperScriptFlags
-  | CommandListRecentDirs ListRecentDirArgs
-  | CommandChangeDir Int
-  | CommandGenChangeWrapperScript
-  | CommandSuggestAlias
+  | CommandListRecentDirs ListRecentDirFlags
+  | CommandChangeDir ChangeDirFlags
+  | CommandGenChangeWrapperScript GenChangeWrapperScriptFlags
+  | CommandSuggestAlias SuggestAliasFlags
   deriving (Show, Eq)
 
-type GenGatherWrapperScriptFlags = Maybe RemoteStorageClientInfo
+data GatherFlags =
+  GatherFlags
+  deriving (Show, Eq)
 
-newtype ListRecentDirArgs =
-  ListRecentDirArgs
+data GenGatherWrapperScriptFlags =
+  GenGatherWrapperScriptFlags
+  deriving (Show, Eq)
+
+newtype ChangeDirFlags =
+  ChangeDirFlags
+    { changeDirFlagsIdx :: Int
+    }
+  deriving (Show, Eq)
+
+data GenChangeWrapperScriptFlags =
+  GenChangeWrapperScriptFlags
+  deriving (Show, Eq)
+
+data SuggestAliasFlags =
+  SuggestAliasFlags
+  deriving (Show, Eq)
+
+newtype ListRecentDirFlags =
+  ListRecentDirFlags
     { lrdArgBypassCache :: Maybe Bool
     }
   deriving (Show, Eq)
@@ -37,27 +57,49 @@ data Flags =
     , flagStorageUsername :: Maybe Username
     , flagStoragePassword :: Maybe Text
     }
-  deriving (Show)
+  deriving (Show, Eq)
 
 data Configuration =
   Configuration
   deriving (Show, Eq)
 
 data Dispatch
-  = DispatchGather
+  = DispatchGather GatherSettings
   | DispatchGenGatherWrapperScript GenGatherWrapperScriptSettings
-  | DispatchListRecentDirs ListRecentDirSets
-  | DispatchChangeDir Int
-  | DispatchGenChangeWrapperScript
-  | DispatchSuggestAlias
+  | DispatchListRecentDirs ListRecentDirSettings
+  | DispatchChangeDir ChangeDirSettings
+  | DispatchGenChangeWrapperScript GenChangeWrapperScriptSettings
+  | DispatchSuggestAlias SuggestAliasSettings
   deriving (Show, Eq)
 
-type GenGatherWrapperScriptSettings = Maybe RemoteStorageClientInfo
+data GatherSettings =
+  GatherSettings
+  deriving (Show, Eq)
 
-newtype ListRecentDirSets =
-  ListRecentDirSets
+newtype GenGatherWrapperScriptSettings =
+  GenGatherWrapperScriptSettings
+    { genGatherWrapperScriptSetRemoteInfo :: Maybe RemoteStorageClientInfo
+    }
+  deriving (Show, Eq)
+
+newtype ListRecentDirSettings =
+  ListRecentDirSettings
     { lrdSetBypassCache :: Bool
     }
+  deriving (Show, Eq)
+
+newtype ChangeDirSettings =
+  ChangeDirSettings
+    { changeDirSetIdx :: Int
+    }
+  deriving (Show, Eq)
+
+data GenChangeWrapperScriptSettings =
+  GenChangeWrapperScriptSettings
+  deriving (Show, Eq)
+
+data SuggestAliasSettings =
+  SuggestAliasSettings
   deriving (Show, Eq)
 
 data Settings =

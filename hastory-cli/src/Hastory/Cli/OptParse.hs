@@ -30,14 +30,18 @@ combineToInstructions cmd Flags {..} Configuration = Instructions d <$> sets
   where
     d =
       case cmd of
-        CommandGather -> DispatchGather
-        (CommandGenGatherWrapperScript mRemoteInfo) -> DispatchGenGatherWrapperScript mRemoteInfo
-        CommandListRecentDirs ListRecentDirArgs {..} ->
+        CommandGather _ -> DispatchGather GatherSettings
+        CommandGenGatherWrapperScript _ ->
+          DispatchGenGatherWrapperScript
+            GenGatherWrapperScriptSettings {genGatherWrapperScriptSetRemoteInfo = Nothing}
+        CommandListRecentDirs ListRecentDirFlags {..} ->
           DispatchListRecentDirs
-            ListRecentDirSets {lrdSetBypassCache = fromMaybe False lrdArgBypassCache}
-        CommandChangeDir i -> DispatchChangeDir i
-        CommandGenChangeWrapperScript -> DispatchGenChangeWrapperScript
-        CommandSuggestAlias -> DispatchSuggestAlias
+            ListRecentDirSettings {lrdSetBypassCache = fromMaybe False lrdArgBypassCache}
+        CommandChangeDir ChangeDirFlags {..} ->
+          DispatchChangeDir ChangeDirSettings {changeDirSetIdx = changeDirFlagsIdx}
+        CommandGenChangeWrapperScript _ ->
+          DispatchGenChangeWrapperScript GenChangeWrapperScriptSettings
+        CommandSuggestAlias _ -> DispatchSuggestAlias SuggestAliasSettings
     sets = do
       home <- getHomeDir
       cacheDir <-
@@ -91,40 +95,20 @@ parseCommand =
 
 parseCommandGather :: ParserInfo Command
 parseCommandGather =
-  info (pure CommandGather) (fullDesc <> progDesc "Read a single command on the standard input.")
+  info
+    (pure $ CommandGather GatherFlags)
+    (fullDesc <> progDesc "Read a single command on the standard input.")
 
 parseGenGatherWrapperScript :: ParserInfo Command
 parseGenGatherWrapperScript =
   info
-    (CommandGenGatherWrapperScript <$> maybeRemoteStorageParser)
+    (pure $ CommandGenGatherWrapperScript GenGatherWrapperScriptFlags)
     (progDesc "Generate the wrapper script to use 'gather'")
-  where
-    maybeRemoteStorageParser = Just <$> remoteStorageParser
-    remoteStorageParser =
-      RemoteStorageClientInfo <$>
-      option
-        (maybeReader parseBaseUrl)
-        (mconcat
-           [long "storage-server-url", metavar "URL", help "URL of the central storage server"]) <*>
-      option
-        (maybeReader $ parseUsername . T.pack)
-        (mconcat
-           [ long "storage-server-username"
-           , metavar "USERNAME"
-           , help "USERNAME of the central storage server"
-           ]) <*>
-      option
-        auto
-        (mconcat
-           [ long "storage-server-password"
-           , metavar "PASSWORD"
-           , help "PASSWORD of the central storage server"
-           ])
 
 parseCommandChangeDir :: ParserInfo Command
 parseCommandChangeDir =
   info
-    (CommandChangeDir <$>
+    (CommandChangeDir . ChangeDirFlags <$>
      argument
        auto
        (mconcat
@@ -137,7 +121,7 @@ parseCommandListRecentDirs :: ParserInfo Command
 parseCommandListRecentDirs =
   info
     (CommandListRecentDirs <$>
-     (ListRecentDirArgs <$>
+     (ListRecentDirFlags <$>
       (flag'
          (Just True)
          (mconcat [long "bypass-cache", help "Always recompute the recent directory options"]) <|>
@@ -150,13 +134,13 @@ parseCommandListRecentDirs =
 parseGenChangeDirectoryWrapperScript :: ParserInfo Command
 parseGenChangeDirectoryWrapperScript =
   info
-    (pure CommandGenChangeWrapperScript)
+    (pure $ CommandGenChangeWrapperScript GenChangeWrapperScriptFlags)
     (progDesc "Generate the wrapper script to use 'change-directory'")
 
 parseSuggestAlias :: ParserInfo Command
 parseSuggestAlias =
   info
-    (pure CommandSuggestAlias)
+    (pure $ CommandSuggestAlias SuggestAliasFlags)
     (progDesc "Suggest commands for which the user may want to make aliases.")
 
 parseFlags :: Parser Flags

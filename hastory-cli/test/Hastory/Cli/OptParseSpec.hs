@@ -19,7 +19,7 @@ spec =
       it "CommandGenGatherWrapperScript has no payload" $ do
         let cliArgs = ["generate-gather-wrapper-script"]
             Success (Arguments cmd _flag) = runArgumentsParser cliArgs
-        cmd `shouldBe` CommandGenGatherWrapperScript Nothing
+        cmd `shouldBe` CommandGenGatherWrapperScript (RemoteInfo Nothing Nothing Nothing)
     context "command-line arguments contains ONLY a url" $
       it "CommandGenGatherWrapperScript has no payload" $ do
         let cliArgs = ["generate-gather-wrapper-script", "--storage-server-url=api.example.com"]

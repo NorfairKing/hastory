@@ -1,5 +1,6 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module Hastory.Cli.Commands.ChangeDir where
 
@@ -12,10 +13,10 @@ import System.Exit (die)
 import Hastory.Cli.Commands.Recent
 import Hastory.Cli.OptParse.Types
 
-change :: (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => Int -> m ()
-change ix = do
+change :: (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => ChangeDirSettings -> m ()
+change ChangeDirSettings {..} = do
   recentDirOpts <- getRecentDirOpts False
   liftIO $
-    case recentDirOpts `atMay` ix of
+    case recentDirOpts `atMay` changeDirSetIdx of
       Nothing -> die "Invalid index choice."
       Just d -> putStrLn d

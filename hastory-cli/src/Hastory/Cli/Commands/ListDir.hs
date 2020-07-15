@@ -11,8 +11,8 @@ import Hastory.Cli.Commands.Recent
 import Hastory.Cli.OptParse.Types
 
 listRecentDirs ::
-     (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => ListRecentDirSets -> m ()
-listRecentDirs ListRecentDirSets {..} = do
+     (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => ListRecentDirSettings -> m ()
+listRecentDirs ListRecentDirSettings {..} = do
   recentDirOpts <- getRecentDirOpts lrdSetBypassCache
   let tups = zip [0 ..] recentDirOpts
       maxlen = maximum $ map (length . show . fst) tups

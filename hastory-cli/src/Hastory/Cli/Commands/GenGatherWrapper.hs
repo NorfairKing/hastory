@@ -8,11 +8,11 @@ import Servant.Client.Core
 import Data.Hastory
 import Hastory.Cli.OptParse.Types
 
-genGatherWrapperScript :: Maybe RemoteStorageClientInfo -> IO ()
+genGatherWrapperScript :: GenGatherWrapperScriptSettings -> IO ()
 genGatherWrapperScript = putStrLn . genScript
 
-genScript :: Maybe RemoteStorageClientInfo -> String
-genScript mRemoteStorage =
+genScript :: GenGatherWrapperScriptSettings -> String
+genScript GenGatherWrapperScriptSettings {..} =
   unlines
     [ "FIRST_PROMPT=1"
     , "function hastory_gather_ {"
@@ -26,7 +26,7 @@ genScript mRemoteStorage =
     ]
   where
     remoteStorageFlags =
-      case mRemoteStorage of
+      case genGatherWrapperScriptSetRemoteInfo of
         Nothing -> ""
         Just RemoteStorageClientInfo {..} ->
           unlines
