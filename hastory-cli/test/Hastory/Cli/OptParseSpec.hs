@@ -14,38 +14,38 @@ import Hastory.Cli.OptParse.Types
 spec :: Spec
 spec =
   describe "runArgumentsParser" $
-  describe "generate-gather-wrapper-script" $ do
-    context "user does NOT provided remote server information" $
-      it "CommandGenGatherWrapperScript has no payload" $ do
-        let cliArgs = ["generate-gather-wrapper-script"]
-            Success (Arguments cmd _flag) = runArgumentsParser cliArgs
-        cmd `shouldBe` CommandGenGatherWrapperScript (RemoteInfo Nothing Nothing Nothing)
-    context "command-line arguments contains ONLY a url" $
-      it "CommandGenGatherWrapperScript has no payload" $ do
-        let cliArgs = ["generate-gather-wrapper-script", "--storage-server-url=api.example.com"]
-            Success (Arguments cmd _flag) = runArgumentsParser cliArgs
-        cmd `shouldBe` CommandGenGatherWrapperScript Nothing
-    context "command-line arguments contains ONLY a username" $
-      it "CommandGenGatherWrapperScript has no payload" $ do
-        let cliArgs = ["generate-gather-wrapper-script", "--storage-server-username=steven"]
-            Success (Arguments cmd _flag) = runArgumentsParser cliArgs
-        cmd `shouldBe` CommandGenGatherWrapperScript Nothing
-    context "command-line arguments contains ONLY a password" $
-      it "CommandGenGatherWrapperScript has no payload" $ do
-        let cliArgs = ["generate-gather-wrapper-script", "--storage-server-password=Passw0rd"]
-            Success (Arguments cmd _flag) = runArgumentsParser cliArgs
-        cmd `shouldBe` CommandGenGatherWrapperScript Nothing
-    context "command-line arguments contains url, username, AND password" $
-      it "CommandGenGatherWrapperScript has correct RemoteStorageClientInfo payload" $ do
-        let (simpleUrl, simpleUsername, password) = ("api.example.com", "steven", "Passw0rd")
-        url <- parseBaseUrl simpleUrl
-        username <- parseUsername (T.pack simpleUsername)
-        let remoteStorageInfo = RemoteStorageClientInfo url username (T.pack password)
-        let cliArgs =
-              [ "generate-gather-wrapper-script"
-              , "--storage-server-url=" <> simpleUrl
-              , "--storage-server-username=" <> simpleUsername
-              , "--storage-server-password=" <> password
-              ]
-            Success (Arguments cmd _flag) = runArgumentsParser cliArgs
-        cmd `shouldBe` CommandGenGatherWrapperScript (Just remoteStorageInfo)
+  describe "Flags" $ do
+    context "cache-dir is provided" $
+      it "contains a FilePath" $ do
+        let (Success (Arguments _cmd flags)) = runArgumentsParser args
+            args = ["gather", "--cache-dir=" <> filePath]
+            filePath = "~/hastory"
+        flags `shouldBe` emptyFlags {flagCacheDir = Just filePath}
+    context "storage-server-url is provided" $
+      it "contains a BaseUrl" $ do
+        let (Success (Arguments _cmd flags)) = runArgumentsParser args
+            args = ["gather", "--storage-server-url=" <> rawUrl]
+            rawUrl = "api.example.com"
+        url <- parseBaseUrl rawUrl
+        flags `shouldBe` emptyFlags {flagStorageServer = Just url}
+    context "storage-server-username is provided" $
+      it "contains a Username" $ do
+        let (Success (Arguments _cmd flags)) = runArgumentsParser args
+            args = ["gather", "--storage-server-username=" <> rawUsername]
+            rawUsername = "steven"
+        username <- parseUsername (T.pack rawUsername)
+        flags `shouldBe` emptyFlags {flagStorageUsername = Just username}
+    context "storage-server-password is provided" $
+      it "contains a password" $ do
+        let (Success (Arguments _cmd flags)) = runArgumentsParser args
+            args = ["gather", "--storage-server-password=" <> rawPassword]
+            rawPassword = "Passw0rd"
+        flags `shouldBe` emptyFlags {flagStoragePassword = Just (T.pack rawPassword)}
+    context "user provides NO flags" $
+      it "is an empty Flag data type" $ do
+        let (Success (Arguments _cmd flags)) = runArgumentsParser args
+            args = ["gather"]
+        flags `shouldBe` emptyFlags
+
+emptyFlags :: Flags
+emptyFlags = Flags Nothing Nothing Nothing Nothing
