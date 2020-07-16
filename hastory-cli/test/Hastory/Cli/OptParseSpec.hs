@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Hastory.Cli.OptParseSpec
   ( spec
   ) where
@@ -12,7 +14,48 @@ import Hastory.Cli.OptParse
 import Hastory.Cli.OptParse.Types
 
 spec :: Spec
-spec = describe "runArgumentsParser" (describeFlags >> describeCommand)
+spec = describeRunArgumentsParser >> describeCombineToInstructions
+
+describeCombineToInstructions :: Spec
+describeCombineToInstructions =
+  describe "combineToInstructions" $
+  describe "CommandGenGatherWrapperScript" $ do
+    context "Flags does NOT contain all 3 fields of a RemoteStorageClientInfo" $
+      it "is DispatchGenGatherWrapperScript with no Nothing" $ do
+        let cmd = CommandGenGatherWrapperScript GenGatherWrapperScriptFlags
+            flags = emptyFlags
+            configuration = Configuration
+        Instructions dispatch _settings <- combineToInstructions cmd flags configuration
+        dispatch `shouldBe`
+          DispatchGenGatherWrapperScript
+            GenGatherWrapperScriptSettings {genGatherWrapperScriptSetRemoteInfo = Nothing}
+    context "Flags DOES contain all 3 fields of a RemoteStorageClientInfo" $
+      it "is DispatchGenGatherWrapperScript with no Nothing" $ do
+        url <- parseBaseUrl "api.example.com"
+        username <- parseUsername "hastory"
+        let cmd = CommandGenGatherWrapperScript GenGatherWrapperScriptFlags
+            flags =
+              emptyFlags
+                { flagCacheDir = Nothing
+                , flagStorageServer = Just url
+                , flagStorageUsername = Just username
+                , flagStoragePassword = Just password
+                }
+            password = "Passw0rd"
+            configuration = Configuration
+            remoteInfo =
+              RemoteStorageClientInfo
+                { remoteStorageClientInfoBaseUrl = url
+                , remoteStorageClientInfoUsername = username
+                , remoteStorageClientInfoPassword = password
+                }
+        Instructions dispatch _settings <- combineToInstructions cmd flags configuration
+        dispatch `shouldBe`
+          DispatchGenGatherWrapperScript
+            GenGatherWrapperScriptSettings {genGatherWrapperScriptSetRemoteInfo = Just remoteInfo}
+
+describeRunArgumentsParser :: Spec
+describeRunArgumentsParser = describe "runArgumentsParser" (describeFlags >> describeCommand)
 
 describeFlags :: Spec
 describeFlags =
@@ -34,7 +77,7 @@ describeFlags =
       it "contains a Username" $ do
         let (Success (Arguments _cmd flags)) = runArgumentsParser args
             args = ["gather", "--storage-server-username=" <> rawUsername]
-            rawUsername = "steven"
+            rawUsername = "hastory"
         username <- parseUsername (T.pack rawUsername)
         flags `shouldBe` emptyFlags {flagStorageUsername = Just username}
     context "storage-server-password is provided" $

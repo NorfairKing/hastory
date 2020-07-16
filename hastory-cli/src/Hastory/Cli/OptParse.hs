@@ -1,7 +1,8 @@
 {-# LANGUAGE RecordWildCards #-}
 
 module Hastory.Cli.OptParse
-  ( getInstructions
+  ( combineToInstructions
+  , getInstructions
   , runArgumentsParser
   , Instructions(..)
   , Dispatch(..)
@@ -26,14 +27,16 @@ getInstructions = do
   combineToInstructions cmd flags config
 
 combineToInstructions :: Command -> Flags -> Configuration -> IO Instructions
-combineToInstructions cmd Flags {..} Configuration = Instructions d <$> sets
+combineToInstructions cmd Flags {..} Configuration = Instructions <$> getDispatch <*> getSettings
   where
-    d =
+    getDispatch = pure dispatch
+    dispatch =
       case cmd of
         CommandGather _ -> DispatchGather GatherSettings
         CommandGenGatherWrapperScript _ ->
           DispatchGenGatherWrapperScript
-            GenGatherWrapperScriptSettings {genGatherWrapperScriptSetRemoteInfo = Nothing}
+            GenGatherWrapperScriptSettings
+              {genGatherWrapperScriptSetRemoteInfo = mbRemoteStorageClientInfo}
         CommandListRecentDirs ListRecentDirFlags {..} ->
           DispatchListRecentDirs
             ListRecentDirSettings {lrdSetBypassCache = fromMaybe False lrdArgBypassCache}
@@ -42,16 +45,15 @@ combineToInstructions cmd Flags {..} Configuration = Instructions d <$> sets
         CommandGenChangeWrapperScript _ ->
           DispatchGenChangeWrapperScript GenChangeWrapperScriptSettings
         CommandSuggestAlias _ -> DispatchSuggestAlias SuggestAliasSettings
-    sets = do
+    getSettings = do
       home <- getHomeDir
       cacheDir <-
         case flagCacheDir of
           Nothing -> resolveDir home ".hastory"
           Just fcd -> resolveDir' fcd
-      let mbRemoteStorageClientInfo =
-            RemoteStorageClientInfo <$> flagStorageServer <*> flagStorageUsername <*>
-            flagStoragePassword
       pure Settings {setCacheDir = cacheDir, remoteStorageClientInfo = mbRemoteStorageClientInfo}
+    mbRemoteStorageClientInfo =
+      RemoteStorageClientInfo <$> flagStorageServer <*> flagStorageUsername <*> flagStoragePassword
 
 getConfiguration :: Command -> Flags -> IO Configuration
 getConfiguration _ _ = pure Configuration
