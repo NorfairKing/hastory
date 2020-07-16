@@ -59,6 +59,10 @@ data Flags =
     }
   deriving (Show, Eq)
 
+data Environment =
+  Environment
+  deriving (Show, Eq)
+
 data Configuration =
   Configuration
   deriving (Show, Eq)

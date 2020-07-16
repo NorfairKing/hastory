@@ -23,9 +23,8 @@ describeCombineToInstructions =
     context "Flags does NOT contain all 3 fields of a RemoteStorageClientInfo" $
       it "is DispatchGenGatherWrapperScript with no Nothing" $ do
         let cmd = CommandGenGatherWrapperScript GenGatherWrapperScriptFlags
-            flags = emptyFlags
-            configuration = Configuration
-        Instructions dispatch _settings <- combineToInstructions cmd flags configuration
+        Instructions dispatch _settings <-
+          combineToInstructions cmd emptyFlags emptyEnvironment emptyConfiguration
         dispatch `shouldBe`
           DispatchGenGatherWrapperScript
             GenGatherWrapperScriptSettings {genGatherWrapperScriptSetRemoteInfo = Nothing}
@@ -42,14 +41,14 @@ describeCombineToInstructions =
                 , flagStoragePassword = Just password
                 }
             password = "Passw0rd"
-            configuration = Configuration
             remoteInfo =
               RemoteStorageClientInfo
                 { remoteStorageClientInfoBaseUrl = url
                 , remoteStorageClientInfoUsername = username
                 , remoteStorageClientInfoPassword = password
                 }
-        Instructions dispatch _settings <- combineToInstructions cmd flags configuration
+        Instructions dispatch _settings <-
+          combineToInstructions cmd flags emptyEnvironment emptyConfiguration
         dispatch `shouldBe`
           DispatchGenGatherWrapperScript
             GenGatherWrapperScriptSettings {genGatherWrapperScriptSetRemoteInfo = Just remoteInfo}
@@ -129,7 +128,19 @@ describeCommand =
         cmd `shouldBe` CommandListRecentDirs ListRecentDirFlags {lrdArgBypassCache = Just False}
 
 emptyFlags :: Flags
-emptyFlags = Flags Nothing Nothing Nothing Nothing
+emptyFlags =
+  Flags
+    { flagCacheDir = Nothing
+    , flagStorageServer = Nothing
+    , flagStorageUsername = Nothing
+    , flagStoragePassword = Nothing
+    }
+
+emptyConfiguration :: Configuration
+emptyConfiguration = Configuration
+
+emptyEnvironment :: Environment
+emptyEnvironment = Environment
 
 isParserFailure :: ParserResult a -> Bool
 isParserFailure (Failure _) = True

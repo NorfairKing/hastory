@@ -23,11 +23,12 @@ import Hastory.Cli.OptParse.Types
 getInstructions :: IO Instructions
 getInstructions = do
   Arguments cmd flags <- getArguments
-  config <- getConfiguration cmd flags
-  combineToInstructions cmd flags config
+  environment <- getEnvironment
+  config <- getConfiguration cmd flags environment
+  combineToInstructions cmd flags environment config
 
-combineToInstructions :: Command -> Flags -> Configuration -> IO Instructions
-combineToInstructions cmd Flags {..} Configuration = Instructions <$> getDispatch <*> getSettings
+combineToInstructions :: Command -> Flags -> Environment -> Configuration -> IO Instructions
+combineToInstructions cmd Flags {..} _ Configuration = Instructions <$> getDispatch <*> getSettings
   where
     getDispatch = pure dispatch
     dispatch =
@@ -55,14 +56,17 @@ combineToInstructions cmd Flags {..} Configuration = Instructions <$> getDispatc
     mbRemoteStorageClientInfo =
       RemoteStorageClientInfo <$> flagStorageServer <*> flagStorageUsername <*> flagStoragePassword
 
-getConfiguration :: Command -> Flags -> IO Configuration
-getConfiguration _ _ = pure Configuration
+getConfiguration :: Command -> Flags -> Environment -> IO Configuration
+getConfiguration _ _ _ = pure Configuration
 
 getArguments :: IO Arguments
 getArguments = do
   args <- getArgs
   let result = runArgumentsParser args
   handleParseResult result
+
+getEnvironment :: IO Environment
+getEnvironment = pure Environment
 
 runArgumentsParser :: [String] -> ParserResult Arguments
 runArgumentsParser =
