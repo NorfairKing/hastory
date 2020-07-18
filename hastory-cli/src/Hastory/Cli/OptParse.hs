@@ -3,15 +3,18 @@
 module Hastory.Cli.OptParse
   ( combineToInstructions
   , getInstructions
+  , envParser
   , runArgumentsParser
   , Instructions(..)
   , Dispatch(..)
   , Settings(..)
   ) where
 
+import Control.Monad
 import Data.Maybe (fromMaybe)
 import Data.Semigroup ((<>))
 import qualified Data.Text as T
+import qualified Env
 import Options.Applicative
 import Path.IO (getHomeDir, resolveDir, resolveDir')
 import Servant.Client.Core.Reexport (parseBaseUrl)
@@ -66,7 +69,31 @@ getArguments = do
   handleParseResult result
 
 getEnvironment :: IO Environment
-getEnvironment = pure Environment
+getEnvironment = Env.parse (Env.header "hastory") (Env.prefixed "HASTORY_" envParser)
+
+envParser :: Env.Parser Env.Error Environment
+envParser =
+  Env.prefixed
+    "HASTORY_"
+    (Environment <$>
+     optional (Env.var Env.nonempty "CACHE_DIR" (Env.help "the cache directory for hastory")) <*>
+     optional
+       (Env.var baseUrlParser "STORAGE_SERVER_URL" (Env.help "URL of the central storage server")) <*>
+     optional
+       (Env.var
+          (usernameParser <=< Env.nonempty)
+          "STORAGE_SERVER_USERNAME"
+          (Env.help "Username for the central storage server")) <*>
+     optional
+       (Env.var
+          Env.nonempty
+          "STORAGE_SERVER_PASSWORD"
+          (Env.help "Password for the central storage server")))
+  where
+    baseUrlParser unparsedUrl =
+      maybe (Left $ Env.UnreadError unparsedUrl) Right (parseBaseUrl unparsedUrl)
+    usernameParser username =
+      maybe (Left . Env.UnreadError . T.unpack $ username) Right (parseUsername username)
 
 runArgumentsParser :: [String] -> ParserResult Arguments
 runArgumentsParser =

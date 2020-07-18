@@ -61,6 +61,11 @@ data Flags =
 
 data Environment =
   Environment
+    { envCacheDir :: Maybe FilePath
+    , envStorageServer :: Maybe BaseUrl
+    , envStorageUsername :: Maybe Username
+    , envStoragePassword :: Maybe Text
+    }
   deriving (Show, Eq)
 
 data Configuration =

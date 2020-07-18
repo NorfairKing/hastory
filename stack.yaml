@@ -13,6 +13,7 @@ extra-deps:
 - password-2.0.1.1
 - password-instances-2.0.0.1
 - servant-auth-client-0.4.0.0
+- envparse-0.4.1
 - github: NorfairKing/validity
   commit: 04ef274e8be3595f5846645f5922791292653e03
   subdirs:

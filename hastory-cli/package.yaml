@@ -23,6 +23,7 @@ library:
   - aeson-pretty
   - bytestring
   - deepseq
+  - envparse
   - exceptions
   - extra
   - hashable
@@ -72,6 +73,7 @@ tests:
     dependencies:
     - base >=4.9 && <=5
     - QuickCheck
+    - envparse
     - genvalidity
     - genvalidity-hspec
     - genvalidity-hspec-aeson
