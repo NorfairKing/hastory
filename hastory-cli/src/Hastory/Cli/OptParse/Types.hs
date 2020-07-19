@@ -116,7 +116,7 @@ data Settings =
     { setCacheDir :: Path Abs Dir
     , remoteStorageClientInfo :: Maybe RemoteStorageClientInfo
     }
-  deriving (Show)
+  deriving (Show, Eq)
 
 data RemoteStorageClientInfo =
   RemoteStorageClientInfo

@@ -87,7 +87,7 @@ describeCommand =
         let (Success (Arguments cmd _flags)) = runArgumentsParser args
             args = ["list-recent-directories", "--bypass-cache"]
         cmd `shouldBe` CommandListRecentDirs ListRecentDirFlags {lrdArgBypassCache = Just True}
-      it "parses to CommandListRecentDirs with bypass-cache" $ do
+      it "parses to CommandListRecentDirs with --no-bypass-cache" $ do
         let (Success (Arguments cmd _flags)) = runArgumentsParser args
             args = ["list-recent-directories", "--no-bypass-cache"]
         cmd `shouldBe` CommandListRecentDirs ListRecentDirFlags {lrdArgBypassCache = Just False}
@@ -128,40 +128,129 @@ describeEnvParser =
 
 describeCombineToInstructions :: Spec
 describeCombineToInstructions =
-  describe "combineToInstructions" $
-  describe "CommandGenGatherWrapperScript" $ do
-    context "Flags does NOT contain all 3 fields of a RemoteStorageClientInfo" $
-      it "is DispatchGenGatherWrapperScript with no Nothing" $ do
-        let cmd = CommandGenGatherWrapperScript GenGatherWrapperScriptFlags
-        Instructions dispatch _settings <-
-          combineToInstructions cmd emptyFlags emptyEnvironment emptyConfiguration
-        dispatch `shouldBe`
-          DispatchGenGatherWrapperScript
-            GenGatherWrapperScriptSettings {genGatherWrapperScriptSetRemoteInfo = Nothing}
-    context "Flags DOES contain all 3 fields of a RemoteStorageClientInfo" $
-      it "is DispatchGenGatherWrapperScript with no Nothing" $ do
-        url <- parseBaseUrl "api.example.com"
-        username <- parseUsername "hastory"
-        let cmd = CommandGenGatherWrapperScript GenGatherWrapperScriptFlags
-            flags =
+  describe "combineToInstructions" $ do
+    context "setCacheDir" $ do
+      it "prefers Flags over Environment" $ do
+        let flags = emptyFlags {flagCacheDir = Just stevenHomeDir}
+            stevenHomeDir = "/home/steven"
+            env = emptyEnvironment {envCacheDir = Just "/home/chris"}
+        stevenAbsDir <- resolveDir' stevenHomeDir
+        Instructions _ settings <-
+          combineToInstructions
+            (CommandGenGatherWrapperScript GenGatherWrapperScriptFlags)
+            flags
+            env
+            Configuration
+        settings `shouldBe` Settings stevenAbsDir Nothing
+      it "falls back to Environment cache if Flag cache is missing" $ do
+        let flags = emptyFlags
+            env = emptyEnvironment {envCacheDir = Just chrisHomeDir}
+            chrisHomeDir = "/home/chris"
+        chrisAbsDir <- resolveDir' chrisHomeDir
+        Instructions _ settings <-
+          combineToInstructions
+            (CommandGenGatherWrapperScript GenGatherWrapperScriptFlags)
+            flags
+            env
+            Configuration
+        settings `shouldBe` Settings chrisAbsDir Nothing
+      it "has a default when Flag and Environment are missing cache dir" $ do
+        defaultCacheDir <- getHomeDir >>= flip resolveDir ".hastory"
+        Instructions _ settings <-
+          combineToInstructions
+            (CommandGenGatherWrapperScript GenGatherWrapperScriptFlags)
+            emptyFlags
+            emptyEnvironment
+            Configuration
+        settings `shouldBe` Settings defaultCacheDir Nothing
+    context "remoteStorageClientInfo" $ do
+      it "prefers Flags over Environment" $ do
+        let flagUsername = Username "flagUser"
+            flagPassword = "flagPassword"
+            envUsername = Username "envUser"
+        flagBaseUrl <- parseBaseUrl "flag.example.com"
+        envBaseUrl <- parseBaseUrl "env.example.com"
+        let flags =
               emptyFlags
-                { flagCacheDir = Nothing
-                , flagStorageServer = Just url
-                , flagStorageUsername = Just username
-                , flagStoragePassword = Just password
+                { flagStorageServer = Just flagBaseUrl
+                , flagStorageUsername = Just flagUsername
+                , flagStoragePassword = Just flagPassword
                 }
-            password = "Passw0rd"
-            remoteInfo =
-              RemoteStorageClientInfo
-                { remoteStorageClientInfoBaseUrl = url
-                , remoteStorageClientInfoUsername = username
-                , remoteStorageClientInfoPassword = password
+            env =
+              emptyEnvironment
+                { envStorageServer = Just envBaseUrl
+                , envStorageUsername = Just envUsername
+                , envStoragePassword = Just "envPassword"
                 }
-        Instructions dispatch _settings <-
-          combineToInstructions cmd flags emptyEnvironment emptyConfiguration
-        dispatch `shouldBe`
-          DispatchGenGatherWrapperScript
-            GenGatherWrapperScriptSettings {genGatherWrapperScriptSetRemoteInfo = Just remoteInfo}
+        Instructions _ settings <-
+          combineToInstructions
+            (CommandGenGatherWrapperScript GenGatherWrapperScriptFlags)
+            flags
+            env
+            Configuration
+        remoteStorageClientInfo settings `shouldBe`
+          Just (RemoteStorageClientInfo flagBaseUrl flagUsername flagPassword)
+      it "combines Flag and Environment correctly" $ do
+        flagBaseUrl <- parseBaseUrl "flag.example.com"
+        let flagPassword = "flagPassword"
+            envUsername = Username "envUser"
+        let flags =
+              emptyFlags
+                {flagStorageServer = Just flagBaseUrl, flagStoragePassword = Just flagPassword}
+            env = emptyEnvironment {envStorageUsername = Just envUsername}
+        Instructions _ settings <-
+          combineToInstructions
+            (CommandGenGatherWrapperScript GenGatherWrapperScriptFlags)
+            flags
+            env
+            Configuration
+        remoteStorageClientInfo settings `shouldBe`
+          Just (RemoteStorageClientInfo flagBaseUrl envUsername flagPassword)
+      it "is nothing when Flags + Environment do not contains full remote data" $
+        -- N.B. URL is missing
+       do
+        let flags = emptyFlags {flagStoragePassword = Just "flagPassword"}
+            env = emptyEnvironment {envStorageUsername = Just (Username "envUsername")}
+        Instructions _ settings <-
+          combineToInstructions
+            (CommandGenGatherWrapperScript GenGatherWrapperScriptFlags)
+            flags
+            env
+            Configuration
+        remoteStorageClientInfo settings `shouldBe` Nothing
+    describe "CommandGenGatherWrapperScript" $ do
+      context "Flags does NOT contain all 3 fields of a RemoteStorageClientInfo" $
+        it "is DispatchGenGatherWrapperScript with no Nothing" $ do
+          let cmd = CommandGenGatherWrapperScript GenGatherWrapperScriptFlags
+          Instructions dispatch _settings <-
+            combineToInstructions cmd emptyFlags emptyEnvironment emptyConfiguration
+          dispatch `shouldBe`
+            DispatchGenGatherWrapperScript
+              GenGatherWrapperScriptSettings {genGatherWrapperScriptSetRemoteInfo = Nothing}
+      context "Flags DOES contain all 3 fields of a RemoteStorageClientInfo" $
+        it "is DispatchGenGatherWrapperScript with no Nothing" $ do
+          url <- parseBaseUrl "api.example.com"
+          username <- parseUsername "hastory"
+          let cmd = CommandGenGatherWrapperScript GenGatherWrapperScriptFlags
+              flags =
+                emptyFlags
+                  { flagCacheDir = Nothing
+                  , flagStorageServer = Just url
+                  , flagStorageUsername = Just username
+                  , flagStoragePassword = Just password
+                  }
+              password = "Passw0rd"
+              remoteInfo =
+                RemoteStorageClientInfo
+                  { remoteStorageClientInfoBaseUrl = url
+                  , remoteStorageClientInfoUsername = username
+                  , remoteStorageClientInfoPassword = password
+                  }
+          Instructions dispatch _settings <-
+            combineToInstructions cmd flags emptyEnvironment emptyConfiguration
+          dispatch `shouldBe`
+            DispatchGenGatherWrapperScript
+              GenGatherWrapperScriptSettings {genGatherWrapperScriptSetRemoteInfo = Just remoteInfo}
 
 emptyFlags :: Flags
 emptyFlags =

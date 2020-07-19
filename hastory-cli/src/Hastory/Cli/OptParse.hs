@@ -31,7 +31,8 @@ getInstructions = do
   combineToInstructions cmd flags environment config
 
 combineToInstructions :: Command -> Flags -> Environment -> Configuration -> IO Instructions
-combineToInstructions cmd Flags {..} _ Configuration = Instructions <$> getDispatch <*> getSettings
+combineToInstructions cmd Flags {..} Environment {..} Configuration =
+  Instructions <$> getDispatch <*> getSettings
   where
     getDispatch = pure dispatch
     dispatch =
@@ -52,12 +53,14 @@ combineToInstructions cmd Flags {..} _ Configuration = Instructions <$> getDispa
     getSettings = do
       home <- getHomeDir
       cacheDir <-
-        case flagCacheDir of
+        case flagCacheDir <|> envCacheDir of
           Nothing -> resolveDir home ".hastory"
           Just fcd -> resolveDir' fcd
       pure Settings {setCacheDir = cacheDir, remoteStorageClientInfo = mbRemoteStorageClientInfo}
     mbRemoteStorageClientInfo =
-      RemoteStorageClientInfo <$> flagStorageServer <*> flagStorageUsername <*> flagStoragePassword
+      RemoteStorageClientInfo <$> (flagStorageServer <|> envStorageServer) <*>
+      (flagStorageUsername <|> envStorageUsername) <*>
+      (flagStoragePassword <|> envStoragePassword)
 
 getConfiguration :: Command -> Flags -> Environment -> IO Configuration
 getConfiguration _ _ _ = pure Configuration
