@@ -80,6 +80,7 @@ envParser =
     "HASTORY_"
     (Environment <$>
      optional (Env.var Env.nonempty "CACHE_DIR" (Env.help "the cache directory for hastory")) <*>
+     optional (Env.var Env.nonempty "CONFIG_FILE" (Env.help "path to a config file")) <*>
      optional
        (Env.var baseUrlParser "STORAGE_SERVER_URL" (Env.help "URL of the central storage server")) <*>
      optional
@@ -183,7 +184,11 @@ parseFlags :: Parser Flags
 parseFlags =
   Flags <$>
   optional
-    (option str (mconcat [long "cache-dir", metavar "DIR", help "the cache directory for hastory"])) <*>
+    (option
+       str
+       (mconcat [long "cache-dir", metavar "FILEPATH", help "the cache directory for hastory"])) <*>
+  optional
+    (option str (mconcat [long "config-file", metavar "FILEPATH", help "path to a config file"])) <*>
   optional
     (option
        (maybeReader parseBaseUrl)
@@ -193,7 +198,7 @@ parseFlags =
        (maybeReader (parseUsername . T.pack))
        (mconcat
           [ long "storage-server-username"
-          , metavar "USERNAME"
+          , metavar "TEXT"
           , help "Username for the central storage server"
           ])) <*>
   optional

@@ -33,6 +33,12 @@ describeFlags =
             args = ["gather", "--cache-dir=" <> filePath]
             filePath = "~/hastory"
         flags `shouldBe` emptyFlags {flagCacheDir = Just filePath}
+    context "config-file is provided" $
+      it "contains a Filepath" $ do
+        let (Success (Arguments _cmd flags)) = runArgumentsParser args
+            args = ["gather", "--config-file=" <> filePath]
+            filePath = "~/hastory"
+        flags `shouldBe` emptyFlags {flagConfigFile = Just filePath}
     context "storage-server-url is provided" $
       it "contains a BaseUrl" $ do
         let (Success (Arguments _cmd flags)) = runArgumentsParser args
@@ -109,6 +115,7 @@ envParserSpec =
         let res = Env.parsePure envParser fullEnvironment
             fullEnvironment =
               [ ("HASTORY_CACHE_DIR", "~/home")
+              , ("HASTORY_CONFIG_FILE", "~/home/.hastory.yaml")
               , ("HASTORY_STORAGE_SERVER_URL", url)
               , ("HASTORY_STORAGE_SERVER_USERNAME", "steven")
               , ("HASTORY_STORAGE_SERVER_PASSWORD", "Passw0rd")
@@ -117,6 +124,7 @@ envParserSpec =
           Right
             emptyEnvironment
               { envCacheDir = Just "~/home"
+              , envConfigFile = Just "~/home/.hastory.yaml"
               , envStorageServer = Just parsedUrl
               , envStorageUsername = Just (Username "steven")
               , envStoragePassword = Just "Passw0rd"
@@ -259,6 +267,7 @@ emptyFlags :: Flags
 emptyFlags =
   Flags
     { flagCacheDir = Nothing
+    , flagConfigFile = Nothing
     , flagStorageServer = Nothing
     , flagStorageUsername = Nothing
     , flagStoragePassword = Nothing
@@ -271,6 +280,7 @@ emptyEnvironment :: Environment
 emptyEnvironment =
   Environment
     { envCacheDir = Nothing
+    , envConfigFile = Nothing
     , envStorageServer = Nothing
     , envStorageUsername = Nothing
     , envStoragePassword = Nothing
