@@ -16,10 +16,13 @@ import Hastory.Cli.OptParse
 import Hastory.Cli.OptParse.Types
 
 spec :: Spec
-spec = describeRunArgumentsParser >> describeEnvParser >> describeCombineToInstructions
+spec = do
+  runArgumentsParserSpec
+  envParserSpec
+  combineToInstructionsSpec
 
-describeRunArgumentsParser :: Spec
-describeRunArgumentsParser = describe "runArgumentsParser" (describeFlags >> describeCommand)
+runArgumentsParserSpec :: Spec
+runArgumentsParserSpec = describe "runArgumentsParser" (describeFlags >> describeCommand)
 
 describeFlags :: Spec
 describeFlags =
@@ -51,7 +54,7 @@ describeFlags =
             rawPassword = "Passw0rd"
         flags `shouldBe` emptyFlags {flagStoragePassword = Just (T.pack rawPassword)}
     context "user provides NO flags" $
-      it "is an empty Flag data type" $ do
+      it "is an empty Flags data type" $ do
         let (Success (Arguments _cmd flags)) = runArgumentsParser args
             args = ["gather"]
         flags `shouldBe` emptyFlags
@@ -92,8 +95,8 @@ describeCommand =
             args = ["list-recent-directories", "--no-bypass-cache"]
         cmd `shouldBe` CommandListRecentDirs ListRecentDirFlags {lrdArgBypassCache = Just False}
 
-describeEnvParser :: Spec
-describeEnvParser =
+envParserSpec :: Spec
+envParserSpec =
   describe "envParser" $ do
     context "user provides NO environmental variables" $
       it "parses to an empty Environment" $ do
@@ -126,8 +129,8 @@ describeEnvParser =
       let res = Env.parsePure envParser [("HASTORY_STORAGE_SERVER_URL", "ftp://hoogle.org")]
       res `shouldBe` Right emptyEnvironment
 
-describeCombineToInstructions :: Spec
-describeCombineToInstructions =
+combineToInstructionsSpec :: Spec
+combineToInstructionsSpec =
   describe "combineToInstructions" $ do
     context "setCacheDir" $ do
       it "prefers Flags over Environment" $ do
@@ -142,7 +145,7 @@ describeCombineToInstructions =
             env
             Configuration
         settings `shouldBe` Settings stevenAbsDir Nothing
-      it "falls back to Environment cache if Flag cache is missing" $ do
+      it "falls back to Environment cache if Flags cache is missing" $ do
         let flags = emptyFlags
             env = emptyEnvironment {envCacheDir = Just chrisHomeDir}
             chrisHomeDir = "/home/chris"
@@ -154,7 +157,7 @@ describeCombineToInstructions =
             env
             Configuration
         settings `shouldBe` Settings chrisAbsDir Nothing
-      it "has a default when Flag and Environment are missing cache dir" $ do
+      it "has a default when Flags and Environment are missing cache dir" $ do
         defaultCacheDir <- getHomeDir >>= flip resolveDir ".hastory"
         Instructions _ settings <-
           combineToInstructions
@@ -190,7 +193,7 @@ describeCombineToInstructions =
             Configuration
         remoteStorageClientInfo settings `shouldBe`
           Just (RemoteStorageClientInfo flagBaseUrl flagUsername flagPassword)
-      it "combines Flag and Environment correctly" $ do
+      it "combines Flags and Environment correctly" $ do
         flagBaseUrl <- parseBaseUrl "flag.example.com"
         let flagPassword = "flagPassword"
             envUsername = Username "envUser"
@@ -206,7 +209,7 @@ describeCombineToInstructions =
             Configuration
         remoteStorageClientInfo settings `shouldBe`
           Just (RemoteStorageClientInfo flagBaseUrl envUsername flagPassword)
-      it "is nothing when Flags + Environment do not contains full remote data" $
+      it "is nothing when Flags and Environment do not contains full remote data" $
         -- N.B. URL is missing
        do
         let flags = emptyFlags {flagStoragePassword = Just "flagPassword"}
