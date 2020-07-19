@@ -9,8 +9,10 @@ import Env
 import Options.Applicative
 import Servant.Client
 
+import GHC.IO.Handle
 import TestImport hiding (Failure, Success)
 
+import qualified Data.ByteString as B
 import Data.Hastory
 import Hastory.Cli.OptParse
 import Hastory.Cli.OptParse.Types
@@ -19,7 +21,29 @@ spec :: Spec
 spec = do
   runArgumentsParserSpec
   envParserSpec
+  getConfigurationSpec
   combineToInstructionsSpec
+
+getConfigurationSpec :: Spec
+getConfigurationSpec =
+  describe "getConfigurationSpec" $ do
+    it "prefers Flags over Environment file" $ do
+      let yamlContents = "username: steven"
+      withConfigFile yamlContents $ \path _handle -> do
+        let flags = emptyFlags {flagCacheDir = Just (toFilePath path)}
+            environment = emptyEnvironment {envCacheDir = Just "~/home"}
+        config <- getConfiguration flags environment
+        configStorageUsername config `shouldBe` Just (Username "steven")
+    it "prefers Environment over default file" pending
+    it "has a default" pending
+
+type ConfigFileContents = B.ByteString
+
+withConfigFile :: ConfigFileContents -> (Path Abs File -> Handle -> Expectation) -> Expectation
+withConfigFile contents f =
+  withSystemTempFile "hastory.yaml" $ \path handle -> do
+    B.hPut handle contents
+    f path handle
 
 runArgumentsParserSpec :: Spec
 runArgumentsParserSpec = describe "runArgumentsParser" (describeFlags >> describeCommand)
@@ -151,7 +175,7 @@ combineToInstructionsSpec =
             (CommandGenGatherWrapperScript GenGatherWrapperScriptFlags)
             flags
             env
-            Configuration
+            emptyConfiguration
         settings `shouldBe` Settings stevenAbsDir Nothing
       it "falls back to Environment cache if Flags cache is missing" $ do
         let flags = emptyFlags
@@ -163,7 +187,7 @@ combineToInstructionsSpec =
             (CommandGenGatherWrapperScript GenGatherWrapperScriptFlags)
             flags
             env
-            Configuration
+            emptyConfiguration
         settings `shouldBe` Settings chrisAbsDir Nothing
       it "has a default when Flags and Environment are missing cache dir" $ do
         defaultCacheDir <- getHomeDir >>= flip resolveDir ".hastory"
@@ -172,7 +196,7 @@ combineToInstructionsSpec =
             (CommandGenGatherWrapperScript GenGatherWrapperScriptFlags)
             emptyFlags
             emptyEnvironment
-            Configuration
+            emptyConfiguration
         settings `shouldBe` Settings defaultCacheDir Nothing
     context "remoteStorageClientInfo" $ do
       it "prefers Flags over Environment" $ do
@@ -198,7 +222,7 @@ combineToInstructionsSpec =
             (CommandGenGatherWrapperScript GenGatherWrapperScriptFlags)
             flags
             env
-            Configuration
+            emptyConfiguration
         remoteStorageClientInfo settings `shouldBe`
           Just (RemoteStorageClientInfo flagBaseUrl flagUsername flagPassword)
       it "combines Flags and Environment correctly" $ do
@@ -214,7 +238,7 @@ combineToInstructionsSpec =
             (CommandGenGatherWrapperScript GenGatherWrapperScriptFlags)
             flags
             env
-            Configuration
+            emptyConfiguration
         remoteStorageClientInfo settings `shouldBe`
           Just (RemoteStorageClientInfo flagBaseUrl envUsername flagPassword)
       it "is nothing when Flags and Environment do not contains full remote data" $
@@ -227,7 +251,7 @@ combineToInstructionsSpec =
             (CommandGenGatherWrapperScript GenGatherWrapperScriptFlags)
             flags
             env
-            Configuration
+            emptyConfiguration
         remoteStorageClientInfo settings `shouldBe` Nothing
     describe "CommandGenGatherWrapperScript" $ do
       context "Flags does NOT contain all 3 fields of a RemoteStorageClientInfo" $
@@ -274,7 +298,13 @@ emptyFlags =
     }
 
 emptyConfiguration :: Configuration
-emptyConfiguration = Configuration
+emptyConfiguration =
+  Configuration
+    { configCacheDir = Nothing
+    , configStorageServer = Nothing
+    , configStorageUsername = Nothing
+    , configStoragePassword = Nothing
+    }
 
 emptyEnvironment :: Environment
 emptyEnvironment =

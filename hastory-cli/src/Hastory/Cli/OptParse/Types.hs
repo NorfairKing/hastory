@@ -72,6 +72,11 @@ data Environment =
 
 data Configuration =
   Configuration
+    { configCacheDir :: Maybe FilePath
+    , configStorageServer :: Maybe BaseUrl
+    , configStorageUsername :: Maybe Username
+    , configStoragePassword :: Maybe Text
+    }
   deriving (Show, Eq)
 
 data Dispatch

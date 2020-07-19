@@ -2,6 +2,7 @@
 
 module Hastory.Cli.OptParse
   ( combineToInstructions
+  , getConfiguration
   , getInstructions
   , envParser
   , runArgumentsParser
@@ -27,11 +28,11 @@ getInstructions :: IO Instructions
 getInstructions = do
   Arguments cmd flags <- getArguments
   environment <- getEnvironment
-  config <- getConfiguration cmd flags environment
+  config <- getConfiguration flags environment
   combineToInstructions cmd flags environment config
 
 combineToInstructions :: Command -> Flags -> Environment -> Configuration -> IO Instructions
-combineToInstructions cmd Flags {..} Environment {..} Configuration =
+combineToInstructions cmd Flags {..} Environment {..} config =
   Instructions <$> getDispatch <*> getSettings
   where
     getDispatch = pure dispatch
@@ -62,8 +63,8 @@ combineToInstructions cmd Flags {..} Environment {..} Configuration =
       (flagStorageUsername <|> envStorageUsername) <*>
       (flagStoragePassword <|> envStoragePassword)
 
-getConfiguration :: Command -> Flags -> Environment -> IO Configuration
-getConfiguration _ _ _ = pure Configuration
+getConfiguration :: Flags -> Environment -> IO Configuration
+getConfiguration _ _ = pure $ Configuration Nothing Nothing Nothing Nothing
 
 getArguments :: IO Arguments
 getArguments = do

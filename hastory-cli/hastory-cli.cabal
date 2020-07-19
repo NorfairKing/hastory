@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: aec3ea6480e61f4b46182d491d30b02677df63163a6094f28aa738a9e7988b80
+-- hash: 93fb62e055873f1f38eceeafd37cf9cf0fc567b58be752171b086e9bfb2dfaf2
 
 name:           hastory-cli
 version:        0.0.0.0
@@ -99,6 +99,7 @@ test-suite hastory-cli-test
   build-depends:
       QuickCheck
     , base >=4.9 && <=5
+    , bytestring
     , envparse
     , genvalidity
     , genvalidity-hspec

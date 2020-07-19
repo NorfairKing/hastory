@@ -73,6 +73,7 @@ tests:
     dependencies:
     - base >=4.9 && <=5
     - QuickCheck
+    - bytestring
     - envparse
     - genvalidity
     - genvalidity-hspec
