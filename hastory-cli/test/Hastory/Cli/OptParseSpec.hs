@@ -9,7 +9,6 @@ import Env
 import Options.Applicative
 import Servant.Client
 
-import GHC.IO.Handle
 import TestImport hiding (Failure, Success)
 
 import qualified Data.ByteString as B
@@ -29,9 +28,9 @@ getConfigurationSpec =
   describe "getConfigurationSpec" $ do
     it "prefers Flags over Environment file" $ do
       let yamlContents = "username: steven"
-      withConfigFile yamlContents $ \path _handle -> do
-        let flags = emptyFlags {flagCacheDir = Just (toFilePath path)}
-            environment = emptyEnvironment {envCacheDir = Just "~/home"}
+      withConfigFile yamlContents $ \path -> do
+        let flags = emptyFlags {flagConfigFile = Just (toFilePath path)}
+            environment = emptyEnvironment {envConfigFile = Just "~/home"}
         config <- getConfiguration flags environment
         configStorageUsername config `shouldBe` Just (Username "steven")
     it "prefers Environment over default file" pending
@@ -39,11 +38,11 @@ getConfigurationSpec =
 
 type ConfigFileContents = B.ByteString
 
-withConfigFile :: ConfigFileContents -> (Path Abs File -> Handle -> Expectation) -> Expectation
+withConfigFile :: ConfigFileContents -> (Path Abs File -> Expectation) -> Expectation
 withConfigFile contents f =
-  withSystemTempFile "hastory.yaml" $ \path handle -> do
-    B.hPut handle contents
-    f path handle
+  withSystemTempFile "hastory.yaml" $ \path _handle -> do
+    B.writeFile (toFilePath path) contents
+    f path
 
 runArgumentsParserSpec :: Spec
 runArgumentsParserSpec = describe "runArgumentsParser" (describeFlags >> describeCommand)

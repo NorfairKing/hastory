@@ -1,4 +1,5 @@
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TypeApplications #-}
 
 module Hastory.Cli.OptParse
   ( combineToInstructions
@@ -17,9 +18,11 @@ import Data.Semigroup ((<>))
 import qualified Data.Text as T
 import qualified Env
 import Options.Applicative
-import Path.IO (getHomeDir, resolveDir, resolveDir')
+import Path.IO (getHomeDir, resolveDir, resolveDir', resolveFile')
 import Servant.Client.Core.Reexport (parseBaseUrl)
 import System.Environment (getArgs)
+import System.Exit
+import YamlParse.Applicative hiding (Parser)
 
 import Data.Hastory.Types
 import Hastory.Cli.OptParse.Types
@@ -64,7 +67,18 @@ combineToInstructions cmd Flags {..} Environment {..} config =
       (flagStoragePassword <|> envStoragePassword)
 
 getConfiguration :: Flags -> Environment -> IO Configuration
-getConfiguration _ _ = pure $ Configuration Nothing Nothing Nothing Nothing
+getConfiguration Flags {..} Environment {..} =
+  maybe useDefaultConfig useConfigFile (flagConfigFile <|> envConfigFile)
+  where
+    useConfigFile filePath = do
+      path <- resolveFile' filePath
+      mConfiguration <- readConfigFile path
+      case mConfiguration of
+        Just configuration -> pure configuration
+        Nothing -> do
+          let documentation = prettySchemaDoc @Configuration
+          die (T.unpack documentation)
+    useDefaultConfig = undefined
 
 getArguments :: IO Arguments
 getArguments = do

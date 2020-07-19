@@ -1,9 +1,13 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Hastory.Cli.OptParse.Types where
 
+import Data.Aeson
 import Data.Hastory.Types
 import Data.Text (Text)
 import Path (Abs, Dir, Path)
-import Servant.Client.Core.Reexport (BaseUrl)
+import Servant.Client.Core.Reexport (BaseUrl, parseBaseUrl)
+import YamlParse.Applicative
 
 data Arguments =
   Arguments Command Flags
@@ -78,6 +82,21 @@ data Configuration =
     , configStoragePassword :: Maybe Text
     }
   deriving (Show, Eq)
+
+instance YamlSchema Configuration where
+  yamlSchema =
+    objectParser "Configuration" $
+    Configuration <$> optionalField "cache-dir" "the cache directory for hastory" <*>
+    maybeParser
+      (maybe Nothing (pure . parseBaseUrl))
+      (optionalField "url" "URL of the central storage server") <*>
+    maybeParser
+      (maybe Nothing (pure . parseUsername))
+      (optionalField "username" "Username for the central storage server") <*>
+    optionalField "storage-server-password" "Password for the central storage server"
+
+instance FromJSON Configuration where
+  parseJSON = viaYamlSchema
 
 data Dispatch
   = DispatchGather GatherSettings

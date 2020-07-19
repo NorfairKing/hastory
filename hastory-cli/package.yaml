@@ -49,6 +49,7 @@ library:
   - validity-path
   - validity-text
   - validity-time
+  - yamlparse-applicative
 
 executables:
   hastory:

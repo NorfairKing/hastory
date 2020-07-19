@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 93fb62e055873f1f38eceeafd37cf9cf0fc567b58be752171b086e9bfb2dfaf2
+-- hash: 8ea0c45ba5f8cdac2edf80e0617d778677b878c86aab554cb06483f333dab019
 
 name:           hastory-cli
 version:        0.0.0.0
@@ -69,6 +69,7 @@ library
     , validity-path
     , validity-text
     , validity-time
+    , yamlparse-applicative
   default-language: Haskell2010
 
 executable hastory
