@@ -14,7 +14,6 @@ import TestImport hiding (Failure, Success)
 
 import Data.Hastory
 import Hastory.Cli.OptParse
-import Hastory.Cli.OptParse.Types
 
 spec :: Spec
 spec = do
@@ -40,7 +39,8 @@ type ConfigFileContents = B.ByteString
 
 withConfigFile :: ConfigFileContents -> (Path Abs File -> Expectation) -> Expectation
 withConfigFile contents f =
-  withSystemTempFile "hastory.yaml" $ \path _handle -> do
+  withSystemTempDir "hastory.yaml" $ \tmpDir -> do
+    path <- resolveFile tmpDir "hastory.yaml"
     B.writeFile (toFilePath path) contents
     f path
 
