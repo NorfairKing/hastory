@@ -9,9 +9,9 @@ import Env
 import Options.Applicative
 import Servant.Client
 
+import qualified Data.ByteString as B
 import TestImport hiding (Failure, Success)
 
-import qualified Data.ByteString as B
 import Data.Hastory
 import Hastory.Cli.OptParse
 import Hastory.Cli.OptParse.Types

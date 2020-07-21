@@ -2,7 +2,9 @@
 
 module Hastory.Cli.OptParse.Types where
 
+import Control.Applicative
 import Data.Aeson
+import Data.Functor
 import Data.Hastory.Types
 import Data.Text (Text)
 import Path (Abs, Dir, Path)
@@ -84,16 +86,31 @@ data Configuration =
   deriving (Show, Eq)
 
 instance YamlSchema Configuration where
-  yamlSchema =
-    objectParser "Configuration" $
-    Configuration <$> optionalField "cache-dir" "the cache directory for hastory" <*>
-    maybeParser
-      (maybe Nothing (pure . parseBaseUrl))
-      (optionalField "url" "URL of the central storage server") <*>
-    maybeParser
-      (maybe Nothing (pure . parseUsername))
-      (optionalField "username" "Username for the central storage server") <*>
-    optionalField "storage-server-password" "Password for the central storage server"
+  yamlSchema = parseEmptyConfigurationFile <|> parseObject
+    where
+      parseEmptyConfigurationFile =
+        ParseNull $>
+        Configuration
+          { configCacheDir = Nothing
+          , configStorageServer = Nothing
+          , configStorageUsername = Nothing
+          , configStoragePassword = Nothing
+          }
+      parseObject =
+        objectParser "Configuration" $
+        Configuration <$> optionalField "cache-dir" "the cache directory for hastory" <*>
+        eitherParser parseBaseUrl' (optionalField "url" "URL of the central storage server") <*>
+        eitherParser
+          parseUsername'
+          (optionalField "username" "Username for the central storage server") <*>
+        optionalField "password" "Password for the central storage server"
+      parseUsername' :: Maybe Text -> Either String (Maybe Username)
+      parseUsername' Nothing = Right Nothing
+      parseUsername' (Just t) =
+        maybe (Left "Unable to parse username") (Right . Just) (parseUsername t)
+      parseBaseUrl' :: Maybe String -> Either String (Maybe BaseUrl)
+      parseBaseUrl' Nothing = Right Nothing
+      parseBaseUrl' (Just t) = maybe (Left "Unable to parse url") (Right . Just) (parseBaseUrl t)
 
 instance FromJSON Configuration where
   parseJSON = viaYamlSchema

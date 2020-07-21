@@ -74,6 +74,7 @@ tests:
     dependencies:
     - base >=4.9 && <=5
     - QuickCheck
+    - aeson
     - bytestring
     - envparse
     - genvalidity
@@ -96,6 +97,7 @@ tests:
     - validity
     - validity-path
     - validity-text
+    - yaml
 
 benchmarks:
   hastory-cli-bench:
@@ -107,8 +109,8 @@ benchmarks:
     - -with-rtsopts=-T
     - -Wall
     dependencies:
-    - QuickCheck
     - base
+    - QuickCheck
     - criterion
     - exceptions
     - genvalidity

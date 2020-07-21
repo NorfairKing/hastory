@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8ea0c45ba5f8cdac2edf80e0617d778677b878c86aab554cb06483f333dab019
+-- hash: 77889adaa944082352239b5cc75b9e72d11a146925e3e639446eb26c1df5f595
 
 name:           hastory-cli
 version:        0.0.0.0
@@ -91,6 +91,7 @@ test-suite hastory-cli-test
   other-modules:
       Hastory.Cli.Commands.GenGatherWrapperSpec
       Hastory.Cli.Commands.SuggestionSpec
+      Hastory.Cli.OptParse.TypesSpec
       Hastory.Cli.OptParseSpec
       TestImport
       Paths_hastory_cli
@@ -99,6 +100,7 @@ test-suite hastory-cli-test
   ghc-options: -optP-Wno-nonportable-include-path -threaded -rtsopts -with-rtsopts=-N -Wall
   build-depends:
       QuickCheck
+    , aeson
     , base >=4.9 && <=5
     , bytestring
     , envparse
@@ -123,6 +125,7 @@ test-suite hastory-cli-test
     , validity
     , validity-path
     , validity-text
+    , yaml
   default-language: Haskell2010
 
 benchmark hastory-cli-bench

@@ -26,3 +26,5 @@ import Test.Validity.Aeson as X
 
 import Path as X
 import Path.IO as X
+
+import Hastory.Cli.OptParse.Types as X
