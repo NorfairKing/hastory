@@ -99,18 +99,18 @@ instance YamlSchema Configuration where
       parseObject =
         objectParser "Configuration" $
         Configuration <$> optionalField "cache-dir" "the cache directory for hastory" <*>
-        eitherParser parseBaseUrl' (optionalField "url" "URL of the central storage server") <*>
         eitherParser
-          parseUsername'
+          (propogatingParseError parseBaseUrl "Unable to parse url")
+          (optionalField "url" "URL of the central storage server") <*>
+        eitherParser
+          (propogatingParseError parseUsername "Unable to parse username")
           (optionalField "username" "Username for the central storage server") <*>
         optionalField "password" "Password for the central storage server"
-      parseUsername' :: Maybe Text -> Either String (Maybe Username)
-      parseUsername' Nothing = Right Nothing
-      parseUsername' (Just t) =
-        maybe (Left "Unable to parse username") (Right . Just) (parseUsername t)
-      parseBaseUrl' :: Maybe String -> Either String (Maybe BaseUrl)
-      parseBaseUrl' Nothing = Right Nothing
-      parseBaseUrl' (Just t) = maybe (Left "Unable to parse url") (Right . Just) (parseBaseUrl t)
+      propogatingParseError :: (a -> Maybe b) -> String -> Maybe a -> Either String (Maybe b)
+      propogatingParseError scalarParser errMsg mScalar =
+        case mScalar of
+          Nothing -> Right Nothing
+          Just scalar -> maybe (Left errMsg) (Right . Just) (scalarParser scalar)
 
 instance FromJSON Configuration where
   parseJSON = viaYamlSchema
