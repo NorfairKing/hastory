@@ -18,7 +18,16 @@ import Data.Semigroup ((<>))
 import qualified Data.Text as T
 import qualified Env
 import Options.Applicative
-import Path.IO (getHomeDir, resolveDir, resolveDir', resolveFile')
+import Path
+import Path.IO
+  ( doesFileExist
+  , getAppUserDataDir
+  , getHomeDir
+  , resolveDir
+  , resolveDir'
+  , resolveFile
+  , resolveFile'
+  )
 import Servant.Client.Core.Reexport (parseBaseUrl)
 import System.Environment (getArgs)
 import System.Exit
@@ -31,7 +40,8 @@ getInstructions :: IO Instructions
 getInstructions = do
   Arguments cmd flags <- getArguments
   environment <- getEnvironment
-  config <- getConfiguration flags environment
+  defaultConfigFile <- getAppUserDataDir "hastory" >>= flip resolveFile "hastory.yaml"
+  config <- getConfiguration defaultConfigFile flags environment
   combineToInstructions cmd flags environment config
 
 combineToInstructions :: Command -> Flags -> Environment -> Configuration -> IO Instructions
@@ -66,19 +76,18 @@ combineToInstructions cmd Flags {..} Environment {..} config =
       (flagStorageUsername <|> envStorageUsername) <*>
       (flagStoragePassword <|> envStoragePassword)
 
-getConfiguration :: Flags -> Environment -> IO Configuration
-getConfiguration Flags {..} Environment {..} =
-  maybe useDefaultConfig useConfigFile (flagConfigFile <|> envConfigFile)
+getConfiguration :: Path Abs File -> Flags -> Environment -> IO Configuration
+getConfiguration defaultConfigFile Flags {..} Environment {..} =
+  maybe useDefaultConfig useProvideConfigFile (flagConfigFile <|> envConfigFile)
   where
-    useConfigFile filePath = do
-      path <- resolveFile' filePath
-      mConfiguration <- readConfigFile path
-      case mConfiguration of
-        Just configuration -> pure configuration
-        Nothing -> do
-          let documentation = prettySchemaDoc @Configuration
-          die (T.unpack documentation)
-    useDefaultConfig = undefined
+    useProvideConfigFile filePath = resolveFile' filePath >>= readConfigFile >>= displayingSchema
+    useDefaultConfig = do
+      fileExists <- doesFileExist defaultConfigFile
+      if fileExists
+        then readConfigFile defaultConfigFile >>= displayingSchema
+        else pure defaultConfiguration
+    displayingSchema :: Maybe Configuration -> IO Configuration
+    displayingSchema = maybe (die (T.unpack (prettySchemaDoc @Configuration))) pure
 
 getArguments :: IO Arguments
 getArguments = do

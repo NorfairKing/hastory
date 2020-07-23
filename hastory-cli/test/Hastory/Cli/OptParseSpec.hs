@@ -24,24 +24,54 @@ spec = do
 
 getConfigurationSpec :: Spec
 getConfigurationSpec =
-  describe "getConfigurationSpec" $ do
-    it "prefers Flags over Environment file" $ do
-      let yamlContents = "username: steven"
-      withConfigFile yamlContents $ \path -> do
+  describe "getConfigurationSpec" $
+  around withDefaultConfigFile $ do
+    it "prefers Flags over Environment file" $ \defaultConfigFile -> do
+      let contentsOfFileInFlags = "url: flag.example.com"
+      withFile contentsOfFileInFlags $ \path -> do
         let flags = emptyFlags {flagConfigFile = Just (toFilePath path)}
-            environment = emptyEnvironment {envConfigFile = Just "~/home"}
-        config <- getConfiguration flags environment
-        configStorageUsername config `shouldBe` Just (Username "steven")
-    it "prefers Environment over default file" pending
-    it "has a default" pending
+            environment = emptyEnvironment {envConfigFile = Just "~/randomUser"}
+        url <- parseBaseUrl "flag.example.com"
+        config <- getConfiguration defaultConfigFile flags environment
+        config `shouldBe` emptyConfiguration {configStorageServer = Just url}
+    it "prefers Environment over default file" $ \defaultConfigFile -> do
+      let contentsOfFileInEnv = "url: environment.example.com"
+      withFile contentsOfFileInEnv $ \path -> do
+        let flags = emptyFlags
+            environment = emptyEnvironment {envConfigFile = Just (toFilePath path)}
+        url <- parseBaseUrl "environment.example.com"
+        config <- getConfiguration defaultConfigFile flags environment
+        config `shouldBe` emptyConfiguration {configStorageServer = Just url}
+    context "Flags and Environment do NOT specify a config" $ do
+      context "default config file exists" $ do
+        it "uses the default config file" $ \defaultConfigFile -> do
+          let defaultConfigContents = "url: default.example.com"
+          B.writeFile (toFilePath defaultConfigFile) defaultConfigContents
+          configuration <- getConfiguration defaultConfigFile emptyFlags emptyEnvironment
+          url <- parseBaseUrl "default.example.com"
+          configuration `shouldBe` emptyConfiguration {configStorageServer = Just url}
+        it "does not parse malformed config files" $ \defaultConfigFile -> do
+          let defaultConfigContents = "url: 1"
+          B.writeFile (toFilePath defaultConfigFile) defaultConfigContents
+          getConfiguration defaultConfigFile emptyFlags emptyEnvironment `shouldThrow` anyException
+      context "default config file does not exist" $
+        it "has 'empty' configuration" $ \defaultConfigFile -> do
+          configuration <- getConfiguration defaultConfigFile emptyFlags emptyEnvironment
+          configuration `shouldBe` emptyConfiguration
 
 type ConfigFileContents = B.ByteString
 
-withConfigFile :: ConfigFileContents -> (Path Abs File -> Expectation) -> Expectation
-withConfigFile contents f =
+withFile :: ConfigFileContents -> (Path Abs File -> Expectation) -> Expectation
+withFile contents f =
   withSystemTempDir "hastory.yaml" $ \tmpDir -> do
     path <- resolveFile tmpDir "hastory.yaml"
     B.writeFile (toFilePath path) contents
+    f path
+
+withDefaultConfigFile :: (Path Abs File -> Expectation) -> Expectation
+withDefaultConfigFile f =
+  withSystemTempDir "hastory.yaml" $ \tmpDir -> do
+    path <- resolveFile tmpDir "hastory.config"
     f path
 
 runArgumentsParserSpec :: Spec
@@ -297,13 +327,7 @@ emptyFlags =
     }
 
 emptyConfiguration :: Configuration
-emptyConfiguration =
-  Configuration
-    { configCacheDir = Nothing
-    , configStorageServer = Nothing
-    , configStorageUsername = Nothing
-    , configStoragePassword = Nothing
-    }
+emptyConfiguration = defaultConfiguration
 
 emptyEnvironment :: Environment
 emptyEnvironment =
