@@ -56,11 +56,30 @@ with final.haskell.lib;
                       "password"
                       "password-instances"
                     ] passwordPkg;
+
+                  # YamlParse-Applicative
+                  yamlparseApplicativeRepo =
+                    final.fetchFromGitHub {
+                      owner = "NorfairKing";
+                      repo = "yamlparse-applicative";
+                      rev = "1d381a4cbc9736a2defc916a93cfcf8000ee7e37";
+                      sha256 =
+                        "sha256:18arsg3qzva8hz4f78a3n5zp639pway90xlvwac67fgv4sl6ivaz";
+                    };
+                  yamlparseApplicativePkg =
+                    name:
+                      dontCheck (
+                        self.callCabal2nix name ( yamlparseApplicativeRepo + "/${name}" ) {}
+                      );
+                  yamlparseApplicativePackages =
+                    final.lib.genAttrs [
+                      "yamlparse-applicative"
+                    ] yamlparseApplicativePkg;
                 in
                   final.hastoryPackages // {
                     # Passwords
                     ghc-byteorder = self.callHackage "ghc-byteorder" "4.11.0.0.10" {};
-                  } // passwordPackages
+                  } // passwordPackages // yamlparseApplicativePackages
             );
         }
     );
