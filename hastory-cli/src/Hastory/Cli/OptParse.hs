@@ -45,7 +45,7 @@ getInstructions = do
   combineToInstructions cmd flags environment config
 
 combineToInstructions :: Command -> Flags -> Environment -> Configuration -> IO Instructions
-combineToInstructions cmd Flags {..} Environment {..} config =
+combineToInstructions cmd Flags {..} Environment {..} Configuration {..} =
   Instructions <$> getDispatch <*> getSettings
   where
     getDispatch = pure dispatch
@@ -67,14 +67,14 @@ combineToInstructions cmd Flags {..} Environment {..} config =
     getSettings = do
       home <- getHomeDir
       cacheDir <-
-        case flagCacheDir <|> envCacheDir of
+        case flagCacheDir <|> envCacheDir <|> configCacheDir of
           Nothing -> resolveDir home ".hastory"
-          Just fcd -> resolveDir' fcd
+          Just cd -> resolveDir' cd
       pure Settings {setCacheDir = cacheDir, remoteStorageClientInfo = mbRemoteStorageClientInfo}
     mbRemoteStorageClientInfo =
-      RemoteStorageClientInfo <$> (flagStorageServer <|> envStorageServer) <*>
-      (flagStorageUsername <|> envStorageUsername) <*>
-      (flagStoragePassword <|> envStoragePassword)
+      RemoteStorageClientInfo <$> (flagStorageServer <|> envStorageServer <|> configStorageServer) <*>
+      (flagStorageUsername <|> envStorageUsername <|> configStorageUsername) <*>
+      (flagStoragePassword <|> envStoragePassword <|> configStoragePassword)
 
 getConfiguration :: Path Abs File -> Flags -> Environment -> IO Configuration
 getConfiguration defaultConfigFile Flags {..} Environment {..} =
