@@ -8,7 +8,7 @@ import TestImport
 
 import Data.Hastory
 import Hastory.Cli.Commands.GenGatherWrapper
-import Hastory.Cli.OptParse.Types
+import Hastory.Cli.OptParse.Types ()
 import Servant.Client.Core
 
 spec :: Spec
