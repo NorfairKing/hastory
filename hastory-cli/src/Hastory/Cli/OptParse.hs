@@ -82,7 +82,7 @@ getArguments = do
   handleParseResult result
 
 getEnvironment :: IO Environment
-getEnvironment = Env.parse (Env.header "hastory") (Env.prefixed "HASTORY_" envParser)
+getEnvironment = Env.parse (Env.header "hastory") envParser
 
 envParser :: Env.Parser Env.Error Environment
 envParser =
