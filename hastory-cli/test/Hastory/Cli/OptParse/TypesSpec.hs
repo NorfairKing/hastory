@@ -20,7 +20,7 @@ spec =
       value <- Data.Yaml.decodeThrow "username: steven"
       fromJSON value `shouldBe`
         Success (emptyConfiguration {configStorageUsername = Just (Username "steven")})
-    it "is an 'full' Configuration when user provides ALL fields" $ do
+    it "is a 'full' Configuration when user provides ALL fields" $ do
       value <-
         Data.Yaml.decodeThrow
           "username: steven\npassword: Passw0rd\nurl: api.example.com\ncache-dir: ~/home"

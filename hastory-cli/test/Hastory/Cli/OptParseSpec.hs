@@ -32,32 +32,32 @@ getConfigurationSpec =
         let flags = emptyFlags {flagConfigFile = Just (toFilePath path)}
             environment = emptyEnvironment {envConfigFile = Just "~/randomUser"}
         url <- parseBaseUrl "flag.example.com"
-        config <- getConfiguration defaultConfigFile flags environment
-        config `shouldBe` emptyConfiguration {configStorageServer = Just url}
+        mConf <- getConfiguration defaultConfigFile flags environment
+        mConf `shouldBe` Just (emptyConfiguration {configStorageServer = Just url})
     it "prefers Environment over default file" $ \defaultConfigFile -> do
       let contentsOfFileInEnv = "url: environment.example.com"
       withFile contentsOfFileInEnv $ \path -> do
         let flags = emptyFlags
             environment = emptyEnvironment {envConfigFile = Just (toFilePath path)}
         url <- parseBaseUrl "environment.example.com"
-        config <- getConfiguration defaultConfigFile flags environment
-        config `shouldBe` emptyConfiguration {configStorageServer = Just url}
+        mConf <- getConfiguration defaultConfigFile flags environment
+        mConf `shouldBe` Just (emptyConfiguration {configStorageServer = Just url})
     context "Flags and Environment do NOT specify a config" $ do
       context "default config file exists" $ do
         it "uses the default config file" $ \defaultConfigFile -> do
           let defaultConfigContents = "url: default.example.com"
           B.writeFile (toFilePath defaultConfigFile) defaultConfigContents
-          configuration <- getConfiguration defaultConfigFile emptyFlags emptyEnvironment
+          mConf <- getConfiguration defaultConfigFile emptyFlags emptyEnvironment
           url <- parseBaseUrl "default.example.com"
-          configuration `shouldBe` emptyConfiguration {configStorageServer = Just url}
+          mConf `shouldBe` Just (emptyConfiguration {configStorageServer = Just url})
         it "does not parse malformed config files" $ \defaultConfigFile -> do
           let defaultConfigContents = "url: 1"
           B.writeFile (toFilePath defaultConfigFile) defaultConfigContents
           getConfiguration defaultConfigFile emptyFlags emptyEnvironment `shouldThrow` anyException
       context "default config file does not exist" $
         it "has 'empty' configuration" $ \defaultConfigFile -> do
-          configuration <- getConfiguration defaultConfigFile emptyFlags emptyEnvironment
-          configuration `shouldBe` emptyConfiguration
+          mConf <- getConfiguration defaultConfigFile emptyFlags emptyEnvironment
+          mConf `shouldBe` Nothing
 
 type ConfigFileContents = B.ByteString
 
@@ -204,7 +204,7 @@ combineToInstructionsSpec =
             (CommandGenGatherWrapperScript GenGatherWrapperScriptFlags)
             flags
             env
-            emptyConfiguration
+            Nothing
         settings `shouldBe` Settings stevenAbsDir Nothing
       it "falls back to Environment cache if Flags cache is missing" $ do
         let flags = emptyFlags
@@ -216,7 +216,7 @@ combineToInstructionsSpec =
             (CommandGenGatherWrapperScript GenGatherWrapperScriptFlags)
             flags
             env
-            emptyConfiguration
+            Nothing
         settings `shouldBe` Settings chrisAbsDir Nothing
       it "falls back to Config when Flags / Environment is missing" $ do
         let stevenHomeDir = "/home/steven"
@@ -226,7 +226,7 @@ combineToInstructionsSpec =
             (CommandGenGatherWrapperScript GenGatherWrapperScriptFlags)
             emptyFlags
             emptyEnvironment
-            emptyConfiguration {configCacheDir = Just stevenHomeDir}
+            (Just (emptyConfiguration {configCacheDir = Just stevenHomeDir}))
         settings `shouldBe` Settings stevenAbsDir Nothing
       it "has default when Configuration / Flags / Environment / Config cache is missing" $ do
         defaultCacheDir <- getHomeDir >>= flip resolveDir ".hastory"
@@ -235,7 +235,7 @@ combineToInstructionsSpec =
             (CommandGenGatherWrapperScript GenGatherWrapperScriptFlags)
             emptyFlags
             emptyEnvironment
-            emptyConfiguration
+            Nothing
         settings `shouldBe` Settings defaultCacheDir Nothing
     context "remoteStorageClientInfo" $ do
       it "prefers Flags over Environment" $ do
@@ -261,7 +261,7 @@ combineToInstructionsSpec =
             (CommandGenGatherWrapperScript GenGatherWrapperScriptFlags)
             flags
             env
-            emptyConfiguration
+            Nothing
         remoteStorageClientInfo settings `shouldBe`
           Just (RemoteStorageClientInfo flagBaseUrl flagUsername flagPassword)
       it "combines Flags, Environment, and Configuration correctly" $ do
@@ -270,13 +270,13 @@ combineToInstructionsSpec =
             confPassword = "Passw0rd"
         let flags = emptyFlags {flagStorageServer = Just flagBaseUrl}
             env = emptyEnvironment {envStorageUsername = Just envUsername}
-            conf = emptyConfiguration {configStoragePassword = Just "Passw0rd"}
+            mConf = Just (emptyConfiguration {configStoragePassword = Just "Passw0rd"})
         Instructions _ settings <-
           combineToInstructions
             (CommandGenGatherWrapperScript GenGatherWrapperScriptFlags)
             flags
             env
-            conf
+            mConf
         remoteStorageClientInfo settings `shouldBe`
           Just (RemoteStorageClientInfo flagBaseUrl envUsername confPassword)
       it "is nothing when Flags / Environment / Configuration do not contains full remote data" $
@@ -289,7 +289,7 @@ combineToInstructionsSpec =
             (CommandGenGatherWrapperScript GenGatherWrapperScriptFlags)
             flags
             env
-            emptyConfiguration
+            Nothing
         remoteStorageClientInfo settings `shouldBe` Nothing
     describe "CommandGenGatherWrapperScript" $ do
       context "Flags contains all 3 fields of a RemoteStorageClientInfo" $
@@ -312,7 +312,7 @@ combineToInstructionsSpec =
                   , remoteStorageClientInfoPassword = password
                   }
           Instructions dispatch _settings <-
-            combineToInstructions cmd flags emptyEnvironment emptyConfiguration
+            combineToInstructions cmd flags emptyEnvironment Nothing
           dispatch `shouldBe`
             DispatchGenGatherWrapperScript
               GenGatherWrapperScriptSettings {genGatherWrapperScriptSetRemoteInfo = Just remoteInfo}
@@ -335,8 +335,7 @@ combineToInstructionsSpec =
                   , remoteStorageClientInfoUsername = username
                   , remoteStorageClientInfoPassword = password
                   }
-          Instructions dispatch _settings <-
-            combineToInstructions cmd emptyFlags env emptyConfiguration
+          Instructions dispatch _settings <- combineToInstructions cmd emptyFlags env Nothing
           dispatch `shouldBe`
             DispatchGenGatherWrapperScript
               GenGatherWrapperScriptSettings {genGatherWrapperScriptSetRemoteInfo = Just remoteInfo}
@@ -345,13 +344,14 @@ combineToInstructionsSpec =
           url <- parseBaseUrl "api.example.com"
           username <- parseUsername "hastory"
           let cmd = CommandGenGatherWrapperScript GenGatherWrapperScriptFlags
-              conf =
-                emptyConfiguration
-                  { configCacheDir = Nothing
-                  , configStorageServer = Just url
-                  , configStorageUsername = Just username
-                  , configStoragePassword = Just password
-                  }
+              mConf =
+                Just
+                  (emptyConfiguration
+                     { configCacheDir = Nothing
+                     , configStorageServer = Just url
+                     , configStorageUsername = Just username
+                     , configStoragePassword = Just password
+                     })
               password = "Passw0rd"
               remoteInfo =
                 RemoteStorageClientInfo
@@ -360,7 +360,7 @@ combineToInstructionsSpec =
                   , remoteStorageClientInfoPassword = password
                   }
           Instructions dispatch _settings <-
-            combineToInstructions cmd emptyFlags emptyEnvironment conf
+            combineToInstructions cmd emptyFlags emptyEnvironment mConf
           dispatch `shouldBe`
             DispatchGenGatherWrapperScript
               GenGatherWrapperScriptSettings {genGatherWrapperScriptSetRemoteInfo = Just remoteInfo}
@@ -376,7 +376,13 @@ emptyFlags =
     }
 
 emptyConfiguration :: Configuration
-emptyConfiguration = defaultConfiguration
+emptyConfiguration =
+  Configuration
+    { configCacheDir = Nothing
+    , configStorageServer = Nothing
+    , configStorageUsername = Nothing
+    , configStoragePassword = Nothing
+    }
 
 emptyEnvironment :: Environment
 emptyEnvironment =

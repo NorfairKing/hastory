@@ -85,15 +85,6 @@ data Configuration =
     }
   deriving (Show, Eq)
 
-defaultConfiguration :: Configuration
-defaultConfiguration =
-  Configuration
-    { configCacheDir = Nothing
-    , configStorageServer = Nothing
-    , configStorageUsername = Nothing
-    , configStoragePassword = Nothing
-    }
-
 instance YamlSchema Configuration where
   yamlSchema = parseEmptyConfigurationFile <|> parseObject
     where

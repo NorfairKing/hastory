@@ -1,5 +1,4 @@
 {-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE TypeApplications #-}
 
 module Hastory.Cli.OptParse
   ( combineToInstructions
@@ -19,18 +18,9 @@ import qualified Data.Text as T
 import qualified Env
 import Options.Applicative
 import Path
-import Path.IO
-  ( doesFileExist
-  , getAppUserDataDir
-  , getHomeDir
-  , resolveDir
-  , resolveDir'
-  , resolveFile
-  , resolveFile'
-  )
+import Path.IO (getAppUserDataDir, getHomeDir, resolveDir, resolveDir', resolveFile, resolveFile')
 import Servant.Client.Core.Reexport (parseBaseUrl)
 import System.Environment (getArgs)
-import System.Exit
 import YamlParse.Applicative hiding (Parser)
 
 import Data.Hastory.Types
@@ -41,11 +31,11 @@ getInstructions = do
   Arguments cmd flags <- getArguments
   environment <- getEnvironment
   defaultConfigFile <- getAppUserDataDir "hastory" >>= flip resolveFile "hastory.yaml"
-  config <- getConfiguration defaultConfigFile flags environment
-  combineToInstructions cmd flags environment config
+  mConfig <- getConfiguration defaultConfigFile flags environment
+  combineToInstructions cmd flags environment mConfig
 
-combineToInstructions :: Command -> Flags -> Environment -> Configuration -> IO Instructions
-combineToInstructions cmd Flags {..} Environment {..} Configuration {..} =
+combineToInstructions :: Command -> Flags -> Environment -> Maybe Configuration -> IO Instructions
+combineToInstructions cmd Flags {..} Environment {..} mConf =
   Instructions <$> getDispatch <*> getSettings
   where
     getDispatch = pure dispatch
@@ -67,27 +57,23 @@ combineToInstructions cmd Flags {..} Environment {..} Configuration {..} =
     getSettings = do
       home <- getHomeDir
       cacheDir <-
-        case flagCacheDir <|> envCacheDir <|> configCacheDir of
+        case flagCacheDir <|> envCacheDir <|> mc configCacheDir of
           Nothing -> resolveDir home ".hastory"
           Just cd -> resolveDir' cd
       pure Settings {setCacheDir = cacheDir, remoteStorageClientInfo = mbRemoteStorageClientInfo}
     mbRemoteStorageClientInfo =
-      RemoteStorageClientInfo <$> (flagStorageServer <|> envStorageServer <|> configStorageServer) <*>
-      (flagStorageUsername <|> envStorageUsername <|> configStorageUsername) <*>
-      (flagStoragePassword <|> envStoragePassword <|> configStoragePassword)
+      RemoteStorageClientInfo <$>
+      (flagStorageServer <|> envStorageServer <|> mc configStorageServer) <*>
+      (flagStorageUsername <|> envStorageUsername <|> mc configStorageUsername) <*>
+      (flagStoragePassword <|> envStoragePassword <|> mc configStoragePassword)
+    mc :: (Configuration -> Maybe a) -> Maybe a
+    mc func = mConf >>= func
 
-getConfiguration :: Path Abs File -> Flags -> Environment -> IO Configuration
+getConfiguration :: Path Abs File -> Flags -> Environment -> IO (Maybe Configuration)
 getConfiguration defaultConfigFile Flags {..} Environment {..} =
-  maybe useDefaultConfig useProvideConfigFile (flagConfigFile <|> envConfigFile)
-  where
-    useProvideConfigFile filePath = resolveFile' filePath >>= readConfigFile >>= displayingSchema
-    useDefaultConfig = do
-      fileExists <- doesFileExist defaultConfigFile
-      if fileExists
-        then readConfigFile defaultConfigFile >>= displayingSchema
-        else pure defaultConfiguration
-    displayingSchema :: Maybe Configuration -> IO Configuration
-    displayingSchema = maybe (die (T.unpack (prettySchemaDoc @Configuration))) pure
+  case flagConfigFile <|> envConfigFile of
+    Just userProvidedPath -> resolveFile' userProvidedPath >>= readConfigFile
+    Nothing -> readConfigFile defaultConfigFile
 
 getArguments :: IO Arguments
 getArguments = do
