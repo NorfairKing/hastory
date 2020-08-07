@@ -13,9 +13,6 @@ import TestImport hiding (Failure, Result, Success)
 spec :: Spec
 spec =
   describe "YamlSchema Configuration" $ do
-    it "is an 'empty' Configuration when user provides NO fields" $ do
-      value <- Data.Yaml.decodeThrow ""
-      fromJSON value `shouldBe` Success emptyConfiguration
     it "is an 'partial' Configuration when user provides SOME fields" $ do
       value <- Data.Yaml.decodeThrow "username: steven"
       fromJSON value `shouldBe`

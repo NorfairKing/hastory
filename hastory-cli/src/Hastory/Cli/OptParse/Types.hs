@@ -2,9 +2,7 @@
 
 module Hastory.Cli.OptParse.Types where
 
-import Control.Applicative
 import Data.Aeson
-import Data.Functor
 import Data.Hastory.Types
 import Data.Text (Text)
 import Path (Abs, Dir, Path)
@@ -86,16 +84,8 @@ data Configuration =
   deriving (Show, Eq)
 
 instance YamlSchema Configuration where
-  yamlSchema = parseEmptyConfigurationFile <|> parseObject
+  yamlSchema = parseObject
     where
-      parseEmptyConfigurationFile =
-        ParseNull $>
-        Configuration
-          { configCacheDir = Nothing
-          , configStorageServer = Nothing
-          , configStorageUsername = Nothing
-          , configStoragePassword = Nothing
-          }
       parseObject =
         objectParser "Configuration" $
         Configuration <$> optionalField "cache-dir" "the cache directory for hastory" <*>
