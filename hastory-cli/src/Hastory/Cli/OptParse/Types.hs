@@ -100,7 +100,9 @@ instance YamlSchema Configuration where
         optionalField "password" "Password for the central storage server" <*>
         eitherParser
           (propogatingParseError parseLrdBypassCache "Unable to parse lrd-bypass-cache")
-          (optionalField "lrd-bypass-cache" "Username for the central storage server")
+          (optionalField
+             "lrd-bypass-cache"
+             "Whether to recompute the recent directory options or use a cache when available")
       propogatingParseError :: (a -> Maybe b) -> String -> Maybe a -> Either String (Maybe b)
       propogatingParseError scalarParser errMsg mScalar =
         case mScalar of
