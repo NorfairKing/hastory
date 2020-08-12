@@ -47,8 +47,9 @@ combineToInstructions cmd Flags {..} Environment {..} mConf =
             GenGatherWrapperScriptSettings
               {genGatherWrapperScriptSetRemoteInfo = mbRemoteStorageClientInfo}
         CommandListRecentDirs ListRecentDirFlags {..} ->
-          DispatchListRecentDirs
-            ListRecentDirSettings {lrdSetBypassCache = fromMaybe False lrdArgBypassCache}
+          let lrdBypassCache = lrdArgBypassCache <|> envLrdBypassCache <|> mc configLrdBypassCache
+           in DispatchListRecentDirs
+                ListRecentDirSettings {lrdSetBypassCache = fromMaybe False lrdBypassCache}
         CommandChangeDir ChangeDirFlags {..} ->
           DispatchChangeDir ChangeDirSettings {changeDirSetIdx = changeDirFlagsIdx}
         CommandGenChangeWrapperScript _ ->
@@ -102,12 +103,28 @@ envParser =
        (Env.var
           Env.nonempty
           "STORAGE_SERVER_PASSWORD"
-          (Env.help "Password for the central storage server")))
+          (Env.help "Password for the central storage server")) <*>
+     optional (byPassCache <|> noBypassCache))
   where
     baseUrlParser unparsedUrl =
       maybe (Left $ Env.UnreadError unparsedUrl) Right (parseBaseUrl unparsedUrl)
     usernameParser username =
       maybe (Left . Env.UnreadError . T.unpack $ username) Right (parseUsername username)
+    byPassCache =
+      Env.var
+        (onMatchOf "BYPASS_CACHE" True)
+        "LRD_BYPASS_CACHE"
+        (Env.help "Always recompute the recent directory options")
+    noBypassCache =
+      Env.var
+        (onMatchOf "NO_BYPASS_CACHE" False)
+        "LRD_BYPASS_CACHE"
+        (Env.help "Use the recent directory cache when available")
+    onMatchOf :: String -> Bool -> String -> Either Env.Error Bool
+    onMatchOf matchWith succeedWith val =
+      if val == matchWith
+        then Right succeedWith
+        else Left (Env.UnreadError val)
 
 runArgumentsParser :: [String] -> ParserResult Arguments
 runArgumentsParser =
@@ -174,7 +191,7 @@ parseCommandListRecentDirs =
          (mconcat [long "bypass-cache", help "Always recompute the recent directory options"]) <|>
        flag'
          (Just False)
-         (mconcat [long "no-bypass-cache", help "Use the recent directory cache when available."]) <|>
+         (mconcat [long "no-bypass-cache", help "Use the recent directory cache when available"]) <|>
        pure Nothing)))
     (progDesc "List the directories that were the working directory most often (recently )")
 

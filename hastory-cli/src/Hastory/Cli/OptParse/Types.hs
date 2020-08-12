@@ -71,6 +71,7 @@ data Environment =
     , envStorageServer :: Maybe BaseUrl
     , envStorageUsername :: Maybe Username
     , envStoragePassword :: Maybe Text
+    , envLrdBypassCache :: Maybe Bool
     }
   deriving (Show, Eq)
 
@@ -80,6 +81,7 @@ data Configuration =
     , configStorageServer :: Maybe BaseUrl
     , configStorageUsername :: Maybe Username
     , configStoragePassword :: Maybe Text
+    , configLrdBypassCache :: Maybe Bool
     }
   deriving (Show, Eq)
 
@@ -95,12 +97,20 @@ instance YamlSchema Configuration where
         eitherParser
           (propogatingParseError parseUsername "Unable to parse username")
           (optionalField "username" "Username for the central storage server") <*>
-        optionalField "password" "Password for the central storage server"
+        optionalField "password" "Password for the central storage server" <*>
+        eitherParser
+          (propogatingParseError parseLrdBypassCache "Unable to parse lrd-bypass-cache")
+          (optionalField "lrd-bypass-cache" "Username for the central storage server")
       propogatingParseError :: (a -> Maybe b) -> String -> Maybe a -> Either String (Maybe b)
       propogatingParseError scalarParser errMsg mScalar =
         case mScalar of
           Nothing -> Right Nothing
           Just scalar -> maybe (Left errMsg) (Right . Just) (scalarParser scalar)
+      parseLrdBypassCache :: String -> Maybe Bool
+      parseLrdBypassCache str
+        | str == "bypass-cache" = Just True
+        | str == "no-bypass-cache" = Just False
+        | otherwise = Nothing
 
 instance FromJSON Configuration where
   parseJSON = viaYamlSchema

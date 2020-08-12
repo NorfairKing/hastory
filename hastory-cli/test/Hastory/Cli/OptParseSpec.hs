@@ -162,7 +162,7 @@ envParserSpec =
         let res = Env.parsePure envParser []
         res `shouldBe` Right emptyEnvironment
     context "users provides ALL environmental variables" $
-      it "parses to a 'full' Environment" $ do
+      it "parses to a full Environment" $ do
         let url = "api.example.com"
         parsedUrl <- parseBaseUrl url
         let res = Env.parsePure envParser fullEnvironment
@@ -172,6 +172,7 @@ envParserSpec =
               , ("HASTORY_STORAGE_SERVER_URL", url)
               , ("HASTORY_STORAGE_SERVER_USERNAME", "steven")
               , ("HASTORY_STORAGE_SERVER_PASSWORD", "Passw0rd")
+              , ("HASTORY_LRD_BYPASS_CACHE", "BYPASS_CACHE")
               ]
         res `shouldBe`
           Right
@@ -181,11 +182,22 @@ envParserSpec =
               , envStorageServer = Just parsedUrl
               , envStorageUsername = Just (Username "steven")
               , envStoragePassword = Just "Passw0rd"
+              , envLrdBypassCache = Just True
               }
-    context "users provides SOME environmental variables" $
+    context "users provides SOME environmental variables" $ do
       it "successfully parses to an Environment" $ do
         let res = Env.parsePure envParser [("HASTORY_CACHE_DIR", "~/home")]
         res `shouldBe` Right emptyEnvironment {envCacheDir = Just "~/home"}
+      context "LRD_BYPASS_CACHE is set in environment" $ do
+        it "parses BYPASS_CACHE correctly" $ do
+          let res = Env.parsePure envParser [("HASTORY_LRD_BYPASS_CACHE", "BYPASS_CACHE")]
+          res `shouldBe` Right emptyEnvironment {envLrdBypassCache = Just True}
+        it "parses NO_BYPASS_CACHE correctly" $ do
+          let res = Env.parsePure envParser [("HASTORY_LRD_BYPASS_CACHE", "NO_BYPASS_CACHE")]
+          res `shouldBe` Right emptyEnvironment {envLrdBypassCache = Just False}
+        it "ignores other values" $ do
+          let res = Env.parsePure envParser [("HASTORY_LRD_BYPASS_CACHE", "INVALID")]
+          res `shouldBe` Right emptyEnvironment {envLrdBypassCache = Nothing}
     it "ignores unparseable environmental variable" $ do
       let res = Env.parsePure envParser [("HASTORY_STORAGE_SERVER_URL", "ftp://hoogle.org")]
       res `shouldBe` Right emptyEnvironment
@@ -382,6 +394,7 @@ emptyConfiguration =
     , configStorageServer = Nothing
     , configStorageUsername = Nothing
     , configStoragePassword = Nothing
+    , configLrdBypassCache = Nothing
     }
 
 emptyEnvironment :: Environment
@@ -392,6 +405,7 @@ emptyEnvironment =
     , envStorageServer = Nothing
     , envStorageUsername = Nothing
     , envStoragePassword = Nothing
+    , envLrdBypassCache = Nothing
     }
 
 isParserFailure :: ParserResult a -> Bool
