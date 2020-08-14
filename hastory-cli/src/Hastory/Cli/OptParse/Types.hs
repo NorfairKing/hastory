@@ -90,7 +90,10 @@ instance YamlSchema Configuration where
     where
       parseObject =
         objectParser "Configuration" $
-        Configuration <$> optionalField "cache-dir" "the cache directory for hastory" <*>
+        Configuration <$>
+        eitherParser
+          (propogatingParseError nonEmptyString "Unable to parse cache-dir")
+          (optionalField "cache-dir" "the cache directory for hastory") <*>
         eitherParser
           (propogatingParseError parseBaseUrl "Unable to parse url")
           (optionalField "url" "URL of the central storage server") <*>
@@ -113,6 +116,11 @@ instance YamlSchema Configuration where
         | str == "bypass-cache" = Just True
         | str == "no-bypass-cache" = Just False
         | otherwise = Nothing
+      nonEmptyString :: String -> Maybe String
+      nonEmptyString str =
+        if null str
+          then Nothing
+          else Just str
 
 instance FromJSON Configuration where
   parseJSON = viaYamlSchema
