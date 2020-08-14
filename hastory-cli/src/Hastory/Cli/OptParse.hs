@@ -90,37 +90,42 @@ envParser =
   Env.prefixed
     "HASTORY_"
     (Environment <$>
-     optional (Env.var Env.nonempty "CACHE_DIR" (Env.help "the cache directory for hastory")) <*>
-     optional (Env.var Env.nonempty "CONFIG_FILE" (Env.help "path to a config file")) <*>
-     optional
-       (Env.var baseUrlParser "STORAGE_SERVER_URL" (Env.help "URL of the central storage server")) <*>
-     optional
-       (Env.var
-          (usernameParser <=< Env.nonempty)
-          "STORAGE_SERVER_USERNAME"
-          (Env.help "Username for the central storage server")) <*>
-     optional
-       (Env.var
-          Env.nonempty
-          "STORAGE_SERVER_PASSWORD"
-          (Env.help "Password for the central storage server")) <*>
-     optional (byPassCache <|> noBypassCache))
+     Env.var
+       (pure . Just <=< Env.nonempty)
+       "CACHE_DIR"
+       (Env.help "the cache directory for hastory" <> Env.def Nothing) <*>
+     Env.var
+       (pure . Just <=< Env.nonempty)
+       "CONFIG_FILE"
+       (Env.help "path to a config file" <> Env.def Nothing) <*>
+     Env.var
+       baseUrlParser
+       "STORAGE_SERVER_URL"
+       (Env.help "URL of the central storage server" <> Env.def Nothing) <*>
+     Env.var
+       usernameParser
+       "STORAGE_SERVER_USERNAME"
+       (Env.help "Username for the central storage server" <> Env.def Nothing) <*>
+     Env.var
+       (pure . Just <=< Env.nonempty)
+       "STORAGE_SERVER_PASSWORD"
+       (Env.help "Password for the central storage server" <> Env.def Nothing) <*>
+     (byPassCache <|> noBypassCache))
   where
     baseUrlParser unparsedUrl =
-      maybe (Left $ Env.UnreadError unparsedUrl) Right (parseBaseUrl unparsedUrl)
+      maybe (Left $ Env.UnreadError unparsedUrl) (Right . Just) (parseBaseUrl unparsedUrl)
     usernameParser username =
-      maybe (Left . Env.UnreadError . T.unpack $ username) Right (parseUsername username)
+      maybe (Left $ Env.UnreadError username) (pure . Just) (parseUsername $ T.pack username)
     byPassCache =
       Env.var
-        (onMatchOf "BYPASS_CACHE" True)
+        (onMatchOf "BYPASS_CACHE" $ Just True)
         "LRD_BYPASS_CACHE"
-        (Env.help "Always recompute the recent directory options")
+        (Env.help "Always recompute the recent directory options" <> Env.def Nothing)
     noBypassCache =
       Env.var
-        (onMatchOf "NO_BYPASS_CACHE" False)
+        (onMatchOf "NO_BYPASS_CACHE" $ Just False)
         "LRD_BYPASS_CACHE"
-        (Env.help "Use the recent directory cache when available")
-    onMatchOf :: String -> Bool -> String -> Either Env.Error Bool
+        (Env.help "Use the recent directory cache when available" <> Env.def Nothing)
     onMatchOf matchWith succeedWith val =
       if val == matchWith
         then Right succeedWith
@@ -212,10 +217,12 @@ parseFlags =
   Flags <$>
   optional
     (option
-       str
+       nonEmptyString
        (mconcat [long "cache-dir", metavar "FILEPATH", help "the cache directory for hastory"])) <*>
   optional
-    (option str (mconcat [long "config-file", metavar "FILEPATH", help "path to a config file"])) <*>
+    (option
+       nonEmptyString
+       (mconcat [long "config-file", metavar "FILEPATH", help "path to a config file"])) <*>
   optional
     (option
        (maybeReader parseBaseUrl)
@@ -236,3 +243,9 @@ parseFlags =
           , metavar "PASSWORD"
           , help "Password for the central storage server"
           ]))
+  where
+    nonEmptyString =
+      maybeReader $ \s ->
+        if null s
+          then Nothing
+          else Just s

@@ -80,32 +80,50 @@ runArgumentsParserSpec = describe "runArgumentsParser" (describeFlags >> describ
 describeFlags :: Spec
 describeFlags =
   describe "Flags" $ do
-    context "cache-dir is provided" $
-      it "contains a FilePath" $ do
+    context "cache-dir is provided" $ do
+      it "contains a FilePath when FilePath is provided" $ do
         let (Success (Arguments _cmd flags)) = runArgumentsParser args
             args = ["gather", "--cache-dir=" <> filePath]
             filePath = "~/hastory"
         flags `shouldBe` emptyFlags {flagCacheDir = Just filePath}
-    context "config-file is provided" $
-      it "contains a Filepath" $ do
+      it "is an error when FilePath is empty" $ do
+        let res = runArgumentsParser args
+            args = ["gather", "--cache-dir="]
+        res `shouldSatisfy` isCliParserFailure
+    context "config-file is provided" $ do
+      it "contains a Filepath when FilePath is provided" $ do
         let (Success (Arguments _cmd flags)) = runArgumentsParser args
             args = ["gather", "--config-file=" <> filePath]
             filePath = "~/hastory"
         flags `shouldBe` emptyFlags {flagConfigFile = Just filePath}
-    context "storage-server-url is provided" $
-      it "contains a BaseUrl" $ do
+      it "is an error when FilePath is empty" $ do
+        let res = runArgumentsParser args
+            args = ["gather", "--config-file="]
+        res `shouldSatisfy` isCliParserFailure
+    context "storage-server-url is provided" $ do
+      it "contains a BaseUrl when url is valid" $ do
         let (Success (Arguments _cmd flags)) = runArgumentsParser args
             args = ["gather", "--storage-server-url=" <> rawUrl]
             rawUrl = "api.example.com"
         url <- parseBaseUrl rawUrl
         flags `shouldBe` emptyFlags {flagStorageServer = Just url}
-    context "storage-server-username is provided" $
-      it "contains a Username" $ do
+      it "is an error when BaseUrl is invalid" $ do
+        let res = runArgumentsParser args
+            args = ["gather", "--storage-server-url=" <> rawUrl]
+            rawUrl = "ftps://1"
+        res `shouldSatisfy` isCliParserFailure
+    context "storage-server-username is provided" $ do
+      it "contains a Username when username is valid" $ do
         let (Success (Arguments _cmd flags)) = runArgumentsParser args
             args = ["gather", "--storage-server-username=" <> rawUsername]
             rawUsername = "hastory"
         username <- parseUsername (T.pack rawUsername)
         flags `shouldBe` emptyFlags {flagStorageUsername = Just username}
+      it "is an error when Username is invalid" $ do
+        let res = runArgumentsParser args
+            args = ["gather", "--storage-server-username=" <> rawUsername]
+            rawUsername = "1"
+        res `shouldSatisfy` isCliParserFailure
     context "storage-server-password is provided" $
       it "contains a password" $ do
         let (Success (Arguments _cmd flags)) = runArgumentsParser args
@@ -132,14 +150,18 @@ describeCommand =
             args = ["generate-gather-wrapper-script"]
         cmd `shouldBe` CommandGenGatherWrapperScript GenGatherWrapperScriptFlags
     context "user provides the 'change-directory' command" $ do
-      it "fails to parse when INT is NOT provided" $ do
-        let res = runArgumentsParser args
-            args = ["change-directory"]
-        res `shouldSatisfy` isParserFailure
       it "parses to CommandChangeDir when INT is provided" $ do
         let (Success (Arguments cmd _flags)) = runArgumentsParser args
             args = ["change-directory", "23"]
         cmd `shouldBe` CommandChangeDir ChangeDirFlags {changeDirFlagsIdx = 23}
+      it "fails to parse with NO options" $ do
+        let res = runArgumentsParser args
+            args = ["change-directory"]
+        res `shouldSatisfy` isCliParserFailure
+      it "fails to parse when value provided is not an INT" $ do
+        let res = runArgumentsParser args
+            args = ["change-directory", "invalid"]
+        res `shouldSatisfy` isCliParserFailure
     context "user provides the 'list-recent-directories' command" $ do
       it "parses to CommandListRecentDirs without any options" $ do
         let (Success (Arguments cmd _flags)) = runArgumentsParser args
@@ -153,6 +175,20 @@ describeCommand =
         let (Success (Arguments cmd _flags)) = runArgumentsParser args
             args = ["list-recent-directories", "--no-bypass-cache"]
         cmd `shouldBe` CommandListRecentDirs ListRecentDirFlags {lrdArgBypassCache = Just False}
+      it "fails to parse when option is invalid" $ do
+        let res = runArgumentsParser args
+            args = ["list-recent-directories", "--invalid"]
+        res `shouldSatisfy` isCliParserFailure
+    context "user provides the 'generate-change-directory-wrapper-script' command" $
+      it "parses to CommandGenChangeWrapperScript" $ do
+        let (Success (Arguments cmd _flags)) = runArgumentsParser args
+            args = ["generate-change-directory-wrapper-script"]
+        cmd `shouldBe` CommandGenChangeWrapperScript GenChangeWrapperScriptFlags
+    context "user provides the 'suggest-alias' command" $
+      it "parses to CommandSuggestAlias" $ do
+        let (Success (Arguments cmd _flags)) = runArgumentsParser args
+            args = ["suggest-alias"]
+        cmd `shouldBe` CommandSuggestAlias SuggestAliasFlags
 
 envParserSpec :: Spec
 envParserSpec =
@@ -188,6 +224,43 @@ envParserSpec =
       it "successfully parses to an Environment" $ do
         let res = Env.parsePure envParser [("HASTORY_CACHE_DIR", "~/home")]
         res `shouldBe` Right emptyEnvironment {envCacheDir = Just "~/home"}
+      context "CACHE_DIR is set in environment" $ do
+        it "parses correctly when CACHE_DIR is valid" $ do
+          let res = Env.parsePure envParser [("HASTORY_CACHE_DIR", "~/home")]
+          res `shouldBe` Right emptyEnvironment {envCacheDir = Just "~/home"}
+        it "is an error when CACHE_DIR is invalid" $ do
+          let res = Env.parsePure envParser [("HASTORY_CACHE_DIR", "")]
+          res `shouldSatisfy` isEnvParserFailure
+      context "CONFIG_FILE is set in environment" $ do
+        it "parses correctly when CONFIG_FILE is valid" $ do
+          let res = Env.parsePure envParser [("HASTORY_CONFIG_FILE", "~/home")]
+          res `shouldBe` Right emptyEnvironment {envConfigFile = Just "~/home"}
+        it "is an error when CONFIG_FILE is invalid" $ do
+          let res = Env.parsePure envParser [("HASTORY_CONFIG_FILE", "")]
+          res `shouldSatisfy` isEnvParserFailure
+      context "STORAGE_SERVER_URL is set in environment" $ do
+        it "parses STORAGE_SERVER_URL correctly" $ do
+          let res = Env.parsePure envParser [("HASTORY_STORAGE_SERVER_URL", "api.example.com")]
+          url <- parseBaseUrl "api.example.com"
+          res `shouldBe` Right emptyEnvironment {envStorageServer = Just url}
+        it "is an error when STORAGE_SERVER_URL is invalid" $ do
+          let res = Env.parsePure envParser [("HASTORY_STORAGE_SERVER_URL", "ftps://1")]
+          res `shouldSatisfy` isEnvParserFailure
+      context "STORAGE_SERVER_USERNAME is set in environment" $ do
+        it "parses STORAGE_SERVER_USERNAME correctly" $ do
+          let res = Env.parsePure envParser [("HASTORY_STORAGE_SERVER_USERNAME", "steven")]
+          username <- parseUsername "steven"
+          res `shouldBe` Right emptyEnvironment {envStorageUsername = Just username}
+        it "is an error when STORAGE_SERVER_USERNAME is invalid" $ do
+          let res = Env.parsePure envParser [("HASTORY_STORAGE_SERVER_USERNAME", "s")]
+          res `shouldSatisfy` isEnvParserFailure
+      context "STORAGE_SERVER_PASSWORD is set in environment" $ do
+        it "parses STORAGE_SERVER_PASSWORD correctly" $ do
+          let res = Env.parsePure envParser [("HASTORY_STORAGE_SERVER_PASSWORD", "Passw0rd")]
+          res `shouldBe` Right emptyEnvironment {envStoragePassword = Just "Passw0rd"}
+        it "is an error when STORAGE_SERVER_PASSWORD is invalid" $ do
+          let res = Env.parsePure envParser [("HASTORY_STORAGE_SERVER_PASSWORD", "")]
+          res `shouldSatisfy` isEnvParserFailure
       context "LRD_BYPASS_CACHE is set in environment" $ do
         it "parses BYPASS_CACHE correctly" $ do
           let res = Env.parsePure envParser [("HASTORY_LRD_BYPASS_CACHE", "BYPASS_CACHE")]
@@ -195,12 +268,9 @@ envParserSpec =
         it "parses NO_BYPASS_CACHE correctly" $ do
           let res = Env.parsePure envParser [("HASTORY_LRD_BYPASS_CACHE", "NO_BYPASS_CACHE")]
           res `shouldBe` Right emptyEnvironment {envLrdBypassCache = Just False}
-        it "ignores other values" $ do
+        it "is an error when LRD_BYPASS_CACHE is set and invalid" $ do
           let res = Env.parsePure envParser [("HASTORY_LRD_BYPASS_CACHE", "INVALID")]
-          res `shouldBe` Right emptyEnvironment {envLrdBypassCache = Nothing}
-    it "ignores unparseable environmental variable" $ do
-      let res = Env.parsePure envParser [("HASTORY_STORAGE_SERVER_URL", "ftp://hoogle.org")]
-      res `shouldBe` Right emptyEnvironment
+          res `shouldSatisfy` isEnvParserFailure
 
 combineToInstructionsSpec :: Spec
 combineToInstructionsSpec =
@@ -408,6 +478,10 @@ emptyEnvironment =
     , envLrdBypassCache = Nothing
     }
 
-isParserFailure :: ParserResult a -> Bool
-isParserFailure (Failure _) = True
-isParserFailure _ = False
+isCliParserFailure :: ParserResult a -> Bool
+isCliParserFailure (Failure _) = True
+isCliParserFailure _ = False
+
+isEnvParserFailure :: Either e a -> Bool
+isEnvParserFailure (Left _) = True
+isEnvParserFailure _ = False
