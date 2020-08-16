@@ -4,16 +4,14 @@ module Hastory.Cli.OptParseSpec
   ( spec
   ) where
 
+import qualified Data.ByteString as B
+import Data.Hastory
 import qualified Data.Text as T
 import Env
+import Hastory.Cli.OptParse
 import Options.Applicative
 import Servant.Client
-
-import qualified Data.ByteString as B
 import TestImport hiding (Failure, Success)
-
-import Data.Hastory
-import Hastory.Cli.OptParse
 
 spec :: Spec
 spec = do
@@ -208,7 +206,7 @@ envParserSpec =
               , ("HASTORY_STORAGE_SERVER_URL", url)
               , ("HASTORY_STORAGE_SERVER_USERNAME", "steven")
               , ("HASTORY_STORAGE_SERVER_PASSWORD", "Passw0rd")
-              , ("HASTORY_LRD_BYPASS_CACHE", "BYPASS_CACHE")
+              , ("HASTORY_BYPASS_CACHE", "True")
               ]
         res `shouldBe`
           Right
@@ -261,15 +259,15 @@ envParserSpec =
         it "is an error when STORAGE_SERVER_PASSWORD is invalid" $ do
           let res = Env.parsePure envParser [("HASTORY_STORAGE_SERVER_PASSWORD", "")]
           res `shouldSatisfy` isEnvParserFailure
-      context "LRD_BYPASS_CACHE is set in environment" $ do
-        it "parses BYPASS_CACHE correctly" $ do
-          let res = Env.parsePure envParser [("HASTORY_LRD_BYPASS_CACHE", "BYPASS_CACHE")]
+      context "BYPASS_CACHE is set in environment" $ do
+        it "parses True correctly when the env var is set to True" $ do
+          let res = Env.parsePure envParser [("HASTORY_BYPASS_CACHE", "True")]
           res `shouldBe` Right emptyEnvironment {envLrdBypassCache = Just True}
-        it "parses NO_BYPASS_CACHE correctly" $ do
-          let res = Env.parsePure envParser [("HASTORY_LRD_BYPASS_CACHE", "NO_BYPASS_CACHE")]
+        it "parses False correctly when the envvar is not set" $ do
+          let res = Env.parsePure envParser [("HASTORY_BYPASS_CACHE", "False")]
           res `shouldBe` Right emptyEnvironment {envLrdBypassCache = Just False}
-        it "is an error when LRD_BYPASS_CACHE is set and invalid" $ do
-          let res = Env.parsePure envParser [("HASTORY_LRD_BYPASS_CACHE", "INVALID")]
+        it "is an error when HASTORY_BYPASS_CACHE is invalid" $ do
+          let res = Env.parsePure envParser [("HASTORY_BYPASS_CACHE", "hello")]
           res `shouldSatisfy` isEnvParserFailure
 
 combineToInstructionsSpec :: Spec

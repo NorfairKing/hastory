@@ -12,19 +12,18 @@ module Hastory.Cli.OptParse
   ) where
 
 import Control.Monad
+import Data.Hastory.Types
 import Data.Maybe (fromMaybe)
 import Data.Semigroup ((<>))
 import qualified Data.Text as T
 import qualified Env
+import Hastory.Cli.OptParse.Types
 import Options.Applicative
 import Path
 import Path.IO (getAppUserDataDir, getHomeDir, resolveDir, resolveDir', resolveFile, resolveFile')
 import Servant.Client.Core.Reexport (parseBaseUrl)
 import System.Environment (getArgs)
 import YamlParse.Applicative hiding (Parser)
-
-import Data.Hastory.Types
-import Hastory.Cli.OptParse.Types
 
 getInstructions :: IO Instructions
 getInstructions = do
@@ -110,26 +109,15 @@ envParser =
        (pure . Just <=< Env.nonempty)
        "STORAGE_SERVER_PASSWORD"
        (Env.help "Password for the central storage server" <> Env.def Nothing) <*>
-     (byPassCache <|> noBypassCache))
+     Env.var
+       (fmap Just . Env.auto)
+       "BYPASS_CACHE"
+       (Env.help "Always recompute the recent directory options" <> Env.def Nothing))
   where
     baseUrlParser unparsedUrl =
       maybe (Left $ Env.UnreadError unparsedUrl) (Right . Just) (parseBaseUrl unparsedUrl)
     usernameParser username =
       maybe (Left $ Env.UnreadError username) (pure . Just) (parseUsername $ T.pack username)
-    byPassCache =
-      Env.var
-        (onMatchOf "BYPASS_CACHE" $ Just True)
-        "LRD_BYPASS_CACHE"
-        (Env.help "Always recompute the recent directory options" <> Env.def Nothing)
-    noBypassCache =
-      Env.var
-        (onMatchOf "NO_BYPASS_CACHE" $ Just False)
-        "LRD_BYPASS_CACHE"
-        (Env.help "Use the recent directory cache when available" <> Env.def Nothing)
-    onMatchOf matchWith succeedWith val =
-      if val == matchWith
-        then Right succeedWith
-        else Left (Env.UnreadError val)
 
 runArgumentsParser :: [String] -> ParserResult Arguments
 runArgumentsParser =

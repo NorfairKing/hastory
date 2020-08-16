@@ -90,37 +90,19 @@ instance YamlSchema Configuration where
     where
       parseObject =
         objectParser "Configuration" $
-        Configuration <$>
-        eitherParser
-          (propogatingParseError nonEmptyString "Unable to parse cache-dir")
-          (optionalField "cache-dir" "the cache directory for hastory") <*>
-        eitherParser
-          (propogatingParseError parseBaseUrl "Unable to parse url")
-          (optionalField "url" "URL of the central storage server") <*>
-        eitherParser
-          (propogatingParseError parseUsername "Unable to parse username")
-          (optionalField "username" "Username for the central storage server") <*>
+        Configuration <$> optionalField "cache-dir" "the cache directory for hastory" <*>
+        optionalFieldWith
+          "url"
+          "URL of the central storage server"
+          (maybeParser parseBaseUrl yamlSchema) <*>
+        optionalFieldWith
+          "username"
+          "Username for the central storage server"
+          (maybeParser parseUsername yamlSchema) <*>
         optionalField "password" "Password for the central storage server" <*>
-        eitherParser
-          (propogatingParseError parseLrdBypassCache "Unable to parse lrd-bypass-cache")
-          (optionalField
-             "lrd-bypass-cache"
-             "Whether to recompute the recent directory options or use a cache when available")
-      propogatingParseError :: (a -> Maybe b) -> String -> Maybe a -> Either String (Maybe b)
-      propogatingParseError scalarParser errMsg mScalar =
-        case mScalar of
-          Nothing -> Right Nothing
-          Just scalar -> maybe (Left errMsg) (Right . Just) (scalarParser scalar)
-      parseLrdBypassCache :: String -> Maybe Bool
-      parseLrdBypassCache str
-        | str == "bypass-cache" = Just True
-        | str == "no-bypass-cache" = Just False
-        | otherwise = Nothing
-      nonEmptyString :: String -> Maybe String
-      nonEmptyString str =
-        if null str
-          then Nothing
-          else Just str
+        optionalField
+          "bypass-cache"
+          "Whether to recompute the recent directory options or use a cache when available"
 
 instance FromJSON Configuration where
   parseJSON = viaYamlSchema
