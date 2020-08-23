@@ -1,4 +1,5 @@
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TypeApplications #-}
 
 module Hastory.Cli.OptParse
   ( combineToInstructions
@@ -19,6 +20,7 @@ import qualified Data.Text as T
 import qualified Env
 import Hastory.Cli.OptParse.Types
 import Options.Applicative
+import qualified Options.Applicative.Help.Pretty as OptParseHelp
 import Path
 import Path.IO (getAppUserDataDir, getHomeDir, resolveDir, resolveDir', resolveFile, resolveFile')
 import Servant.Client.Core.Reexport (parseBaseUrl)
@@ -133,7 +135,17 @@ runArgumentsParser =
     argParser
 
 argParser :: ParserInfo Arguments
-argParser = info (helper <*> parseArgs) (fullDesc <> progDesc "Hastory")
+argParser = info (helper <*> parseArgs) (fullDesc <> progDesc "Hastory" <> footerDoc footerStr)
+  where
+    footerStr =
+      Just $
+      OptParseHelp.string $
+      unlines
+        [ Env.helpDoc envParser
+        , ""
+        , "Configuration file format:"
+        , T.unpack (prettySchemaDoc @Configuration)
+        ]
 
 parseArgs :: Parser Arguments
 parseArgs = Arguments <$> parseCommand <*> parseFlags
