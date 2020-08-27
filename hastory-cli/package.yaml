@@ -23,6 +23,7 @@ library:
   - aeson-pretty
   - bytestring
   - deepseq
+  - envparse
   - exceptions
   - extra
   - hashable
@@ -48,6 +49,7 @@ library:
   - validity-path
   - validity-text
   - validity-time
+  - yamlparse-applicative
 
 executables:
   hastory:
@@ -71,24 +73,31 @@ tests:
     - -Wall
     dependencies:
     - base >=4.9 && <=5
-    - hastory-cli
-    - hastory-data
-    - hastory-data-gen
+    - QuickCheck
+    - aeson
+    - bytestring
+    - envparse
     - genvalidity
     - genvalidity-hspec
     - genvalidity-hspec-aeson
     - genvalidity-path
     - genvalidity-text
     - genvalidity-time
+    - hastory-cli
+    - hastory-data
+    - hastory-data-gen
     - hspec
+    - optparse-applicative
     - path
     - path-io
+    - safe
+    - servant-client
+    - servant-client-core
+    - text
     - validity
     - validity-path
     - validity-text
-    - QuickCheck
-    - safe
-    - text
+    - yaml
 
 benchmarks:
   hastory-cli-bench:
@@ -100,8 +109,8 @@ benchmarks:
     - -with-rtsopts=-T
     - -Wall
     dependencies:
-    - QuickCheck
     - base
+    - QuickCheck
     - criterion
     - exceptions
     - genvalidity
@@ -113,4 +122,3 @@ benchmarks:
     - path-io
     - silently
     - unliftio
-

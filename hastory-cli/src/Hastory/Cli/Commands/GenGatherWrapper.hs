@@ -1,8 +1,18 @@
+{-# LANGUAGE RecordWildCards #-}
+
 module Hastory.Cli.Commands.GenGatherWrapper where
 
-genGatherWrapperScript :: IO ()
-genGatherWrapperScript =
-  putStrLn $
+import qualified Data.Text as T
+import Servant.Client.Core
+
+import Data.Hastory
+import Hastory.Cli.OptParse.Types
+
+genGatherWrapperScript :: GenGatherWrapperScriptSettings -> IO ()
+genGatherWrapperScript = putStrLn . genScript
+
+genScript :: GenGatherWrapperScriptSettings -> String
+genScript GenGatherWrapperScriptSettings {..} =
   unlines
     [ "FIRST_PROMPT=1"
     , "function hastory_gather_ {"
@@ -11,6 +21,17 @@ genGatherWrapperScript =
     , "    unset FIRST_PROMPT"
     , "    return"
     , "  fi"
-    , "  echo $(fc -nl $((HISTCMD - 1))) | hastory gather"
+    , "  echo $(fc -nl $((HISTCMD - 1))) | hastory gather" <> remoteStorageFlags
     , "}"
     ]
+  where
+    remoteStorageFlags =
+      case genGatherWrapperScriptSetRemoteInfo of
+        Nothing -> ""
+        Just RemoteStorageClientInfo {..} ->
+          unlines
+            [ "--storage-server-username=" <>
+              (T.unpack . usernameText) remoteStorageClientInfoUsername
+            , "--storage-server-url=" <> showBaseUrl remoteStorageClientInfoBaseUrl
+            , "--storage-server-password=" <> T.unpack remoteStorageClientInfoPassword
+            ]

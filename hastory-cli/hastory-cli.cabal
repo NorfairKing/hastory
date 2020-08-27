@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 7c38df38419900fdc22d659c4b270b5673e2ef35c8c2e88e3a6a756a3e979381
+-- hash: 77889adaa944082352239b5cc75b9e72d11a146925e3e639446eb26c1df5f595
 
 name:           hastory-cli
 version:        0.0.0.0
@@ -42,6 +42,7 @@ library
     , base >=4.9 && <=5
     , bytestring
     , deepseq
+    , envparse
     , exceptions
     , extra
     , hashable
@@ -68,6 +69,7 @@ library
     , validity-path
     , validity-text
     , validity-time
+    , yamlparse-applicative
   default-language: Haskell2010
 
 executable hastory
@@ -87,7 +89,10 @@ test-suite hastory-cli-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      Hastory.Cli.Commands.GenGatherWrapperSpec
       Hastory.Cli.Commands.SuggestionSpec
+      Hastory.Cli.OptParse.TypesSpec
+      Hastory.Cli.OptParseSpec
       TestImport
       Paths_hastory_cli
   hs-source-dirs:
@@ -95,7 +100,10 @@ test-suite hastory-cli-test
   ghc-options: -optP-Wno-nonportable-include-path -threaded -rtsopts -with-rtsopts=-N -Wall
   build-depends:
       QuickCheck
+    , aeson
     , base >=4.9 && <=5
+    , bytestring
+    , envparse
     , genvalidity
     , genvalidity-hspec
     , genvalidity-hspec-aeson
@@ -107,13 +115,17 @@ test-suite hastory-cli-test
     , hastory-data
     , hastory-data-gen
     , hspec
+    , optparse-applicative
     , path
     , path-io
     , safe
+    , servant-client
+    , servant-client-core
     , text
     , validity
     , validity-path
     , validity-text
+    , yaml
   default-language: Haskell2010
 
 benchmark hastory-cli-bench
