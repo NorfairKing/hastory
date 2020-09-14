@@ -36,6 +36,14 @@ spec =
             Right _ <- runClientM (createEntryClient token syncReq) siClientEnv
             entries <- runSqlPool (selectList [] []) siPool :: IO [Entity ServerEntry]
             map entityVal entries `shouldBe` toServerEntries syncReq userId
+      it "returns the id of the server entries" $ \ServerInfo {..} ->
+        forAllValid $ \(firstEntry, secondEntry) -> do
+          userForm <- generate genValid
+          withNewUser siClientEnv userForm $ \(_, token) -> do
+            let syncReq = SyncRequest [firstEntry, secondEntry] "host"
+            Right responseKeys <- runClientM (createEntryClient token syncReq) siClientEnv
+            persistedKeys <- runSqlPool (selectList [] []) siPool :: IO [Entity ServerEntry]
+            responseKeys `shouldBe` map entityKey persistedKeys
       context "when same entry is sync'd twice" $ do
         it "the db does not change between the first sync and the second sync" $ \ServerInfo {..} ->
           forAllValid $ \syncReq -> do
