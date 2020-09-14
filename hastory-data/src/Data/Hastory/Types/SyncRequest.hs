@@ -13,7 +13,7 @@ import Network.HostName (HostName)
 
 data SyncRequest =
   SyncRequest
-    { syncRequestEntry :: Entry
+    { syncRequestEntries :: [Entry]
     , syncRequestHostName :: Text
     }
   deriving (Show, Eq, Generic)
@@ -24,5 +24,5 @@ instance FromJSON SyncRequest
 
 instance Validity SyncRequest
 
-toSyncRequest :: Entry -> HostName -> SyncRequest
-toSyncRequest entry hostName = SyncRequest entry (T.pack hostName)
+toSyncRequest :: [Entry] -> HostName -> SyncRequest
+toSyncRequest entries hostName = SyncRequest entries (T.pack hostName)

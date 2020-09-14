@@ -34,8 +34,8 @@ spec =
           userForm <- generate genValid
           withNewUser siClientEnv userForm $ \(userId, token) -> do
             Right _ <- runClientM (createEntryClient token syncReq) siClientEnv
-            [Entity _ entry] <- runSqlPool (selectList [] []) siPool :: IO [Entity ServerEntry]
-            entry `shouldBe` toServerEntry syncReq userId
+            entries <- runSqlPool (selectList [] []) siPool :: IO [Entity ServerEntry]
+            map entityVal entries `shouldBe` toServerEntries syncReq userId
       context "when same entry is sync'd twice" $ do
         it "the db does not change between the first sync and the second sync" $ \ServerInfo {..} ->
           forAllValid $ \syncReq -> do
@@ -49,9 +49,10 @@ spec =
                 runSqlPool (selectList [] []) siPool :: IO [Entity ServerEntry]
               entriesAfterSecondSync `shouldBe` entriesAfterFirstSync
         it "db only persists one entry" $ \ServerInfo {..} ->
-          forAllValid $ \syncReq -> do
+          forAllValid $ \entry -> do
             userForm <- generate genValid
             withNewUser siClientEnv userForm $ \(_, token) -> do
+              let syncReq = SyncRequest [entry] "hostname"
               replicateM_ 2 $ runClientM (createEntryClient token syncReq) siClientEnv
               dbEntries <- runSqlPool (selectList [] []) siPool :: IO [Entity ServerEntry]
               length dbEntries `shouldBe` 1

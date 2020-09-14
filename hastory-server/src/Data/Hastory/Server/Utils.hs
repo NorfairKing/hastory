@@ -6,6 +6,7 @@ import Control.Monad.Error.Class
 import Crypto.Hash (Digest, SHA256(..), hashWith)
 import Data.ByteString (ByteString)
 import Data.Hastory.Types
+import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import Data.Time.Format (defaultTimeLocale, formatTime, iso8601DateFormat)
@@ -48,13 +49,17 @@ hashEntry Entry {..} host = hashWith SHA256 (unifiedData :: ByteString)
     formatIso8601 = formatTime defaultTimeLocale formatString
     formatString = iso8601DateFormat (Just "%H:%M:%S")
 
-toServerEntry :: SyncRequest -> UserId -> ServerEntry
-toServerEntry syncRequest serverEntryUser = ServerEntry {..}
+toServerEntries :: SyncRequest -> UserId -> [ServerEntry]
+toServerEntries syncRequest serverEntryUser =
+  let syncEntries = syncRequestEntries syncRequest
+      hostName = syncRequestHostName syncRequest
+   in map (toServerEntry serverEntryUser hostName) syncEntries
+
+toServerEntry :: UserId -> Text -> Entry -> ServerEntry
+toServerEntry serverEntryUser serverEntryHostName entry@Entry {..} = ServerEntry {..}
   where
-    entry@Entry {..} = syncRequestEntry syncRequest
     serverEntryText = entryText
     serverEntryWorkingDir = entryWorkingDir
     serverEntryDateTime = entryDateTime
     serverEntryHostUser = entryUser
-    serverEntryHostName = syncRequestHostName syncRequest
-    serverEntryContentHash = hashEntry entry (syncRequestHostName syncRequest)
+    serverEntryContentHash = hashEntry entry serverEntryHostName
