@@ -144,10 +144,9 @@ data SuggestAliasSettings =
   SuggestAliasSettings
   deriving (Show, Eq)
 
-data Settings =
+newtype Settings =
   Settings
     { setCacheDir :: Path Abs Dir
-    , remoteStorageClientInfo :: Maybe RemoteStorageClientInfo
     }
   deriving (Show, Eq)
 

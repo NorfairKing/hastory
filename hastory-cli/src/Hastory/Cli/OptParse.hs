@@ -60,12 +60,7 @@ combineToInstructions cmd Flags {..} Environment {..} mConf =
         case flagCacheDir <|> envCacheDir <|> mc configCacheDir of
           Nothing -> resolveDir home ".hastory"
           Just cd -> resolveDir' cd
-      pure Settings {setCacheDir = cacheDir, remoteStorageClientInfo = mbRemoteStorageClientInfo}
-    mbRemoteStorageClientInfo =
-      RemoteStorageClientInfo <$>
-      (flagStorageServer <|> envStorageServer <|> mc configStorageServer) <*>
-      (flagStorageUsername <|> envStorageUsername <|> mc configStorageUsername) <*>
-      (flagStoragePassword <|> envStoragePassword <|> mc configStoragePassword)
+      pure Settings {setCacheDir = cacheDir}
     mc :: (Configuration -> Maybe a) -> Maybe a
     mc func = mConf >>= func
 
