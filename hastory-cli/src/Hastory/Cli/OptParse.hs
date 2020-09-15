@@ -44,9 +44,7 @@ combineToInstructions cmd Flags {..} Environment {..} mConf =
       case cmd of
         CommandGather _ -> DispatchGather GatherSettings
         CommandGenGatherWrapperScript _ ->
-          DispatchGenGatherWrapperScript
-            GenGatherWrapperScriptSettings
-              {genGatherWrapperScriptSetRemoteInfo = mbRemoteStorageClientInfo}
+          DispatchGenGatherWrapperScript GenGatherWrapperScriptSettings
         CommandListRecentDirs ListRecentDirFlags {..} ->
           let lrdBypassCache = lrdArgBypassCache <|> envLrdBypassCache <|> mc configLrdBypassCache
            in DispatchListRecentDirs

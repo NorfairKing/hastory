@@ -120,10 +120,8 @@ data GatherSettings =
   GatherSettings
   deriving (Show, Eq)
 
-newtype GenGatherWrapperScriptSettings =
+data GenGatherWrapperScriptSettings =
   GenGatherWrapperScriptSettings
-    { genGatherWrapperScriptSetRemoteInfo :: Maybe RemoteStorageClientInfo
-    }
   deriving (Show, Eq)
 
 newtype ListRecentDirSettings =

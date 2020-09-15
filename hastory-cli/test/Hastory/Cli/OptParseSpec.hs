@@ -371,79 +371,12 @@ combineToInstructionsSpec =
             env
             Nothing
         remoteStorageClientInfo settings `shouldBe` Nothing
-    describe "CommandGenGatherWrapperScript" $ do
-      context "Flags contains all 3 fields of a RemoteStorageClientInfo" $
-        it "is DispatchGenGatherWrapperScript with remote storage info" $ do
-          url <- parseBaseUrl "api.example.com"
-          username <- parseUsername "hastory"
-          let cmd = CommandGenGatherWrapperScript GenGatherWrapperScriptFlags
-              flags =
-                emptyFlags
-                  { flagCacheDir = Nothing
-                  , flagStorageServer = Just url
-                  , flagStorageUsername = Just username
-                  , flagStoragePassword = Just password
-                  }
-              password = "Passw0rd"
-              remoteInfo =
-                RemoteStorageClientInfo
-                  { remoteStorageClientInfoBaseUrl = url
-                  , remoteStorageClientInfoUsername = username
-                  , remoteStorageClientInfoPassword = password
-                  }
-          Instructions dispatch _settings <-
-            combineToInstructions cmd flags emptyEnvironment Nothing
-          dispatch `shouldBe`
-            DispatchGenGatherWrapperScript
-              GenGatherWrapperScriptSettings {genGatherWrapperScriptSetRemoteInfo = Just remoteInfo}
-      context "Environment contains all 3 fields of a RemoteStorageClientInfo" $
-        it "is DispatchGenGatherWrapperScript with remote storage info" $ do
-          url <- parseBaseUrl "api.example.com"
-          username <- parseUsername "hastory"
-          let cmd = CommandGenGatherWrapperScript GenGatherWrapperScriptFlags
-              env =
-                emptyEnvironment
-                  { envCacheDir = Nothing
-                  , envStorageServer = Just url
-                  , envStorageUsername = Just username
-                  , envStoragePassword = Just password
-                  }
-              password = "Passw0rd"
-              remoteInfo =
-                RemoteStorageClientInfo
-                  { remoteStorageClientInfoBaseUrl = url
-                  , remoteStorageClientInfoUsername = username
-                  , remoteStorageClientInfoPassword = password
-                  }
-          Instructions dispatch _settings <- combineToInstructions cmd emptyFlags env Nothing
-          dispatch `shouldBe`
-            DispatchGenGatherWrapperScript
-              GenGatherWrapperScriptSettings {genGatherWrapperScriptSetRemoteInfo = Just remoteInfo}
-      context "Configuration contains all 3 fields of a RemoteStorageClientInfo" $
-        it "is DispatchGenGatherWrapperScript with remote storage info" $ do
-          url <- parseBaseUrl "api.example.com"
-          username <- parseUsername "hastory"
-          let cmd = CommandGenGatherWrapperScript GenGatherWrapperScriptFlags
-              mConf =
-                Just
-                  (emptyConfiguration
-                     { configCacheDir = Nothing
-                     , configStorageServer = Just url
-                     , configStorageUsername = Just username
-                     , configStoragePassword = Just password
-                     })
-              password = "Passw0rd"
-              remoteInfo =
-                RemoteStorageClientInfo
-                  { remoteStorageClientInfoBaseUrl = url
-                  , remoteStorageClientInfoUsername = username
-                  , remoteStorageClientInfoPassword = password
-                  }
-          Instructions dispatch _settings <-
-            combineToInstructions cmd emptyFlags emptyEnvironment mConf
-          dispatch `shouldBe`
-            DispatchGenGatherWrapperScript
-              GenGatherWrapperScriptSettings {genGatherWrapperScriptSetRemoteInfo = Just remoteInfo}
+    describe "CommandGenGatherWrapperScript" $
+      it "is DispatchGenGatherWrapperScript with GenGatherWrapperScriptSettings" $ do
+        let cmd = CommandGenGatherWrapperScript GenGatherWrapperScriptFlags
+        Instructions dispatch _settings <-
+          combineToInstructions cmd emptyFlags emptyEnvironment Nothing
+        dispatch `shouldBe` DispatchGenGatherWrapperScript GenGatherWrapperScriptSettings
 
 emptyFlags :: Flags
 emptyFlags =
