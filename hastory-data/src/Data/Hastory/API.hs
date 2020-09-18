@@ -21,8 +21,7 @@ import Data.Hastory.Types
 
 type AuthCookies = '[ Header "Set-Cookie" Text]
 
-type EntriesAPI
-   = "entries" :> ReqBody '[ JSON] SyncRequest :> PostCreated '[ JSON] [Key ServerEntry]
+type EntriesAPI = "entries" :> ReqBody '[ JSON] SyncRequest :> PostCreated '[ JSON] NoContent
 
 type ProtectedAPI = Auth '[ JWT] AuthCookie
 
@@ -83,7 +82,7 @@ extractJWTCookie headersList =
 -- See https://hackage.haskell.org/package/servant-client-0.16.0.1/docs/Servant-Client.html#v:client
 createUserClient :: UserForm -> ClientM UserId
 createSessionClient :: UserForm -> ClientM (Headers AuthCookies NoContent)
-createEntryClient :: Token -> SyncRequest -> ClientM [Key ServerEntry]
+createEntryClient :: Token -> SyncRequest -> ClientM NoContent
 (createUserClient :<|> createSessionClient :<|> createEntryClient) = client api
 
 -- | Re-export of runClientM
