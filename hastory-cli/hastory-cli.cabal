@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 77889adaa944082352239b5cc75b9e72d11a146925e3e639446eb26c1df5f595
+-- hash: 133a8a987143bf830d86c5ece90be1184e1ba1096088846483b26d78c31d93e1
 
 name:           hastory-cli
 version:        0.0.0.0
@@ -27,6 +27,7 @@ library
       Hastory.Cli.Commands.ListDir
       Hastory.Cli.Commands.Recent
       Hastory.Cli.Commands.SuggestAlias
+      Hastory.Cli.Commands.Sync
       Hastory.Cli.Internal
       Hastory.Cli.OptParse
       Hastory.Cli.OptParse.Types
@@ -91,6 +92,7 @@ test-suite hastory-cli-test
   other-modules:
       Hastory.Cli.Commands.GenGatherWrapperSpec
       Hastory.Cli.Commands.SuggestionSpec
+      Hastory.Cli.Commands.SyncSpec
       Hastory.Cli.OptParse.TypesSpec
       Hastory.Cli.OptParseSpec
       TestImport
@@ -114,7 +116,9 @@ test-suite hastory-cli-test
     , hastory-cli-data
     , hastory-data
     , hastory-data-gen
+    , hastory-server
     , hspec
+    , mtl
     , optparse-applicative
     , path
     , path-io

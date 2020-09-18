@@ -30,6 +30,7 @@ Entry
     workingDir (Path Abs Dir)
     dateTime UTCTime
     user Text
+    syncWitness Int Maybe
     deriving Show Eq Generic
 |]
 

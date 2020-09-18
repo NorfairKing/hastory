@@ -20,4 +20,9 @@ gatherEntryWith text = do
   user <- getEffectiveUserName
   pure
     Entry
-      {entryText = text, entryDateTime = curtime, entryWorkingDir = curdir, entryUser = T.pack user}
+      { entryText = text
+      , entryDateTime = curtime
+      , entryWorkingDir = curdir
+      , entryUser = T.pack user
+      , entrySyncWitness = Nothing
+      }

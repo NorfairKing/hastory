@@ -86,7 +86,9 @@ tests:
     - hastory-cli
     - hastory-data
     - hastory-data-gen
+    - hastory-server
     - hspec
+    - mtl
     - optparse-applicative
     - path
     - path-io
