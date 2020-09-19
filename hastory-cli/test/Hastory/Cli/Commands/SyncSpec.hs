@@ -49,6 +49,20 @@ spec =
           length localEntities `shouldBe` 2
           length serverEntities `shouldBe` 2
           map entityVal localEntities `shouldBe` map toEntry serverEntities
+    it "updates local entries when syncing" $ \ServerInfo {..} -> do
+      let unSetSyncWitness entry = entry {entrySyncWitness = Nothing}
+      entry <- unSetSyncWitness <$> generate genValid
+      userForm <- generate genValid
+      let remote = RemoteStorageClientInfo (baseUrl siClientEnv) username password
+          username = userFormUserName userForm
+          password = userFormPassword userForm
+      withNewUser siClientEnv userForm $ \(_userId, _token) ->
+        withSystemTempDir "local-hastory" $ \tmpDir -> do
+          let set = Settings tmpDir
+          _ <- createUnsyncdEntries [entry] set
+          _ <- runReaderT (sync remote) set
+          localEntities :: [Entity Entry] <- runReaderT (runDb $ selectList [] []) set
+          length localEntities `shouldBe` 1
 
 createUnsyncdEntries :: [Entry] -> Settings -> IO [Key Entry]
 createUnsyncdEntries entries = runReaderT (runDb $ insertMany entries)
