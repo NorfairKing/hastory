@@ -10,6 +10,7 @@ module Data.Hastory.API where
 import Control.Monad.Except
 import Data.Text (Text)
 import Data.Text.Encoding
+import Database.Persist
 import Network.HTTP.Client hiding (Proxy)
 import Servant
 import Servant.Auth.Client
@@ -19,9 +20,14 @@ import Web.Cookie
 
 import Data.Hastory.Types
 
+type RequiredQueryParam = QueryParam' '[ Required, Strict]
+
 type AuthCookies = '[ Header "Set-Cookie" Text]
 
-type EntriesAPI = "entries" :> ReqBody '[ JSON] SyncRequest :> PostCreated '[ JSON] NoContent
+type EntriesGetAPI
+   = "entries" :> RequiredQueryParam "position" ServerEntryId :> Get '[ JSON] [Entity ServerEntry]
+
+type EntriesPostAPI = "entries" :> ReqBody '[ JSON] SyncRequest :> PostCreated '[ JSON] NoContent
 
 type ProtectedAPI = Auth '[ JWT] AuthCookie
 
@@ -31,7 +37,8 @@ type SessionsAPI
    = "sessions" :> ReqBody '[ JSON] UserForm :> Verb 'POST 204 '[ JSON] (Headers AuthCookies NoContent)
 
 -- | Main Hastory API specification.
-type HastoryAPI = UsersAPI :<|> SessionsAPI :<|> (ProtectedAPI :> EntriesAPI)
+type HastoryAPI
+   = UsersAPI :<|> SessionsAPI :<|> (ProtectedAPI :> EntriesPostAPI) :<|> (ProtectedAPI :> EntriesGetAPI)
 
 -- | Proxy for Hastory API.
 api :: Proxy HastoryAPI
@@ -83,7 +90,8 @@ extractJWTCookie headersList =
 createUserClient :: UserForm -> ClientM UserId
 createSessionClient :: UserForm -> ClientM (Headers AuthCookies NoContent)
 createEntryClient :: Token -> SyncRequest -> ClientM NoContent
-(createUserClient :<|> createSessionClient :<|> createEntryClient) = client api
+getEntryClient :: Token -> ServerEntryId -> ClientM [Entity ServerEntry]
+(createUserClient :<|> createSessionClient :<|> createEntryClient :<|> getEntryClient) = client api
 
 -- | Re-export of runClientM
 runHastoryClient :: ClientM a -> ClientEnv -> IO (Either ClientError a)

@@ -11,3 +11,8 @@ createEntryHandler cookie syncReq =
           uniqueContentHash = UniqueContentHash (serverEntryContentHash serverEntry)
       runDB upsertIfNotExist
     pure NoContent
+
+fetchEntryHandler :: AuthCookie -> ServerEntryId -> HastoryHandler [Entity ServerEntry]
+fetchEntryHandler cookie position =
+  withUser (unAuthCookie cookie) $ \user ->
+    runDB $ selectList [ServerEntryId >. position, ServerEntryUser ==. entityKey user] []

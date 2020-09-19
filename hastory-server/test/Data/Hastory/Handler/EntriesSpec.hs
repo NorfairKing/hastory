@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Data.Hastory.Handler.EntriesSpec
   ( spec
@@ -20,7 +21,12 @@ import Data.Hastory.Server.Utils
 
 spec :: Spec
 spec =
-  serverSpec $
+  serverSpec $ do
+    postEntries
+    getEntries
+
+postEntries :: SpecWith ServerInfo
+postEntries =
   describe "POST /entries" $ do
     context "incorrect token" $
       it "is a 401" $ \ServerInfo {..} ->
@@ -64,3 +70,32 @@ spec =
               replicateM_ 2 $ runClientM (createEntryClient token syncReq) siClientEnv
               dbEntries <- runSqlPool (selectList [] []) siPool :: IO [Entity ServerEntry]
               length dbEntries `shouldBe` 1
+
+getEntries :: SpecWith ServerInfo
+getEntries =
+  describe "GET /entries" $ do
+    it "returns server entries greater than position" $ \ServerInfo {..} -> do
+      userForm <- generate genValid
+      withNewUser siClientEnv userForm $ \(userId, token) -> do
+        entries <- generate $ vectorOf 3 genValid
+        let serverEntries = map (toServerEntry userId "someHost") entries
+        _ <- runSqlPool (insertMany serverEntries) siPool -- save to sync server
+        [_small, mid, large] <- runSqlPool (selectList [] [Asc ServerEntryId]) siPool
+        let midId = entityKey mid
+        Right returnedEntries <- runClientM (getEntryClient token midId) siClientEnv
+        returnedEntries `shouldBe` [large]
+    it "only returns server entries that belong to logged-in user" $ \ServerInfo {..} -> do
+      firstUserForm <- generate genValid
+      withNewUser siClientEnv firstUserForm $ \(userOneId, _token) -> do
+        secondUserForm <- generate genValid
+        withNewUser siClientEnv secondUserForm $ \(userTwoId, userTwoToken) -> do
+          [firstEntry, secondEntry] <- generate $ vectorOf 2 genValid
+          let serverEntries =
+                [ toServerEntry userOneId "user1Host" firstEntry
+                , toServerEntry userTwoId "user2Host" secondEntry
+                ]
+          _ <- runSqlPool (insertMany serverEntries) siPool -- save to sync server
+          entriesForUserTwo <- runSqlPool (selectList [ServerEntryUser ==. userTwoId] []) siPool
+          let zero = toSqlKey 0
+          Right returnedEntries <- runClientM (getEntryClient userTwoToken zero) siClientEnv
+          returnedEntries `shouldBe` entriesForUserTwo

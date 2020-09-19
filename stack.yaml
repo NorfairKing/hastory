@@ -9,6 +9,7 @@ packages:
 - hastory-server
 extra-deps:
 - base64-0.4.2
+- cryptonite-0.26
 - ghc-byteorder-4.11.0.0.10
 - password-2.0.1.1
 - password-instances-2.0.0.1
