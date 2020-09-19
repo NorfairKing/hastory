@@ -4,11 +4,13 @@
 
 module Hastory.Cli.Commands.Sync
   ( sync
+  , toEntry
   ) where
 
 import Control.Monad.Catch
 import Control.Monad.IO.Unlift (MonadUnliftIO)
 import Control.Monad.Reader
+import Data.Int
 import Database.Persist.Sqlite
 import Network.HostName (getHostName)
 import System.Exit
@@ -18,11 +20,52 @@ import Data.Hastory.API
 import Hastory.Cli.Internal
 import Hastory.Cli.OptParse.Types
 
+-- | Send local entries to sync server and fetch new entries from sync server.
 sync :: (MonadThrow m, MonadReader Settings m, MonadUnliftIO m) => RemoteStorageClientInfo -> m ()
 sync remoteInfo = do
   hastoryClient <- getHastoryClient remoteInfo
+  push hastoryClient
+  pull hastoryClient
+
+-- | Fetch entries from sync server.
+pull :: (MonadThrow m, MonadReader Settings m, MonadUnliftIO m) => HastoryClient -> m ()
+pull HastoryClient {..} = do
+  maxSyncWitnessId <- fmap toSqlKey getMaxSyncWitness
+  res <-
+    liftIO $ runHastoryClient (getEntryClient hastoryClientToken maxSyncWitnessId) hastoryClientEnv
+  case res of
+    Left err -> liftIO $ die "Unable to pull data"
+    Right serverEntries -> runDb $ insertMany_ (map toEntry serverEntries)
+
+-- | Send local entries to the server.
+push :: (MonadThrow m, MonadReader Settings m, MonadUnliftIO m) => HastoryClient -> m ()
+push hastoryClient = do
   unSyncdEntries <- (fmap . fmap) entityVal readUnsyncdEntries
   unless (null unSyncdEntries) (sendEntriesToServer hastoryClient unSyncdEntries)
+
+-- | Mechanically, the syncWitness is the id (Int64) of the entry on the remote
+-- server. We assume that the client knows about all entries up to and including
+-- the maximum syncWitness in the local database. By sending the maximum
+-- syncWitness to the remote server when fetching entries, the server will only
+-- return entries that are unknown to the client.
+getMaxSyncWitness :: (MonadThrow m, MonadReader Settings m, MonadUnliftIO m) => m Int64
+getMaxSyncWitness = do
+  mEntityEntry <- runDb (selectFirst [EntrySyncWitness !=. Nothing] [Desc EntrySyncWitness])
+  case mEntityEntry of
+    Nothing -> pure 0
+    Just entity ->
+      case entrySyncWitness (entityVal entity) of
+        Nothing -> pure 0
+        Just syncWitness -> pure syncWitness
+
+toEntry :: Entity ServerEntry -> Entry
+toEntry entity = Entry {..}
+  where
+    entryText = serverEntryText (entityVal entity)
+    entryUser = serverEntryHostUser (entityVal entity)
+    entryWorkingDir = serverEntryWorkingDir (entityVal entity)
+    entryDateTime = serverEntryDateTime (entityVal entity)
+    entrySyncWitness = Just . fromSqlKey . entityKey $ entity
 
 getHastoryClient :: (MonadThrow m, MonadUnliftIO m) => RemoteStorageClientInfo -> m HastoryClient
 getHastoryClient (RemoteStorageClientInfo baseUrl username password) = do

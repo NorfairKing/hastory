@@ -13,6 +13,7 @@ import Data.Aeson
 import Data.GenValidity.Path ()
 import Data.GenValidity.Text ()
 import Data.GenValidity.Time ()
+import Data.Int
 import Data.Text (Text)
 import Data.Time (UTCTime)
 import Data.Validity (Validity)
@@ -30,7 +31,7 @@ Entry
     workingDir (Path Abs Dir)
     dateTime UTCTime
     user Text
-    syncWitness Int Maybe
+    syncWitness Int64 Maybe
     deriving Show Eq Generic
 |]
 
