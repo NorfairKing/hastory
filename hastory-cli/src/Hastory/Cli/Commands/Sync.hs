@@ -35,7 +35,28 @@ pull HastoryClient {..} = do
     liftIO $ runHastoryClient (getEntryClient hastoryClientToken maxSyncWitnessId) hastoryClientEnv
   case res of
     Left err -> liftIO $ die "Unable to pull data"
-    Right serverEntries -> runDb $ insertMany_ (map toEntry serverEntries)
+    Right serverEntries -> mapM_ updateOrInsert serverEntries
+
+updateOrInsert ::
+     (MonadThrow m, MonadReader Settings m, MonadUnliftIO m) => Entity ServerEntry -> m EntryId
+updateOrInsert serverEntity = do
+  let entry = toEntry serverEntity
+  mEntity <-
+    runDb $
+    selectFirst
+      [ EntryText ==. entryText entry
+      , EntryWorkingDir ==. entryWorkingDir entry
+      , EntryDateTime ==. entryDateTime entry
+      , EntryUser ==. entryUser entry
+      , EntrySyncWitness ==. Nothing
+      ]
+      []
+  case mEntity of
+    Nothing -> runDb (insert entry)
+    Just localEntity -> do
+      let localKey = entityKey localEntity
+      runDb $ replace localKey entry
+      pure localKey
 
 -- | Send local entries to the server.
 push :: (MonadThrow m, MonadReader Settings m, MonadUnliftIO m) => HastoryClient -> m ()
