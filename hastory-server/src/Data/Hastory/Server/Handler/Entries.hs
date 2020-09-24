@@ -7,8 +7,8 @@ createEntryHandler cookie syncReq =
   withUser (unAuthCookie cookie) $ \user -> do
     let serverEntries = toServerEntries syncReq (entityKey user)
     forM_ serverEntries $ \serverEntry -> do
-      let upsertIfNotExist = upsertBy uniqueContentHash serverEntry []
-          uniqueContentHash = UniqueContentHash (serverEntryContentHash serverEntry)
+      let uniqueContentHash = UniqueContentHash (serverEntryContentHash serverEntry)
+          upsertIfNotExist = upsertBy uniqueContentHash serverEntry []
       runDB upsertIfNotExist
     pure NoContent
 
