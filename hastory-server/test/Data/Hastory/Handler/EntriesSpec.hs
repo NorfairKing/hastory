@@ -62,3 +62,40 @@ postEntries =
                 replicateM_ 2 $ runClientM (createEntryClient token syncReq logPosition) siClientEnv
                 dbEntries <- runSqlPool (selectList [] []) siPool :: IO [Entity ServerEntry]
                 length dbEntries `shouldBe` 1
+        it "responds with server entries" $ \ServerInfo {..} ->
+          forAllValid $ \userForm ->
+            forAllValid $ \entry ->
+              withNewUser siClientEnv userForm $ \(_userId, token) -> do
+                let logPosition = toSqlKey 0
+                    syncReq = SyncRequest [entry] "hostname"
+                Right responseEntries <-
+                  runClientM (createEntryClient token syncReq logPosition) siClientEnv
+                serverEntries <- runSqlPool (selectList [] []) siPool
+                serverEntries `shouldBe` responseEntries
+        it "responds with server entries that belong to the user" $ \ServerInfo {..} ->
+          forAllValid $ \userFormOne ->
+            forAllValid $ \userFormTwo ->
+              forAllValid $ \entryOne ->
+                forAllValid $ \entryTwo ->
+                  withNewUser siClientEnv userFormOne $ \(userIdOne, userOneToken) ->
+                    withNewUser siClientEnv userFormTwo $ \(userIdTwo, _userTwoToken) -> do
+                      let serverEntryOne = toServerEntry userIdOne "host" entryOne
+                          serverEntryTwo = toServerEntry userIdTwo "host" entryTwo
+                      userOneServerEntry <- runSqlPool (insertEntity serverEntryOne) siPool
+                      _userTwoServerEntry <- runSqlPool (insertEntity serverEntryTwo) siPool
+                      let syncReq = SyncRequest [entryOne] "host"
+                          logPosition = toSqlKey 0
+                      Right responseEntries <-
+                        runClientM (createEntryClient userOneToken syncReq logPosition) siClientEnv
+                      responseEntries `shouldBe` [userOneServerEntry]
+        it "responds with server entries that have an ID greater than the logPosition" $ \ServerInfo {..} ->
+          forAllValid $ \(entryOne, entryTwo, entryThree) ->
+            forAllValid $ \userForm ->
+              withNewUser siClientEnv userForm $ \(userId, token) -> do
+                let serverEntries =
+                      map (toServerEntry userId "host") [entryOne, entryTwo, entryThree]
+                [_small, mid, large] <- runSqlPool (insertMany serverEntries) siPool
+                let syncReq = SyncRequest [] "host"
+                Right responseEntries <-
+                  runClientM (createEntryClient token syncReq mid) siClientEnv
+                map entityKey responseEntries `shouldBe` [large]
