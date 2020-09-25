@@ -10,7 +10,6 @@ import Control.Monad
 import Servant.Auth.Client
 import Servant.Client
 import Test.Hspec
-import Test.QuickCheck
 import Test.Validity
 
 import Data.Hastory.API
@@ -34,32 +33,32 @@ postEntries =
           responseStatusCode resp `shouldBe` status401
     context "correct token" $ do
       it "saves entry to database" $ \ServerInfo {..} ->
-        forAllValid $ \syncReq -> do
-          userForm <- generate genValid
-          withNewUser siClientEnv userForm $ \(userId, token) -> do
-            let logPosition = toSqlKey 0
-            Right _ <- runClientM (createEntryClient token syncReq logPosition) siClientEnv
-            entries <- runSqlPool (selectList [] []) siPool :: IO [Entity ServerEntry]
-            map entityVal entries `shouldBe` toServerEntries syncReq userId
-      context "when same entry is sync'd twice" $ do
-        it "the db does not change between the first sync and the second sync" $ \ServerInfo {..} ->
-          forAllValid $ \syncReq -> do
-            userForm <- generate genValid
-            withNewUser siClientEnv userForm $ \(_, token) -> do
+        forAllValid $ \syncReq ->
+          forAllValid $ \userForm ->
+            withNewUser siClientEnv userForm $ \(userId, token) -> do
               let logPosition = toSqlKey 0
               Right _ <- runClientM (createEntryClient token syncReq logPosition) siClientEnv
-              entriesAfterFirstSync <-
-                runSqlPool (selectList [] []) siPool :: IO [Entity ServerEntry]
-              Right _ <- runClientM (createEntryClient token syncReq logPosition) siClientEnv
-              entriesAfterSecondSync <-
-                runSqlPool (selectList [] []) siPool :: IO [Entity ServerEntry]
-              entriesAfterSecondSync `shouldBe` entriesAfterFirstSync
+              entries <- runSqlPool (selectList [] []) siPool :: IO [Entity ServerEntry]
+              map entityVal entries `shouldBe` toServerEntries syncReq userId
+      context "when same entry is sync'd twice" $ do
+        it "the db does not change between the first sync and the second sync" $ \ServerInfo {..} ->
+          forAllValid $ \syncReq ->
+            forAllValid $ \userForm ->
+              withNewUser siClientEnv userForm $ \(_, token) -> do
+                let logPosition = toSqlKey 0
+                Right _ <- runClientM (createEntryClient token syncReq logPosition) siClientEnv
+                entriesAfterFirstSync <-
+                  runSqlPool (selectList [] []) siPool :: IO [Entity ServerEntry]
+                Right _ <- runClientM (createEntryClient token syncReq logPosition) siClientEnv
+                entriesAfterSecondSync <-
+                  runSqlPool (selectList [] []) siPool :: IO [Entity ServerEntry]
+                entriesAfterSecondSync `shouldBe` entriesAfterFirstSync
         it "db only persists one entry" $ \ServerInfo {..} ->
-          forAllValid $ \entry -> do
-            userForm <- generate genValid
-            withNewUser siClientEnv userForm $ \(_, token) -> do
-              let syncReq = SyncRequest [entry] "hostname"
-                  logPosition = toSqlKey 0
-              replicateM_ 2 $ runClientM (createEntryClient token syncReq logPosition) siClientEnv
-              dbEntries <- runSqlPool (selectList [] []) siPool :: IO [Entity ServerEntry]
-              length dbEntries `shouldBe` 1
+          forAllValid $ \entry ->
+            forAllValid $ \userForm ->
+              withNewUser siClientEnv userForm $ \(_, token) -> do
+                let syncReq = SyncRequest [entry] "hostname"
+                    logPosition = toSqlKey 0
+                replicateM_ 2 $ runClientM (createEntryClient token syncReq logPosition) siClientEnv
+                dbEntries <- runSqlPool (selectList [] []) siPool :: IO [Entity ServerEntry]
+                length dbEntries `shouldBe` 1
