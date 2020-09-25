@@ -24,10 +24,8 @@ type RequiredQueryParam = QueryParam' '[ Required, Strict]
 
 type AuthCookies = '[ Header "Set-Cookie" Text]
 
-type EntriesGetAPI
-   = "entries" :> RequiredQueryParam "position" ServerEntryId :> Get '[ JSON] [Entity ServerEntry]
-
-type EntriesPostAPI = "entries" :> ReqBody '[ JSON] SyncRequest :> PostCreated '[ JSON] NoContent
+type EntriesPostAPI
+   = "entries" :> ReqBody '[ JSON] SyncRequest :> RequiredQueryParam "logPosition" ServerEntryId :> PostCreated '[ JSON] [Entity ServerEntry]
 
 type ProtectedAPI = Auth '[ JWT] AuthCookie
 
@@ -37,8 +35,7 @@ type SessionsAPI
    = "sessions" :> ReqBody '[ JSON] UserForm :> Verb 'POST 204 '[ JSON] (Headers AuthCookies NoContent)
 
 -- | Main Hastory API specification.
-type HastoryAPI
-   = UsersAPI :<|> SessionsAPI :<|> (ProtectedAPI :> EntriesPostAPI) :<|> (ProtectedAPI :> EntriesGetAPI)
+type HastoryAPI = UsersAPI :<|> SessionsAPI :<|> (ProtectedAPI :> EntriesPostAPI)
 
 -- | Proxy for Hastory API.
 api :: Proxy HastoryAPI
@@ -89,9 +86,8 @@ extractJWTCookie headersList =
 -- See https://hackage.haskell.org/package/servant-client-0.16.0.1/docs/Servant-Client.html#v:client
 createUserClient :: UserForm -> ClientM UserId
 createSessionClient :: UserForm -> ClientM (Headers AuthCookies NoContent)
-createEntryClient :: Token -> SyncRequest -> ClientM NoContent
-getEntryClient :: Token -> ServerEntryId -> ClientM [Entity ServerEntry]
-(createUserClient :<|> createSessionClient :<|> createEntryClient :<|> getEntryClient) = client api
+createEntryClient :: Token -> SyncRequest -> ServerEntryId -> ClientM [Entity ServerEntry]
+(createUserClient :<|> createSessionClient :<|> createEntryClient) = client api
 
 -- | Re-export of runClientM
 runHastoryClient :: ClientM a -> ClientEnv -> IO (Either ClientError a)

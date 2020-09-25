@@ -55,19 +55,15 @@ optParser =
 
 -- | Main server logic for Hastory Server.
 server :: Options -> ServerSettings -> Server HastoryAPI
-server Options {..} serverSettings =
-  userHandler :<|> sessionHandler :<|> postEntryHandler :<|> getEntryHandler
+server Options {..} serverSettings = userHandler :<|> sessionHandler :<|> postEntryHandler
   where
     userHandler = flip runReaderT serverSettings . createUserHandler
     sessionHandler = flip runReaderT serverSettings . createSessionHandler
     postEntryHandler =
       withAuthenticated
-        (\authCookie -> flip runReaderT serverSettings . createEntryHandler authCookie)
-        (const $ runReaderT unAuthenticated serverSettings)
-    getEntryHandler =
-      withAuthenticated
-        (\authCookie -> flip runReaderT serverSettings . fetchEntryHandler authCookie)
-        (const $ runReaderT unAuthenticated serverSettings)
+        (\authCookie syncReq ->
+           flip runReaderT serverSettings . createEntryHandler authCookie syncReq)
+        (\_ _ -> runReaderT unAuthenticated serverSettings)
 
 -- | Main warp application. Consumes requests and produces responses.
 app :: Options -> ServerSettings -> Application
