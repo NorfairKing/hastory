@@ -23,19 +23,20 @@ import Hastory.Cli.OptParse.Types
 -- | Send local entries to sync server and fetch new entries from sync server.
 sync :: (MonadThrow m, MonadReader Settings m, MonadUnliftIO m) => RemoteStorageClientInfo -> m ()
 sync remoteInfo = do
-  hastoryClient <- getHastoryClient remoteInfo
-  push hastoryClient
-  pull hastoryClient
-
--- | Fetch entries from sync server.
-pull :: (MonadThrow m, MonadReader Settings m, MonadUnliftIO m) => HastoryClient -> m ()
-pull HastoryClient {..} = do
-  maxSyncWitnessId <- fmap toSqlKey getMaxSyncWitness
-  res <-
-    liftIO $ runHastoryClient (getEntryClient hastoryClientToken maxSyncWitnessId) hastoryClientEnv
-  case res of
-    Left err -> liftIO $ die "Unable to pull data"
+  HastoryClient {..} <- getHastoryClient remoteInfo
+  maxSyncWitness <- fmap toSqlKey getMaxSyncWitness
+  syncRequest <- getSyncRequest
+  let request = createEntryClient hastoryClientToken syncRequest maxSyncWitness
+  response <- liftIO $ runHastoryClient request hastoryClientEnv
+  case response of
+    Left err -> liftIO $ die ("sync error: " ++ show err)
     Right serverEntries -> mapM_ updateOrInsert serverEntries
+
+getSyncRequest :: (MonadThrow m, MonadReader Settings m, MonadUnliftIO m) => m SyncRequest
+getSyncRequest = do
+  unSyncdLocalEntries <- map entityVal <$> readUnsyncdEntries
+  hostname <- liftIO getHostName
+  pure $ toSyncRequest unSyncdLocalEntries hostname
 
 updateOrInsert ::
      (MonadThrow m, MonadReader Settings m, MonadUnliftIO m) => Entity ServerEntry -> m EntryId
@@ -57,12 +58,6 @@ updateOrInsert serverEntity = do
       let localKey = entityKey localEntity
       runDb $ replace localKey entry
       pure localKey
-
--- | Send local entries to the server.
-push :: (MonadThrow m, MonadReader Settings m, MonadUnliftIO m) => HastoryClient -> m ()
-push hastoryClient = do
-  unSyncdEntries <- (fmap . fmap) entityVal readUnsyncdEntries
-  unless (null unSyncdEntries) (sendEntriesToServer hastoryClient unSyncdEntries)
 
 -- | Mechanically, the syncWitness is the id (Int64) of the entry on the remote
 -- server. We assume that the client knows about all entries up to and including
@@ -97,13 +92,3 @@ getHastoryClient (RemoteStorageClientInfo baseUrl username password) = do
 
 readUnsyncdEntries :: (MonadThrow m, MonadReader Settings m, MonadUnliftIO m) => m [Entity Entry]
 readUnsyncdEntries = runDb $ selectList [EntrySyncWitness ==. Nothing] []
-
-sendEntriesToServer :: (MonadUnliftIO m) => HastoryClient -> [Entry] -> m ()
-sendEntriesToServer HastoryClient {..} entries = do
-  hostName <- liftIO getHostName
-  let syncReq = toSyncRequest entries hostName
-  syncResults <-
-    liftIO $ runHastoryClient (createEntryClient hastoryClientToken syncReq) hastoryClientEnv
-  case syncResults of
-    Left _clientError -> error "left"
-    Right _ -> pure ()
