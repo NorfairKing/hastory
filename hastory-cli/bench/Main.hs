@@ -1,5 +1,5 @@
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 
 module Main where
@@ -46,8 +46,7 @@ main =
         ]
 
 benchSets :: Settings
-benchSets =
-  Settings {setCacheDir = $(mkAbsDir "/tmp/hastory-cache"), remoteStorageClientInfo = Nothing}
+benchSets = Settings {setCacheDir = $(mkAbsDir "/tmp/hastory-cache")}
 
 gatherBenchmark :: Int -> Benchmark
 gatherBenchmark i =
@@ -76,7 +75,14 @@ prepareEntries i = do
         d <- elements absDirs
         zt <- genValid
         u <- genValid
-        pure Entry {entryText = t, entryWorkingDir = d, entryDateTime = zt, entryUser = u}
+        pure
+          Entry
+            { entryText = t
+            , entryWorkingDir = d
+            , entryDateTime = zt
+            , entryUser = u
+            , entrySyncWitness = Nothing
+            }
     storeHistory entry
 
 getSomeAbsDirs :: (MonadIO m, MonadThrow m) => m [Path Abs Dir]
