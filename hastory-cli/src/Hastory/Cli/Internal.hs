@@ -7,6 +7,7 @@ module Hastory.Cli.Internal where
 import Data.Hastory
 import Hastory.Cli.Data (migrateAll)
 import Hastory.Cli.OptParse.Types
+import System.Exit
 
 import Control.Monad.Catch
 import Control.Monad.IO.Unlift (MonadUnliftIO)
@@ -51,3 +52,17 @@ runDb dbAction = do
   SQL.runSqlite (T.pack . toFilePath $ hDb) $ do
     SQL.runMigration migrateAll
     dbAction
+
+runDb' ::
+     (MonadReader Settings m, MonadUnliftIO m)
+  => ReaderT SqlBackend (NoLoggingT (ResourceT m)) a
+  -> m a
+runDb' dbAction = do
+  sets <- ask
+  case runReaderT histDb sets of
+    Nothing -> liftIO $ die "Unable to locate histDb"
+    Just hDb -> do
+      ensureDir $ parent hDb
+      SQL.runSqlite (T.pack . toFilePath $ hDb) $ do
+        SQL.runMigration migrateAll
+        dbAction

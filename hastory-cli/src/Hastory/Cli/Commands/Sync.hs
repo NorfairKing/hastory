@@ -7,7 +7,6 @@ module Hastory.Cli.Commands.Sync
   , toEntry
   ) where
 
-import Control.Monad.Catch
 import Control.Monad.IO.Unlift (MonadUnliftIO)
 import Control.Monad.Reader
 import Data.Int
@@ -21,7 +20,7 @@ import Hastory.Cli.Internal
 import Hastory.Cli.OptParse.Types
 
 -- | Send local entries to sync server and fetch new entries from sync server.
-sync :: (MonadThrow m, MonadReader Settings m, MonadUnliftIO m) => RemoteStorageClientInfo -> m ()
+sync :: (MonadReader Settings m, MonadUnliftIO m) => RemoteStorageClientInfo -> m ()
 sync remoteInfo = do
   HastoryClient {..} <- getHastoryClient remoteInfo
   maxSyncWitness <- fmap toSqlKey getMaxSyncWitness
@@ -32,18 +31,17 @@ sync remoteInfo = do
     Left err -> liftIO $ die ("sync error: " ++ show err)
     Right serverEntries -> mapM_ updateOrInsert serverEntries
 
-getSyncRequest :: (MonadThrow m, MonadReader Settings m, MonadUnliftIO m) => m SyncRequest
+getSyncRequest :: (MonadReader Settings m, MonadUnliftIO m) => m SyncRequest
 getSyncRequest = do
   unSyncdLocalEntries <- map entityVal <$> readUnsyncdEntries
   hostname <- liftIO getHostName
   pure $ toSyncRequest unSyncdLocalEntries hostname
 
-updateOrInsert ::
-     (MonadThrow m, MonadReader Settings m, MonadUnliftIO m) => Entity ServerEntry -> m EntryId
+updateOrInsert :: (MonadReader Settings m, MonadUnliftIO m) => Entity ServerEntry -> m EntryId
 updateOrInsert serverEntity = do
   let entry = toEntry serverEntity
   mEntity <-
-    runDb $
+    runDb' $
     selectFirst
       [ EntryText ==. entryText entry
       , EntryWorkingDir ==. entryWorkingDir entry
@@ -53,10 +51,10 @@ updateOrInsert serverEntity = do
       ]
       []
   case mEntity of
-    Nothing -> runDb (insert entry)
+    Nothing -> runDb' (insert entry)
     Just localEntity -> do
       let localKey = entityKey localEntity
-      runDb $ replace localKey entry
+      runDb' $ replace localKey entry
       pure localKey
 
 -- | Mechanically, the syncWitness is the id (Int64) of the entry on the remote
@@ -64,9 +62,9 @@ updateOrInsert serverEntity = do
 -- the maximum syncWitness in the local database. By sending the maximum
 -- syncWitness to the remote server when fetching entries, the server will only
 -- return entries that are unknown to the client.
-getMaxSyncWitness :: (MonadThrow m, MonadReader Settings m, MonadUnliftIO m) => m Int64
+getMaxSyncWitness :: (MonadReader Settings m, MonadUnliftIO m) => m Int64
 getMaxSyncWitness = do
-  mEntityEntry <- runDb (selectFirst [EntrySyncWitness !=. Nothing] [Desc EntrySyncWitness])
+  mEntityEntry <- runDb' (selectFirst [EntrySyncWitness !=. Nothing] [Desc EntrySyncWitness])
   case mEntityEntry of
     Nothing -> pure 0
     Just entity ->
@@ -83,12 +81,12 @@ toEntry entity = Entry {..}
     entryDateTime = serverEntryDateTime (entityVal entity)
     entrySyncWitness = Just . fromSqlKey . entityKey $ entity
 
-getHastoryClient :: (MonadThrow m, MonadUnliftIO m) => RemoteStorageClientInfo -> m HastoryClient
+getHastoryClient :: (MonadUnliftIO m) => RemoteStorageClientInfo -> m HastoryClient
 getHastoryClient (RemoteStorageClientInfo baseUrl username password) = do
   eHastoryClient <- liftIO $ mkHastoryClient baseUrl username password
   case eHastoryClient of
     Left _err -> liftIO $ die "Unable to log in to server"
     Right client -> pure client
 
-readUnsyncdEntries :: (MonadThrow m, MonadReader Settings m, MonadUnliftIO m) => m [Entity Entry]
-readUnsyncdEntries = runDb $ selectList [EntrySyncWitness ==. Nothing] []
+readUnsyncdEntries :: (MonadReader Settings m, MonadUnliftIO m) => m [Entity Entry]
+readUnsyncdEntries = runDb' $ selectList [EntrySyncWitness ==. Nothing] []
