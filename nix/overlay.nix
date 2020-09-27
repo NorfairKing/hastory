@@ -21,6 +21,7 @@ with final.haskell.lib;
         "hastory-cli-data"
         "hastory-data"
         "hastory-data-gen"
+        "hastory-digest"
         "hastory-path"
         "hastory-server"
         "hastory-server-data"
