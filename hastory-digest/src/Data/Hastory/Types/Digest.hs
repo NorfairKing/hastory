@@ -1,9 +1,8 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Hastory.Server.Digest where
+module Data.Hastory.Types.Digest where
 
--- TODO: Move this under Server.Data
 import Crypto.Hash (Digest, HashAlgorithm, digestFromByteString)
 import qualified Data.ByteArray as BA
 import qualified Data.ByteString as B

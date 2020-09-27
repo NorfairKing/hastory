@@ -5,6 +5,7 @@ packages:
 - hastory-cli-data
 - hastory-data-gen
 - hastory-server-data
+- hastory-digest
 - hastory-path
 - hastory-server
 extra-deps:

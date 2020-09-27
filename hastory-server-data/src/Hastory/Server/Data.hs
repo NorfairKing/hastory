@@ -24,10 +24,10 @@ import Database.Persist.TH (mkMigrate, mkPersist, persistLowerCase, share, sqlSe
 import GHC.Generics (Generic)
 import Path (Abs, Dir, Path)
 
+import Data.Hastory.Types.Digest ()
 import Data.Hastory.Types.Path ()
 import Hastory.Server.Data.Password (Bcrypt, PasswordHash)
 import Hastory.Server.Data.Username (Username)
-import Hastory.Server.Digest ()
 
 instance FromJSON (Digest SHA256) where
   parseJSON =

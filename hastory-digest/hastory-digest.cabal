@@ -4,9 +4,9 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8742f1538ccb21c7ed11ad04a03cd37b16380b759f3e4a98327732a7e39ab98e
+-- hash: 01fcd8f9cd894bcc723ae7eef31d00912a654144d272ec772ce29c52bd3744a0
 
-name:           hastory-server-data
+name:           hastory-digest
 version:        0.0.0.0
 category:       Command Line
 homepage:       https://github.com/NorfairKing/hastory
@@ -19,32 +19,16 @@ build-type:     Simple
 
 library
   exposed-modules:
-      Hastory.Server.Data
-      Hastory.Server.Data.Password
-      Hastory.Server.Data.PasswordDifficulty
-      Hastory.Server.Data.UserForm
-      Hastory.Server.Data.Username
+      Data.Hastory.Types.Digest
   other-modules:
-      Paths_hastory_server_data
+      Paths_hastory_digest
   hs-source-dirs:
       src/
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -fhide-source-paths
   build-depends:
-      aeson
-    , base >=4.9 && <=5
-    , base64
+      base >=4.9 && <=5
     , bytestring
     , cryptonite
-    , hastory-digest
-    , hastory-path
     , memory
-    , password
-    , password-instances
-    , path
     , persistent
-    , persistent-template
-    , text
-    , time
-    , validity
-    , validity-text
   default-language: Haskell2010
