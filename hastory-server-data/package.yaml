@@ -14,12 +14,8 @@ library:
   source-dirs: src/
   dependencies:
     - aeson
-    - base64
-    - bytestring
-    - cryptonite
     - hastory-digest
     - hastory-path
-    - memory
     - password
     - password-instances
     - path

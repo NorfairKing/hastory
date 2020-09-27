@@ -13,10 +13,13 @@ dependencies:
 library:
   source-dirs: src/
   dependencies:
+    - aeson
+    - base64
     - bytestring
     - cryptonite
     - memory
     - persistent
+    - text
   exposed-modules:
     - Data.Hastory.Types.Digest
   ghc-options:

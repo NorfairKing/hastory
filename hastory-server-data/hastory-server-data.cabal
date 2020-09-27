@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8742f1538ccb21c7ed11ad04a03cd37b16380b759f3e4a98327732a7e39ab98e
+-- hash: 4480abf3e72b85367fc35fd5393bee418539df9d0649e33acae575130a770c3b
 
 name:           hastory-server-data
 version:        0.0.0.0
@@ -32,12 +32,8 @@ library
   build-depends:
       aeson
     , base >=4.9 && <=5
-    , base64
-    , bytestring
-    , cryptonite
     , hastory-digest
     , hastory-path
-    , memory
     , password
     , password-instances
     , path
