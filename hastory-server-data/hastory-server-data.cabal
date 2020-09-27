@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 4480abf3e72b85367fc35fd5393bee418539df9d0649e33acae575130a770c3b
+-- hash: 923e5cee1f1a8a124e5de0dc9cc74e08d25c56eabcb7c3b61937e41ddd9937d9
 
 name:           hastory-server-data
 version:        0.0.0.0
@@ -36,7 +36,6 @@ library
     , hastory-path
     , password
     , password-instances
-    , path
     , persistent
     , persistent-template
     , text

@@ -19,9 +19,8 @@ import Data.Time (UTCTime)
 import Data.Validity (Validity)
 import Database.Persist.TH (mkMigrate, mkPersist, persistLowerCase, share, sqlSettings)
 import GHC.Generics (Generic)
-import Path (Abs, Dir, Path)
 
-import Data.Hastory.Types.Path ()
+import Data.Hastory.Types.Path
 
 share
   [mkPersist sqlSettings, mkMigrate "migrateAll"]

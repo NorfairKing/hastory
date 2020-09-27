@@ -12,14 +12,14 @@
 
 module Hastory.Server.Data where
 
+-- import           Path                         (Abs, Dir, Path)
 import Data.Text (Text)
 import Data.Time (UTCTime)
 import Database.Persist.TH (mkMigrate, mkPersist, persistLowerCase, share, sqlSettings)
 import GHC.Generics (Generic)
-import Path (Abs, Dir, Path)
 
 import Data.Hastory.Types.Digest
-import Data.Hastory.Types.Path ()
+import Data.Hastory.Types.Path
 import Hastory.Server.Data.Password (Bcrypt, PasswordHash)
 import Hastory.Server.Data.Username (Username)
 

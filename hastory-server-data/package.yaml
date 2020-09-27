@@ -18,7 +18,6 @@ library:
     - hastory-path
     - password
     - password-instances
-    - path
     - persistent
     - persistent-template
     - text

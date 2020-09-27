@@ -2,12 +2,14 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Data.Hastory.Types.Path where
+module Data.Hastory.Types.Path
+  ( module Data.Hastory.Types.Path
+  ) where
 
 import Data.Text (unpack)
 import Database.Persist (PersistField(..), PersistValue(..))
 import Database.Persist.Sqlite (PersistFieldSql(..), SqlType(..))
-import Path (Abs, Dir, Path, parseAbsDir, toFilePath)
+import Path as Data.Hastory.Types.Path
 
 instance PersistField (Path Abs Dir) where
   toPersistValue = toPersistValue . toFilePath

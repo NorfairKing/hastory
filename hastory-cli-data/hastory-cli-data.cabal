@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.31.2.
+-- This file has been generated from package.yaml by hpack version 0.33.0.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: ae0cdc4d43a8761fa2903da4307933aea9d305f3faab5fce6fbf2c9c63e04851
+-- hash: e22fab416571eb4f3be00de4d05bfccfe3cc57704e8e6a335c5acd36f8b7d935
 
 name:           hastory-cli-data
 version:        0.0.0.0
@@ -33,7 +33,6 @@ library
     , genvalidity-text
     , genvalidity-time
     , hastory-path
-    , path
     , persistent-template
     , text
     , time

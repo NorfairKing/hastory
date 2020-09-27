@@ -19,7 +19,6 @@ library:
     - genvalidity-text
     - genvalidity-time
     - hastory-path
-    - path
     - persistent-template
     - text
     - time
