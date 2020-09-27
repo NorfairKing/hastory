@@ -45,7 +45,7 @@ updateOrInsert serverEntity = do
     upsertBy
       (EntryData entryText entryWorkingDir entryDateTime entryUser)
       entry
-      [EntrySyncWitness ==. entrySyncWitness]
+      [EntrySyncWitness =. entrySyncWitness]
   pure $ entityKey entity
 
 -- | Mechanically, the syncWitness is the id (Int64) of the entry on the remote
