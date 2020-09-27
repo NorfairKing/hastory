@@ -39,23 +39,14 @@ getSyncRequest = do
 
 updateOrInsert :: (MonadReader Settings m, MonadUnliftIO m) => Entity ServerEntry -> m EntryId
 updateOrInsert serverEntity = do
-  let entry = toEntry serverEntity
-  mEntity <-
+  let entry@Entry {..} = toEntry serverEntity
+  entity <-
     runDb' $
-    selectFirst
-      [ EntryText ==. entryText entry
-      , EntryWorkingDir ==. entryWorkingDir entry
-      , EntryDateTime ==. entryDateTime entry
-      , EntryUser ==. entryUser entry
-      , EntrySyncWitness ==. Nothing
-      ]
-      []
-  case mEntity of
-    Nothing -> runDb' (insert entry)
-    Just localEntity -> do
-      let localKey = entityKey localEntity
-      runDb' $ replace localKey entry
-      pure localKey
+    upsertBy
+      (EntryData entryText entryWorkingDir entryDateTime entryUser)
+      entry
+      [EntrySyncWitness ==. entrySyncWitness]
+  pure $ entityKey entity
 
 -- | Mechanically, the syncWitness is the id (Int64) of the entry on the remote
 -- server. We assume that the client knows about all entries up to and including

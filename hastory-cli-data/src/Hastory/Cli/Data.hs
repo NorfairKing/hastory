@@ -31,6 +31,7 @@ Entry
     dateTime UTCTime
     user Text
     syncWitness Int64 Maybe
+    EntryData text workingDir dateTime user
     deriving Show Eq Generic
 |]
 
