@@ -21,18 +21,18 @@ spec =
   describe "sync" $ do
     it "sends unsync'd data to the sync server" $ \ServerInfo {..} ->
       forAllValid $ \userForm ->
-        forAllValid $ \(entryOne, entryTwo) -> do
+        forAllValid $ \entries -> do
           let remoteInfo = RemoteStorageClientInfo (baseUrl siClientEnv) username password
               username = userFormUserName userForm
               password = userFormPassword userForm
           withNewUser siClientEnv userForm $ \_registrationData ->
             withSystemTempDir "local-hastory" $ \tmpDir -> do
               let settings = Settings tmpDir
-                  entries = map nullifySyncWitness [entryOne, entryTwo]
-              _ <- createUnsyncdEntries entries settings
+                  localEntries = nub (map nullifySyncWitness entries)
+              _ <- createUnsyncdEntries localEntries settings
               runReaderT (sync remoteInfo) settings
               serverEntries :: [Entity ServerEntry] <- runSqlPool (selectList [] []) siPool
-              length serverEntries `shouldBe` 2
+              length serverEntries `shouldBe` length localEntries
     it "fetches new entries from the sync server" $ \ServerInfo {..} ->
       forAllValid $ \userForm ->
         forAllValid $ \(entryOne, entryTwo) -> do
