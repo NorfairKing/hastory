@@ -32,10 +32,13 @@ instance HashAlgorithm a => PersistFieldSql (Digest a) where
 
 instance FromJSON (Digest SHA256) where
   parseJSON =
-    withText "Digest SHA256" $ \text -> do
-      let failureMsg err = fail ("Failed to parse (Digest SHA256): " ++ T.unpack err)
-      bytestring <- either failureMsg pure (Base64.decodeBase64 $ T.encodeUtf8 text)
-      maybe (failureMsg text) pure (digestFromByteString bytestring)
+    withText "Digest SHA256" $ \text ->
+      case Base64.decodeBase64 (T.encodeUtf8 text) of
+        Left err -> fail ("Failed to parse (Digest SHA256): " ++ T.unpack err)
+        Right bs ->
+          case digestFromByteString bs of
+            Nothing -> fail "Failed to parse (Digest SHA256)"
+            Just digest -> pure digest
 
 instance ToJSON (Digest SHA256) where
   toJSON = toJSON . T.decodeUtf8 . Base64.encodeBase64' . convert

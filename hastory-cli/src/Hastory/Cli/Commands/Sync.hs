@@ -55,22 +55,20 @@ updateOrInsert serverEntity = do
 -- return entries that are unknown to the client.
 getMaxSyncWitness :: (MonadReader Settings m, MonadUnliftIO m) => m Int64
 getMaxSyncWitness = do
-  mEntityEntry <- runDb' (selectFirst [EntrySyncWitness !=. Nothing] [Desc EntrySyncWitness])
-  case mEntityEntry of
+  mEntityEntry <- runDb' $ selectFirst [EntrySyncWitness !=. Nothing] [Desc EntrySyncWitness]
+  let mSyncWitness = entrySyncWitness . entityVal =<< mEntityEntry
+  case mSyncWitness of
     Nothing -> pure 0
-    Just entity ->
-      case entrySyncWitness (entityVal entity) of
-        Nothing -> pure 0
-        Just syncWitness -> pure syncWitness
+    Just i -> pure i
 
 toEntry :: Entity ServerEntry -> Entry
-toEntry entity = Entry {..}
+toEntry (Entity serverEntryId ServerEntry {..}) = Entry {..}
   where
-    entryText = serverEntryText (entityVal entity)
-    entryUser = serverEntryHostUser (entityVal entity)
-    entryWorkingDir = serverEntryWorkingDir (entityVal entity)
-    entryDateTime = serverEntryDateTime (entityVal entity)
-    entrySyncWitness = Just . fromSqlKey . entityKey $ entity
+    entryText = serverEntryText
+    entryUser = serverEntryHostUser
+    entryWorkingDir = serverEntryWorkingDir
+    entryDateTime = serverEntryDateTime
+    entrySyncWitness = Just (fromSqlKey serverEntryId)
 
 getHastoryClient :: (MonadUnliftIO m) => RemoteStorageClientInfo -> m HastoryClient
 getHastoryClient (RemoteStorageClientInfo baseUrl username password) = do

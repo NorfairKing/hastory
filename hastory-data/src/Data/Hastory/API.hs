@@ -24,18 +24,18 @@ type RequiredQueryParam = QueryParam' '[ Required, Strict]
 
 type AuthCookies = '[ Header "Set-Cookie" Text]
 
-type EntriesPostAPI
+type EntriesPost
    = "entries" :> ReqBody '[ JSON] SyncRequest :> RequiredQueryParam "logPosition" ServerEntryId :> PostCreated '[ JSON] [Entity ServerEntry]
 
-type ProtectedAPI = Auth '[ JWT] AuthCookie
+type Protected = Auth '[ JWT] AuthCookie
 
 type UsersAPI = "users" :> ReqBody '[ JSON] UserForm :> PostCreated '[ JSON] UserId
 
-type SessionsAPI
+type Sessions
    = "sessions" :> ReqBody '[ JSON] UserForm :> Verb 'POST 204 '[ JSON] (Headers AuthCookies NoContent)
 
 -- | Main Hastory API specification.
-type HastoryAPI = UsersAPI :<|> SessionsAPI :<|> (ProtectedAPI :> EntriesPostAPI)
+type HastoryAPI = UsersAPI :<|> Sessions :<|> (Protected :> EntriesPost)
 
 -- | Proxy for Hastory API.
 api :: Proxy HastoryAPI
