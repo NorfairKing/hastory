@@ -14,10 +14,7 @@ createEntryHandler cookie syncReq logPosition =
 insertNewEntries :: Entity User -> SyncRequest -> HastoryHandler [Entity ServerEntry]
 insertNewEntries user syncReq = do
   let serverEntries = toServerEntries syncReq (entityKey user)
-  forM serverEntries $ \serverEntry -> do
-    let uniqueContentHash = UniqueContentHash (serverEntryContentHash serverEntry)
-        upsertIfNotExist = upsertBy uniqueContentHash serverEntry []
-    runDB upsertIfNotExist
+  forM serverEntries $ \serverEntry -> runDB $ upsert serverEntry [] --  make no update if record exists
 
 fetchEntriesGreaterThan :: Entity User -> ServerEntryId -> HastoryHandler [Entity ServerEntry]
 fetchEntriesGreaterThan user logPosition = runDB query

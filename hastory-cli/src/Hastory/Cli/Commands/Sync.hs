@@ -10,6 +10,7 @@ module Hastory.Cli.Commands.Sync
 import Control.Monad.IO.Unlift (MonadUnliftIO)
 import Control.Monad.Reader
 import Data.Int
+import Data.Maybe
 import Database.Persist.Sqlite
 import Network.HostName (getHostName)
 import System.Exit
@@ -57,9 +58,7 @@ getMaxSyncWitness :: (MonadReader Settings m, MonadUnliftIO m) => m Int64
 getMaxSyncWitness = do
   mEntityEntry <- runDb' $ selectFirst [EntrySyncWitness !=. Nothing] [Desc EntrySyncWitness]
   let mSyncWitness = entrySyncWitness . entityVal =<< mEntityEntry
-  case mSyncWitness of
-    Nothing -> pure 0
-    Just i -> pure i
+  pure $ fromMaybe 0 mSyncWitness
 
 toEntry :: Entity ServerEntry -> Entry
 toEntry (Entity serverEntryId ServerEntry {..}) = Entry {..}
