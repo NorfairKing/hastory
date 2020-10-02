@@ -32,6 +32,7 @@ Entry
     user Text
     syncWitness Int64 Maybe
     EntryData text workingDir dateTime user
+    hostName Text Maybe
     deriving Show Eq Generic
 |]
 

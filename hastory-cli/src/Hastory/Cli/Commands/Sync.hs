@@ -68,6 +68,7 @@ toEntry (Entity serverEntryId ServerEntry {..}) = Entry {..}
     entryWorkingDir = serverEntryWorkingDir
     entryDateTime = serverEntryDateTime
     entrySyncWitness = Just (fromSqlKey serverEntryId)
+    entryHostName = Just serverEntryHostName
 
 getHastoryClient :: (MonadUnliftIO m) => RemoteStorageClientInfo -> m HastoryClient
 getHastoryClient (RemoteStorageClientInfo baseUrl username password) = do

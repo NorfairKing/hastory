@@ -1,3 +1,4 @@
+{-# HLINT ignore "Reduce duplication" #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
@@ -64,10 +65,27 @@ spec =
               _ <- createUnsyncdEntries entries set
               _ <- runReaderT (sync remote) set
               localEntities :: [Entity Entry] <- runReaderT (runDb $ selectList [] []) set
-              length localEntities `shouldBe` 1
+              map (entrySyncWitness . entityVal) localEntities `shouldSatisfy` all isJust
+    it "does not overwrite local entry host name" $ \ServerInfo {..} ->
+      forAllValid $ \userForm ->
+        forAllValid $ \entry -> do
+          let remote = RemoteStorageClientInfo (baseUrl siClientEnv) username password
+              username = userFormUserName userForm
+              password = userFormPassword userForm
+          withNewUser siClientEnv userForm $ \(_userId, _token) ->
+            withSystemTempDir "local-hastory" $ \tmpDir -> do
+              let set = Settings tmpDir
+                  entries = map (nullifyHostName . nullifySyncWitness) [entry]
+              _ <- createUnsyncdEntries entries set
+              _ <- runReaderT (sync remote) set
+              localEntities :: [Entity Entry] <- runReaderT (runDb $ selectList [] []) set
+              map (entryHostName . entityVal) localEntities `shouldSatisfy` all isNothing
 
 createUnsyncdEntries :: [Entry] -> Settings -> IO [Key Entry]
 createUnsyncdEntries entries = runReaderT (runDb $ insertMany entries)
 
 nullifySyncWitness :: Entry -> Entry
 nullifySyncWitness entry = entry {entrySyncWitness = Nothing}
+
+nullifyHostName :: Entry -> Entry
+nullifyHostName entry = entry {entryHostName = Nothing}

@@ -25,4 +25,5 @@ gatherEntryWith text = do
       , entryWorkingDir = curdir
       , entryUser = T.pack user
       , entrySyncWitness = Nothing
+      , entryHostName = Nothing
       }
