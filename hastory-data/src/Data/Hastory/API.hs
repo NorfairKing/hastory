@@ -25,7 +25,7 @@ type RequiredQueryParam = QueryParam' '[ Required, Strict]
 type AuthCookies = '[ Header "Set-Cookie" Text]
 
 type EntriesPost
-   = "entries" :> ReqBody '[ JSON] SyncRequest :> RequiredQueryParam "logPosition" ServerEntryId :> PostCreated '[ JSON] [Entity ServerEntry]
+   = "entries" :> ReqBody '[ JSON] SyncRequest :> PostCreated '[ JSON] [Entity ServerEntry]
 
 type Protected = Auth '[ JWT] AuthCookie
 
@@ -86,7 +86,7 @@ extractJWTCookie headersList =
 -- See https://hackage.haskell.org/package/servant-client-0.16.0.1/docs/Servant-Client.html#v:client
 createUserClient :: UserForm -> ClientM UserId
 createSessionClient :: UserForm -> ClientM (Headers AuthCookies NoContent)
-createEntryClient :: Token -> SyncRequest -> ServerEntryId -> ClientM [Entity ServerEntry]
+createEntryClient :: Token -> SyncRequest -> ClientM [Entity ServerEntry]
 (createUserClient :<|> createSessionClient :<|> createEntryClient) = client api
 
 -- | Re-export of runClientM

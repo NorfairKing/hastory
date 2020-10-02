@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 4d2a2a6ee14b0db507e417665a04ef98746e490b2180ba3c9e79e06c413495f5
+-- hash: 5a0bf8f118e4934ed84ebaf679f08ba775ae561e6c753563d5c4f11010ff9e2d
 
 name:           hastory-data-gen
 version:        0.0.0.0
@@ -38,6 +38,7 @@ library
     , hspec
     , path
     , path-io
+    , persistent
     , text
     , validity
     , validity-path

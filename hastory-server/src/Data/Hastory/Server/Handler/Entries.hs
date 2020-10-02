@@ -4,12 +4,11 @@ module Data.Hastory.Server.Handler.Entries
 
 import Data.Hastory.Server.Handler.Import
 
-createEntryHandler ::
-     AuthCookie -> SyncRequest -> ServerEntryId -> HastoryHandler [Entity ServerEntry]
-createEntryHandler cookie syncReq logPosition =
+createEntryHandler :: AuthCookie -> SyncRequest -> HastoryHandler [Entity ServerEntry]
+createEntryHandler cookie syncReq =
   withUser (unAuthCookie cookie) $ \user -> do
     _ <- insertNewEntries user syncReq
-    fetchEntriesGreaterThan user logPosition
+    fetchEntriesGreaterThan user (syncRequestLogPosition syncReq)
 
 insertNewEntries :: Entity User -> SyncRequest -> HastoryHandler [Entity ServerEntry]
 insertNewEntries user syncReq = do

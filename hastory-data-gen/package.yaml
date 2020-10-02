@@ -18,8 +18,8 @@ library:
   exposed-modules:
   - Data.Hastory.Gen
   dependencies:
-  - QuickCheck
   - base >=4.9 && <=5
+  - QuickCheck
   - genvalidity
   - genvalidity-hspec
   - genvalidity-hspec-aeson
@@ -27,10 +27,11 @@ library:
   - genvalidity-text
   - genvalidity-time
   - hspec
+  - persistent
+  - text
   - validity
   - validity-path
   - validity-text
-  - text
 
 tests:
   hastory-data-test:

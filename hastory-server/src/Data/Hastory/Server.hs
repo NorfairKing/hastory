@@ -61,9 +61,8 @@ server Options {..} serverSettings = userHandler :<|> sessionHandler :<|> postEn
     sessionHandler = flip runReaderT serverSettings . createSessionHandler
     postEntryHandler =
       withAuthenticated
-        (\authCookie syncReq ->
-           flip runReaderT serverSettings . createEntryHandler authCookie syncReq)
-        (\_ _ -> runReaderT unAuthenticated serverSettings)
+        (\authCookie -> flip runReaderT serverSettings . createEntryHandler authCookie)
+        (\_ -> runReaderT unAuthenticated serverSettings)
 
 -- | Main warp application. Consumes requests and produces responses.
 app :: Options -> ServerSettings -> Application

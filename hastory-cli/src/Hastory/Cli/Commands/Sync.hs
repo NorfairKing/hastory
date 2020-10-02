@@ -24,9 +24,8 @@ import Hastory.Cli.OptParse.Types
 sync :: (MonadReader Settings m, MonadUnliftIO m) => RemoteStorageClientInfo -> m ()
 sync remoteInfo = do
   HastoryClient {..} <- getHastoryClient remoteInfo
-  maxSyncWitness <- fmap toSqlKey getMaxSyncWitness
   syncRequest <- getSyncRequest
-  let request = createEntryClient hastoryClientToken syncRequest maxSyncWitness
+  let request = createEntryClient hastoryClientToken syncRequest
   response <- liftIO $ runHastoryClient request hastoryClientEnv
   case response of
     Left err -> liftIO $ die ("sync error: " ++ show err)
@@ -34,9 +33,10 @@ sync remoteInfo = do
 
 getSyncRequest :: (MonadReader Settings m, MonadUnliftIO m) => m SyncRequest
 getSyncRequest = do
+  maxSyncWitness <- fmap toSqlKey getMaxSyncWitness
   unSyncdLocalEntries <- map entityVal <$> readUnsyncdEntries
   hostname <- liftIO getHostName
-  pure $ toSyncRequest unSyncdLocalEntries hostname
+  pure $ toSyncRequest unSyncdLocalEntries hostname maxSyncWitness
 
 updateOrInsert :: (MonadReader Settings m, MonadUnliftIO m) => Entity ServerEntry -> m EntryId
 updateOrInsert serverEntity = do

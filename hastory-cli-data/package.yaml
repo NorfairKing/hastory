@@ -19,6 +19,7 @@ library:
     - genvalidity-text
     - genvalidity-time
     - hastory-path
+    - hastory-server-data
     - persistent-template
     - text
     - time

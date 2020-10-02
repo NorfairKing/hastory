@@ -1,4 +1,6 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module Data.Hastory.Gen where
 
@@ -6,6 +8,7 @@ import Control.Applicative
 import Data.GenValidity
 import Data.GenValidity.Text
 import qualified Data.Text as T
+import Database.Persist.Sql (fromSqlKey, toSqlKey)
 import Test.QuickCheck
 
 import Data.Hastory
@@ -22,8 +25,16 @@ instance GenValid Password where
   genValid = mkPassword <$> genValid
   shrinkValid _ = [] -- don't shrink Password
 
+instance GenValid ServerEntryId where
+  genValid = toSqlKey <$> arbitrary
+  shrinkValid = map toSqlKey . shrinkValid . fromSqlKey
+
 instance GenValid SyncRequest where
-  genValid = genValidStructurally
+  genValid = do
+    syncRequestEntries <- genValid
+    syncRequestHostName <- genValid
+    syncRequestLogPosition <- genValid
+    pure $ SyncRequest {..}
   shrinkValid = shrinkValidStructurally
 
 instance GenValid UserForm where
