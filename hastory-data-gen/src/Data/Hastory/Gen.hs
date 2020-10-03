@@ -1,6 +1,5 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
 {-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE RecordWildCards #-}
 
 module Data.Hastory.Gen where
 
@@ -26,15 +25,11 @@ instance GenValid Password where
   shrinkValid _ = [] -- don't shrink Password
 
 instance GenValid ServerEntryId where
-  genValid = toSqlKey <$> arbitrary
+  genValid = toSqlKey <$> genValid
   shrinkValid = map toSqlKey . shrinkValid . fromSqlKey
 
 instance GenValid SyncRequest where
-  genValid = do
-    syncRequestEntries <- genValid
-    syncRequestHostName <- genValid
-    syncRequestLogPosition <- genValid
-    pure $ SyncRequest {..}
+  genValid = genValidStructurallyWithoutExtraChecking
   shrinkValid = shrinkValidStructurally
 
 instance GenValid UserForm where
