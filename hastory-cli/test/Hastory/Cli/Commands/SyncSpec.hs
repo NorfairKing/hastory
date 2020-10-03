@@ -1,4 +1,3 @@
-{-# HLINT ignore "Reduce duplication" #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
