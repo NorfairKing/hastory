@@ -8,11 +8,6 @@ module Hastory.Cli.Commands.Recent
   ( getRecentDirOpts
   ) where
 
-import Data.Hastory
-import Hastory.Cli.Internal
-import Hastory.Cli.OptParse.Types
-import Hastory.Cli.Utils (doCountsWith)
-
 import Control.Monad.Catch
 import Control.Monad.IO.Unlift (MonadUnliftIO)
 import Control.Monad.Reader
@@ -29,6 +24,11 @@ import qualified Data.Time.LocalTime as Time
 import GHC.Generics (Generic)
 import Path (Abs, File, Path, (</>), mkRelFile, toFilePath)
 import Path.IO (forgivingAbsence, getHomeDir)
+
+import Hastory.Cli.Internal
+import Hastory.Cli.OptParse.Types
+import Hastory.Cli.Utils (doCountsWith)
+import Hastory.Data.Client.DB
 
 getRecentDirOpts :: (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => Bool -> m [FilePath]
 getRecentDirOpts bypassCache =

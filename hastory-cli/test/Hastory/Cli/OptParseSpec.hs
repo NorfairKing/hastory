@@ -5,10 +5,10 @@ module Hastory.Cli.OptParseSpec
   ) where
 
 import qualified Data.ByteString as B
-import Data.Hastory
 import qualified Data.Text as T
 import Env
 import Hastory.Cli.OptParse
+import Hastory.Data
 import Options.Applicative
 import Servant.Client
 import TestImport hiding (Failure, Success)

@@ -7,13 +7,18 @@ module Hastory.Cli.Commands.SyncSpec
   ) where
 
 import Control.Monad.Reader
-import Data.Hastory.Gen ()
-import Data.Hastory.Server.TestUtils
-import Data.Hastory.Server.Utils
+import Servant.Client
+
+import TestImport
+
 import Hastory.Cli.Commands.Sync
 import Hastory.Cli.Internal
-import Servant.Client
-import TestImport
+import Hastory.Data
+import Hastory.Data.Client.DB
+import Hastory.Data.Server.DB
+import Hastory.Gen ()
+import Hastory.Server.TestUtils
+import Hastory.Server.Utils
 
 spec :: Spec
 spec =

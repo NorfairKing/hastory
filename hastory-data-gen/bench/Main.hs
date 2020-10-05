@@ -9,8 +9,9 @@ import Test.QuickCheck
 import Criterion.Main as Criterion
 import Criterion.Types as Criterion
 
-import Data.Hastory
-import Data.Hastory.Gen ()
+import Hastory.API.Gather
+import Hastory.Data.Client.DB
+import Hastory.Gen ()
 
 main :: IO ()
 main =

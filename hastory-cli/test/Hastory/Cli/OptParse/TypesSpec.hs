@@ -5,8 +5,8 @@ module Hastory.Cli.OptParse.TypesSpec
   ) where
 
 import Data.Aeson (Result(..), fromJSON)
-import Data.Hastory
 import Data.Yaml (decodeThrow)
+import Hastory.Data
 import Servant.Client
 import TestImport hiding (Failure, Result, Success)
 

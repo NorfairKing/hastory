@@ -15,8 +15,6 @@ dependencies:
 library:
   source-dirs: src/
   ghc-options: -Wall
-  exposed-modules:
-  - Data.Hastory.Gen
   dependencies:
   - base >=4.9 && <=5
   - QuickCheck
@@ -71,10 +69,12 @@ benchmarks:
     - -with-rtsopts=-T
     - -Wall
     dependencies:
+    - QuickCheck
     - base
-    - hastory-data-gen
+    - criterion
     - exceptions
     - genvalidity
-    - criterion
-    - QuickCheck
+    - hastory-api
+    - hastory-data
+    - hastory-data-gen
     - mtl

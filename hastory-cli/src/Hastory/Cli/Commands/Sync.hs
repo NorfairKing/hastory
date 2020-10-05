@@ -15,10 +15,12 @@ import Database.Persist.Sqlite
 import Network.HostName (getHostName)
 import System.Exit
 
-import Data.Hastory
-import Data.Hastory.API
+import Hastory.API
 import Hastory.Cli.Internal
 import Hastory.Cli.OptParse.Types
+import Hastory.Data
+import Hastory.Data.Client.DB hiding (migrateAll)
+import Hastory.Data.Server.DB hiding (migrateAll)
 
 -- | Send local entries to sync server and fetch new entries from sync server.
 sync :: (MonadReader Settings m, MonadUnliftIO m) => RemoteStorageClientInfo -> m ()

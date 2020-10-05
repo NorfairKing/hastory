@@ -8,8 +8,8 @@ import qualified Data.Text as T
 import Safe (tailSafe)
 import Test.Validity (forAllValid)
 
-import Data.Hastory
-import Data.Hastory.Gen ()
+import Hastory.Data.Client.DB
+import Hastory.Gen ()
 
 import Hastory.Cli.Commands.SuggestAlias
 

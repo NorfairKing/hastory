@@ -1,0 +1,61 @@
+name: hastory-api
+version: '0.0.0.0'
+category: Command Line
+author: Tom Sydney Kerckhove
+maintainer: syd.kerckhove@gmail.com
+copyright: ! 'Copyright: (c) 2016-2018 Tom Sydney Kerckhove'
+license: AllRightsReserved
+homepage: https://github.com/NorfairKing/hastory
+
+dependencies:
+- base >=4.9 && <=5
+
+
+library:
+  source-dirs: src/
+  ghc-options:
+  - -Wall
+  - -Wincomplete-uni-patterns
+  - -Wincomplete-record-updates
+  - -Wredundant-constraints
+
+  dependencies:
+  - aeson
+  - conduit
+  - cookie
+  - deepseq
+  - exceptions
+  - genvalidity
+  - genvalidity-path
+  - genvalidity-text
+  - genvalidity-time
+  - hashable
+  - hashable-time
+  - hastory-data
+  - hostname
+  - hspec
+  - http-client
+  - lifted-base
+  - monad-control
+  - monad-logger
+  - mtl
+  - path
+  - path-io
+  - persistent
+  - persistent-sqlite
+  - persistent-template
+  - safe
+  - servant
+  - servant-auth-client
+  - servant-auth-server
+  - servant-client
+  - servant-client-core
+  - servant-server
+  - text
+  - time
+  - unix
+  - unordered-containers
+  - validity
+  - validity-path
+  - validity-text
+  - validity-time

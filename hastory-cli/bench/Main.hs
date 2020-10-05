@@ -20,8 +20,8 @@ import Test.QuickCheck
 import Criterion.Main as Criterion
 import Criterion.Types as Criterion
 
-import Data.Hastory
-import Data.Hastory.Gen ()
+import Hastory.Data.Client.DB
+import Hastory.Gen ()
 
 import Hastory.Cli
 import Hastory.Cli.Commands.Gather
@@ -82,6 +82,7 @@ prepareEntries i = do
             , entryDateTime = zt
             , entryUser = u
             , entrySyncWitness = Nothing
+            , entryHostName = Nothing
             }
     storeHistory entry
 

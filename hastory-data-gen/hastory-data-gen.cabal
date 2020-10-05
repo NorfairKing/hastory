@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 5a0bf8f118e4934ed84ebaf679f08ba775ae561e6c753563d5c4f11010ff9e2d
+-- hash: dcb9ea12c9406baefe9bf1b9852cdf61264af479856f1e595d6920fb25469e79
 
 name:           hastory-data-gen
 version:        0.0.0.0
@@ -19,7 +19,7 @@ build-type:     Simple
 
 library
   exposed-modules:
-      Data.Hastory.Gen
+      Hastory.Gen
   other-modules:
       Paths_hastory_data_gen
   hs-source-dirs:
@@ -49,7 +49,7 @@ test-suite hastory-data-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      Data.Hastory.InstanceSpec
+      Hastory.InstanceSpec
       TestImport
       Paths_hastory_data_gen
   hs-source-dirs:
@@ -92,6 +92,7 @@ benchmark hastory-data-bench
     , criterion
     , exceptions
     , genvalidity
+    , hastory-api
     , hastory-data
     , hastory-data-gen
     , mtl

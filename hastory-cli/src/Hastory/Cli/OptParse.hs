@@ -13,7 +13,6 @@ module Hastory.Cli.OptParse
   ) where
 
 import Control.Monad
-import Data.Hastory.Types
 import Data.Maybe (fromMaybe)
 import Data.Semigroup ((<>))
 import qualified Data.Text as T
@@ -26,6 +25,8 @@ import Path.IO (getAppUserDataDir, getHomeDir, resolveDir, resolveDir', resolveF
 import Servant.Client.Core.Reexport (parseBaseUrl)
 import System.Environment (getArgs)
 import YamlParse.Applicative hiding (Parser)
+
+import Hastory.Data
 
 getInstructions :: IO Instructions
 getInstructions = do

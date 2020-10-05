@@ -3,8 +3,8 @@
 module Hastory.Cli.OptParse.Types where
 
 import Data.Aeson
-import Data.Hastory.Types
 import Data.Text (Text)
+import Hastory.Data
 import Path (Abs, Dir, Path)
 import Servant.Client.Core.Reexport (BaseUrl, parseBaseUrl)
 import YamlParse.Applicative
