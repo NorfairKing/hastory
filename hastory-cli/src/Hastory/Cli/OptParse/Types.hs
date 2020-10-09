@@ -147,10 +147,10 @@ newtype Settings =
     }
   deriving (Show, Eq)
 
-data RemoteStorageClientInfo =
-  RemoteStorageClientInfo
-    { remoteStorageClientInfoBaseUrl :: BaseUrl
-    , remoteStorageClientInfoUsername :: Username
-    , remoteStorageClientInfoPassword :: Text
+data RemoteStorage =
+  RemoteStorage
+    { remoteStorageBaseUrl :: BaseUrl
+    , remoteStorageUsername :: Username
+    , remoteStoragePassword :: Text
     }
   deriving (Show, Eq)

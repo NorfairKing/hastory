@@ -23,7 +23,7 @@ import Hastory.Data.Client.DB hiding (migrateAll)
 import Hastory.Data.Server.DB hiding (migrateAll)
 
 -- | Send local entries to sync server and fetch new entries from sync server.
-sync :: (MonadReader Settings m, MonadUnliftIO m) => RemoteStorageClientInfo -> m ()
+sync :: (MonadReader Settings m, MonadUnliftIO m) => RemoteStorage -> m ()
 sync remoteInfo = do
   HastoryClient {..} <- getHastoryClient remoteInfo
   syncRequest <- getSyncRequest
@@ -72,8 +72,8 @@ toEntry (Entity serverEntryId ServerEntry {..}) = Entry {..}
     entrySyncWitness = Just (fromSqlKey serverEntryId)
     entryHostName = Just serverEntryHostName
 
-getHastoryClient :: (MonadUnliftIO m) => RemoteStorageClientInfo -> m HastoryClient
-getHastoryClient (RemoteStorageClientInfo baseUrl username password) = do
+getHastoryClient :: (MonadUnliftIO m) => RemoteStorage -> m HastoryClient
+getHastoryClient (RemoteStorage baseUrl username password) = do
   eHastoryClient <- liftIO $ mkHastoryClient baseUrl username password
   case eHastoryClient of
     Left _err -> liftIO $ die "Unable to log in to server"

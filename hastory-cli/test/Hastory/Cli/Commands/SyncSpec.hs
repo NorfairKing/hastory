@@ -27,7 +27,7 @@ spec =
     it "sends unsync'd data to the sync server" $ \ServerInfo {..} ->
       forAllValid $ \userForm ->
         forAllValid $ \entries -> do
-          let remoteInfo = RemoteStorageClientInfo (baseUrl siClientEnv) username password
+          let remoteInfo = RemoteStorage (baseUrl siClientEnv) username password
               username = userFormUserName userForm
               password = userFormPassword userForm
           withNewUser siClientEnv userForm $ \_registrationData ->
@@ -41,7 +41,7 @@ spec =
     it "fetches new entries from the sync server" $ \ServerInfo {..} ->
       forAllValid $ \userForm ->
         forAllValid $ \(entryOne, entryTwo) -> do
-          let remoteStorage = RemoteStorageClientInfo (baseUrl siClientEnv) username password
+          let remoteStorage = RemoteStorage (baseUrl siClientEnv) username password
               username = userFormUserName userForm
               password = userFormPassword userForm
           withNewUser siClientEnv userForm $ \(userId, _token) ->
@@ -59,7 +59,7 @@ spec =
     it "updates local entries when syncing" $ \ServerInfo {..} ->
       forAllValid $ \userForm ->
         forAllValid $ \entry -> do
-          let remote = RemoteStorageClientInfo (baseUrl siClientEnv) username password
+          let remote = RemoteStorage (baseUrl siClientEnv) username password
               username = userFormUserName userForm
               password = userFormPassword userForm
           withNewUser siClientEnv userForm $ \(_userId, _token) ->
@@ -73,7 +73,7 @@ spec =
     it "does not overwrite local entry host name" $ \ServerInfo {..} ->
       forAllValid $ \userForm ->
         forAllValid $ \entry -> do
-          let remote = RemoteStorageClientInfo (baseUrl siClientEnv) username password
+          let remote = RemoteStorage (baseUrl siClientEnv) username password
               username = userFormUserName userForm
               password = userFormPassword userForm
           withNewUser siClientEnv userForm $ \(_userId, _token) ->
