@@ -58,9 +58,6 @@ data Flags =
   Flags
     { flagCacheDir :: Maybe FilePath
     , flagConfigFile :: Maybe FilePath
-    , flagStorageServer :: Maybe BaseUrl
-    , flagStorageUsername :: Maybe Username
-    , flagStoragePassword :: Maybe Text
     }
   deriving (Show, Eq)
 

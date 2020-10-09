@@ -216,27 +216,7 @@ parseFlags =
   optional
     (option
        nonEmptyString
-       (mconcat [long "config-file", metavar "FILEPATH", help "path to a config file"])) <*>
-  optional
-    (option
-       (maybeReader parseBaseUrl)
-       (mconcat [long "storage-server-url", metavar "URL", help "URL of the central storage server"])) <*>
-  optional
-    (option
-       (maybeReader (parseUsername . T.pack))
-       (mconcat
-          [ long "storage-server-username"
-          , metavar "TEXT"
-          , help "Username for the central storage server"
-          ])) <*>
-  optional
-    (option
-       (T.pack <$> str)
-       (mconcat
-          [ long "storage-server-password"
-          , metavar "PASSWORD"
-          , help "Password for the central storage server"
-          ]))
+       (mconcat [long "config-file", metavar "FILEPATH", help "path to a config file"]))
   where
     nonEmptyString =
       maybeReader $ \s ->

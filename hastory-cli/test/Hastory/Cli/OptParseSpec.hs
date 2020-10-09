@@ -5,7 +5,6 @@ module Hastory.Cli.OptParseSpec
   ) where
 
 import qualified Data.ByteString as B
-import qualified Data.Text as T
 import Env
 import Hastory.Cli.OptParse
 import Hastory.Data
@@ -98,36 +97,6 @@ describeFlags =
         let res = runArgumentsParser args
             args = ["gather", "--config-file="]
         res `shouldSatisfy` isCliParserFailure
-    context "storage-server-url is provided" $ do
-      it "contains a BaseUrl when url is valid" $ do
-        let (Success (Arguments _cmd flags)) = runArgumentsParser args
-            args = ["gather", "--storage-server-url=" <> rawUrl]
-            rawUrl = "api.example.com"
-        url <- parseBaseUrl rawUrl
-        flags `shouldBe` emptyFlags {flagStorageServer = Just url}
-      it "is an error when BaseUrl is invalid" $ do
-        let res = runArgumentsParser args
-            args = ["gather", "--storage-server-url=" <> rawUrl]
-            rawUrl = "ftps://1"
-        res `shouldSatisfy` isCliParserFailure
-    context "storage-server-username is provided" $ do
-      it "contains a Username when username is valid" $ do
-        let (Success (Arguments _cmd flags)) = runArgumentsParser args
-            args = ["gather", "--storage-server-username=" <> rawUsername]
-            rawUsername = "hastory"
-        username <- parseUsername (T.pack rawUsername)
-        flags `shouldBe` emptyFlags {flagStorageUsername = Just username}
-      it "is an error when Username is invalid" $ do
-        let res = runArgumentsParser args
-            args = ["gather", "--storage-server-username=" <> rawUsername]
-            rawUsername = "1"
-        res `shouldSatisfy` isCliParserFailure
-    context "storage-server-password is provided" $
-      it "contains a password" $ do
-        let (Success (Arguments _cmd flags)) = runArgumentsParser args
-            args = ["gather", "--storage-server-password=" <> rawPassword]
-            rawPassword = "Passw0rd"
-        flags `shouldBe` emptyFlags {flagStoragePassword = Just (T.pack rawPassword)}
     context "user provides NO flags" $
       it "is an empty Flags data type" $ do
         let (Success (Arguments _cmd flags)) = runArgumentsParser args
@@ -325,14 +294,7 @@ combineToInstructionsSpec =
         dispatch `shouldBe` DispatchGenGatherWrapperScript GenGatherWrapperScriptSettings
 
 emptyFlags :: Flags
-emptyFlags =
-  Flags
-    { flagCacheDir = Nothing
-    , flagConfigFile = Nothing
-    , flagStorageServer = Nothing
-    , flagStorageUsername = Nothing
-    , flagStoragePassword = Nothing
-    }
+emptyFlags = Flags {flagCacheDir = Nothing, flagConfigFile = Nothing}
 
 emptyConfiguration :: Configuration
 emptyConfiguration =
