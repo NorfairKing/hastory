@@ -23,8 +23,8 @@ import Hastory.Data.Client.DB hiding (migrateAll)
 import Hastory.Data.Server.DB hiding (migrateAll)
 
 -- | Send local entries to sync server and fetch new entries from sync server.
-sync :: (MonadReader Settings m, MonadUnliftIO m) => RemoteStorage -> m ()
-sync remoteInfo = do
+sync :: (MonadReader Settings m, MonadUnliftIO m) => SyncSettings -> m ()
+sync (SyncSettings remoteInfo) = do
   HastoryClient {..} <- getHastoryClient remoteInfo
   syncRequest <- getSyncRequest
   let request = createEntryClient hastoryClientToken syncRequest

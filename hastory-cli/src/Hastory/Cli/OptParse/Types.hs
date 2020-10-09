@@ -24,6 +24,15 @@ data Command
   | CommandChangeDir ChangeDirFlags
   | CommandGenChangeWrapperScript GenChangeWrapperScriptFlags
   | CommandSuggestAlias SuggestAliasFlags
+  | CommandSync SyncFlags
+  deriving (Show, Eq)
+
+data SyncFlags =
+  SyncFlags
+    { syncFlagsStorageServer :: Maybe BaseUrl
+    , syncFlagsUsername :: Maybe Username
+    , syncFlagsPassword :: Maybe Text
+    }
   deriving (Show, Eq)
 
 data GatherFlags =
@@ -111,6 +120,7 @@ data Dispatch
   | DispatchChangeDir ChangeDirSettings
   | DispatchGenChangeWrapperScript GenChangeWrapperScriptSettings
   | DispatchSuggestAlias SuggestAliasSettings
+  | DispatchSync SyncSettings
   deriving (Show, Eq)
 
 data GatherSettings =
@@ -139,6 +149,12 @@ data GenChangeWrapperScriptSettings =
 
 data SuggestAliasSettings =
   SuggestAliasSettings
+  deriving (Show, Eq)
+
+newtype SyncSettings =
+  SyncSettings
+    { syncSettingsRemoteStorage :: RemoteStorage
+    }
   deriving (Show, Eq)
 
 newtype Settings =

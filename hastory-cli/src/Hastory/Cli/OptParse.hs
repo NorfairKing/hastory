@@ -17,15 +17,16 @@ import Data.Maybe (fromMaybe)
 import Data.Semigroup ((<>))
 import qualified Data.Text as T
 import qualified Env
-import Hastory.Cli.OptParse.Types
 import Options.Applicative
 import qualified Options.Applicative.Help.Pretty as OptParseHelp
 import Path
 import Path.IO (getAppUserDataDir, getHomeDir, resolveDir, resolveDir', resolveFile, resolveFile')
 import Servant.Client.Core.Reexport (parseBaseUrl)
 import System.Environment (getArgs)
+import System.Exit (die)
 import YamlParse.Applicative hiding (Parser)
 
+import Hastory.Cli.OptParse.Types
 import Hastory.Data
 
 getInstructions :: IO Instructions
@@ -40,21 +41,37 @@ combineToInstructions :: Command -> Flags -> Environment -> Maybe Configuration 
 combineToInstructions cmd Flags {..} Environment {..} mConf =
   Instructions <$> getDispatch <*> getSettings
   where
-    getDispatch = pure dispatch
-    dispatch =
+    getDispatch =
       case cmd of
-        CommandGather _ -> DispatchGather GatherSettings
+        CommandGather _ -> pure $ DispatchGather GatherSettings
         CommandGenGatherWrapperScript _ ->
-          DispatchGenGatherWrapperScript GenGatherWrapperScriptSettings
+          pure $ DispatchGenGatherWrapperScript GenGatherWrapperScriptSettings
         CommandListRecentDirs ListRecentDirFlags {..} ->
           let lrdBypassCache = lrdArgBypassCache <|> envLrdBypassCache <|> mc configLrdBypassCache
-           in DispatchListRecentDirs
+           in pure $
+              DispatchListRecentDirs
                 ListRecentDirSettings {lrdSetBypassCache = fromMaybe False lrdBypassCache}
         CommandChangeDir ChangeDirFlags {..} ->
-          DispatchChangeDir ChangeDirSettings {changeDirSetIdx = changeDirFlagsIdx}
+          pure $ DispatchChangeDir ChangeDirSettings {changeDirSetIdx = changeDirFlagsIdx}
         CommandGenChangeWrapperScript _ ->
-          DispatchGenChangeWrapperScript GenChangeWrapperScriptSettings
-        CommandSuggestAlias _ -> DispatchSuggestAlias SuggestAliasSettings
+          pure $ DispatchGenChangeWrapperScript GenChangeWrapperScriptSettings
+        CommandSuggestAlias _ -> pure $ DispatchSuggestAlias SuggestAliasSettings
+        CommandSync syncFlags -> DispatchSync . SyncSettings <$> getRemoteStorage syncFlags
+    getRemoteStorage :: SyncFlags -> IO RemoteStorage
+    getRemoteStorage SyncFlags {..} = do
+      remoteStorageBaseUrl <-
+        case syncFlagsStorageServer <|> envStorageServer <|> mc configStorageServer of
+          Nothing -> die "Storage server not found"
+          Just baseUrl -> pure baseUrl
+      remoteStorageUsername <-
+        case syncFlagsUsername <|> envStorageUsername <|> mc configStorageUsername of
+          Nothing -> die "Username not found"
+          Just username -> pure username
+      remoteStoragePassword <-
+        case syncFlagsPassword <|> envStoragePassword <|> mc configStoragePassword of
+          Nothing -> die "Password not found"
+          Just pw -> pure pw
+      pure RemoteStorage {..}
     getSettings = do
       home <- getHomeDir
       cacheDir <-
@@ -154,6 +171,7 @@ parseCommand =
     , command "list-recent-directories" parseCommandListRecentDirs
     , command "generate-change-directory-wrapper-script" parseGenChangeDirectoryWrapperScript
     , command "suggest-alias" parseSuggestAlias
+    , command "sync" parseSync
     ]
 
 parseCommandGather :: ParserInfo Command
@@ -205,6 +223,26 @@ parseSuggestAlias =
   info
     (pure $ CommandSuggestAlias SuggestAliasFlags)
     (progDesc "Suggest commands for which the user may want to make aliases.")
+
+parseSync :: ParserInfo Command
+parseSync =
+  info (CommandSync <$> syncParser) (progDesc "Sync the local database with a remote server.")
+  where
+    syncParser =
+      SyncFlags <$> syncFlagStorageParser <*> syncFlagUsernameParser <*> syncFlagPasswordParser
+    syncFlagStorageParser =
+      optional $
+      option
+        (maybeReader parseBaseUrl)
+        (long "storage-server" <> help "Remote storage url" <> metavar "URL")
+    syncFlagUsernameParser =
+      optional $
+      option
+        (maybeReader $ parseUsername . T.pack)
+        (long "storage-username" <> help "Remote storage username" <> metavar "USERNAME")
+    syncFlagPasswordParser =
+      optional $
+      strOption (long "storage-password" <> help "Remote storage password" <> metavar "PASSWORD")
 
 parseFlags :: Parser Flags
 parseFlags =

@@ -35,7 +35,7 @@ spec =
               let settings = Settings tmpDir
                   localEntries = nub (map nullifySyncWitness entries)
               _ <- createUnsyncdEntries localEntries settings
-              runReaderT (sync remoteInfo) settings
+              runReaderT (sync $ SyncSettings remoteInfo) settings
               serverEntries :: [Entity ServerEntry] <- runSqlPool (selectList [] []) siPool
               length serverEntries `shouldBe` length localEntries
     it "fetches new entries from the sync server" $ \ServerInfo {..} ->
@@ -50,7 +50,7 @@ spec =
                   serverEntries = map (toServerEntry userId "localhost") entries
               _ <- runSqlPool (insertMany serverEntries) siPool
               let settings = Settings tmpDir
-              _ <- runReaderT (sync remoteStorage) settings
+              _ <- runReaderT (sync $ SyncSettings remoteStorage) settings
               localEntities <- runReaderT (runDb $ selectList [] [Desc EntrySyncWitness]) settings
               serverEntities <- runSqlPool (selectList [] [Desc ServerEntryId]) siPool
               length localEntities `shouldBe` 2
@@ -67,7 +67,7 @@ spec =
               let set = Settings tmpDir
                   entries = map nullifySyncWitness [entry]
               _ <- createUnsyncdEntries entries set
-              _ <- runReaderT (sync remote) set
+              _ <- runReaderT (sync $ SyncSettings remote) set
               localEntities :: [Entity Entry] <- runReaderT (runDb $ selectList [] []) set
               map (entrySyncWitness . entityVal) localEntities `shouldSatisfy` all isJust
     it "does not overwrite local entry host name" $ \ServerInfo {..} ->
@@ -81,7 +81,7 @@ spec =
               let set = Settings tmpDir
                   entries = map (nullifyHostName . nullifySyncWitness) [entry]
               _ <- createUnsyncdEntries entries set
-              _ <- runReaderT (sync remote) set
+              _ <- runReaderT (sync $ SyncSettings remote) set
               localEntities :: [Entity Entry] <- runReaderT (runDb $ selectList [] []) set
               map (entryHostName . entityVal) localEntities `shouldSatisfy` all isNothing
 

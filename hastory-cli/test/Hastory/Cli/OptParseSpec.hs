@@ -156,6 +156,18 @@ describeCommand =
         let (Success (Arguments cmd _flags)) = runArgumentsParser args
             args = ["suggest-alias"]
         cmd `shouldBe` CommandSuggestAlias SuggestAliasFlags
+    context "user provides the 'sync' command" $
+      it "parses to CommandSync" $ do
+        url <- parseBaseUrl "api.google.com"
+        let (Success (Arguments cmd _flags)) = runArgumentsParser args
+            args =
+              [ "sync"
+              , "--storage-server=api.google.com"
+              , "--storage-username=steven"
+              , "--storage-password=letmein"
+              ]
+            expectedSyncFlags = SyncFlags (Just url) (Just $ Username "steven") (Just "letmein")
+        cmd `shouldBe` CommandSync expectedSyncFlags
 
 envParserSpec :: Spec
 envParserSpec =
