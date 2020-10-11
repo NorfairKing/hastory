@@ -4,7 +4,6 @@
 
 module Hastory.Cli.Internal where
 
-import Control.Monad.Catch
 import Control.Monad.IO.Unlift (MonadUnliftIO)
 import Control.Monad.Logger (NoLoggingT)
 import Control.Monad.Reader
@@ -15,6 +14,7 @@ import Database.Persist.Sqlite (SqlBackend)
 import qualified Database.Persist.Sqlite as SQL
 import Path (Abs, Dir, File, Path, (</>), mkRelDir, parent, parseRelFile, toFilePath)
 import Path.IO (ensureDir)
+import System.Exit
 
 import Hastory.Cli.OptParse.Types
 import Hastory.Data.Client.DB
@@ -25,11 +25,13 @@ hastoryDir = asks setCacheDir
 histDir :: MonadReader Settings m => m (Path Abs Dir)
 histDir = fmap (</> $(mkRelDir "command-history")) hastoryDir
 
-histDb :: (MonadThrow m, MonadReader Settings m) => m (Path Abs File)
+histDb :: (MonadReader Settings m, MonadUnliftIO m) => m (Path Abs File)
 histDb = do
   hd <- histDir
-  file <- parseRelFile "hastory.db"
-  pure $ hd </> file
+  let filePath = "hastory.db"
+  case parseRelFile "hastory.db" of
+    Nothing -> liftIO $ die ("Unable to parse relative file path: " <> filePath)
+    Just file -> pure $ hd </> file
 
 getLastNDaysOfHistory :: (MonadReader Settings m, MonadUnliftIO m) => Integer -> m [Entry]
 getLastNDaysOfHistory n = do
