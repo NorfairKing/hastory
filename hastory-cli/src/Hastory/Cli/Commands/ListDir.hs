@@ -3,15 +3,13 @@
 
 module Hastory.Cli.Commands.ListDir where
 
-import Control.Monad.Catch
 import Control.Monad.IO.Unlift (MonadUnliftIO)
 import Control.Monad.Reader
 
 import Hastory.Cli.Commands.Recent
 import Hastory.Cli.OptParse.Types
 
-listRecentDirs ::
-     (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => ListRecentDirSettings -> m ()
+listRecentDirs :: (MonadReader Settings m, MonadUnliftIO m) => ListRecentDirSettings -> m ()
 listRecentDirs ListRecentDirSettings {..} = do
   recentDirOpts <- getRecentDirOpts lrdSetBypassCache
   let tups = zip [0 ..] recentDirOpts

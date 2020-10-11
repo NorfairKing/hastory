@@ -31,13 +31,12 @@ histDb = do
   file <- parseRelFile "hastory.db"
   pure $ hd </> file
 
-getLastNDaysOfHistory ::
-     (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => Integer -> m [Entry]
+getLastNDaysOfHistory :: (MonadReader Settings m, MonadUnliftIO m) => Integer -> m [Entry]
 getLastNDaysOfHistory n = do
   currentTime <- liftIO getCurrentTime
   let minDateTime = addUTCTime nDaysInPast currentTime
       nDaysInPast = negate $ fromInteger (86400 * n)
-  entries <- runDb $ SQL.selectList [EntryDateTime SQL.>=. minDateTime] []
+  entries <- runDb' $ SQL.selectList [EntryDateTime SQL.>=. minDateTime] []
   pure (SQL.entityVal <$> entries)
 
 runDb ::
