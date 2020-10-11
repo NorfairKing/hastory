@@ -25,7 +25,6 @@ library:
   - bytestring
   - deepseq
   - envparse
-  - exceptions
   - extra
   - hashable
   - hashable-time

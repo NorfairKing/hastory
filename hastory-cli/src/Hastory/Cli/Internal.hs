@@ -36,25 +36,14 @@ getLastNDaysOfHistory n = do
   currentTime <- liftIO getCurrentTime
   let minDateTime = addUTCTime nDaysInPast currentTime
       nDaysInPast = negate $ fromInteger (86400 * n)
-  entries <- runDb' $ SQL.selectList [EntryDateTime SQL.>=. minDateTime] []
+  entries <- runDb $ SQL.selectList [EntryDateTime SQL.>=. minDateTime] []
   pure (SQL.entityVal <$> entries)
 
 runDb ::
-     (MonadThrow m, MonadReader Settings m, MonadUnliftIO m)
-  => ReaderT SqlBackend (NoLoggingT (ResourceT m)) a
-  -> m a
-runDb dbAction = do
-  hDb <- histDb
-  ensureDir $ parent hDb
-  SQL.runSqlite (T.pack . toFilePath $ hDb) $ do
-    SQL.runMigration migrateAll
-    dbAction
-
-runDb' ::
      (MonadReader Settings m, MonadUnliftIO m)
   => ReaderT SqlBackend (NoLoggingT (ResourceT m)) a
   -> m a
-runDb' dbAction = do
+runDb dbAction = do
   sets <- ask
   hDb <- liftIO $ runReaderT histDb sets
   ensureDir $ parent hDb

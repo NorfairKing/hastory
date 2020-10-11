@@ -25,7 +25,7 @@ gatherFrom text = do
   storeHistory entry
 
 storeHistory :: (MonadReader Settings m, MonadUnliftIO m) => Entry -> m (Entity Entry)
-storeHistory entry@Entry {..} = runDb' (upsertBy uniqueRecord entry noUpdate)
+storeHistory entry@Entry {..} = runDb (upsertBy uniqueRecord entry noUpdate)
   where
     uniqueRecord = EntryData entryText entryWorkingDir entryDateTime entryUser
     noUpdate = []
