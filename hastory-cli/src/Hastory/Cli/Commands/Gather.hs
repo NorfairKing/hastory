@@ -1,53 +1,32 @@
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 
 module Hastory.Cli.Commands.Gather where
 
 import Control.Monad.Catch
-import Control.Monad.Extra (whenJustM)
 import Control.Monad.IO.Unlift (MonadUnliftIO)
-import Control.Monad.Logger (MonadLogger)
-import Control.Monad.Logger.CallStack (logWarn, runNoLoggingT)
 import Control.Monad.Reader
-import Data.Semigroup ((<>))
 import Data.Text (Text)
-import qualified Data.Text as T
 import qualified Data.Text.IO as T
-import qualified Database.Persist.Sqlite as SQL
-import Network.HostName (getHostName)
+import Database.Persist.Sqlite (Entity, upsertBy)
 
-import Data.Hastory
-import Data.Hastory.API
-import Data.Hastory.Types (toSyncRequest)
+import Hastory.API.Gather
 import Hastory.Cli.Internal
 import Hastory.Cli.OptParse.Types
+import Hastory.Data.Client.DB
 
-gather :: (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => m ()
+gather :: (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => m (Entity Entry)
 gather = do
   text <- liftIO T.getContents
   gatherFrom text
 
-gatherFrom :: (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => Text -> m ()
+gatherFrom :: (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => Text -> m (Entity Entry)
 gatherFrom text = do
   entry <- liftIO $ gatherEntryWith text
   storeHistory entry
 
-sendEntryToStorageServer :: (MonadIO m, MonadLogger m) => Entry -> RemoteStorageClientInfo -> m ()
-sendEntryToStorageServer entry (RemoteStorageClientInfo url username password) = do
-  eHastoryClient <- mkHastoryClient url username password
-  case eHastoryClient of
-    Left err -> logWarn . T.pack . show $ err
-    Right HastoryClient {..} -> do
-      hostName <- liftIO getHostName
-      let syncReq = toSyncRequest entry hostName
-      res <-
-        liftIO $ runHastoryClient (createEntryClient hastoryClientToken syncReq) hastoryClientEnv
-      case res of
-        Left err -> logWarn $ "Saving entry to remote server has failed: " <> T.pack (show err)
-        Right _ -> pure ()
-
-storeHistory :: (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => Entry -> m ()
-storeHistory entry = do
-  _key <- runDb (SQL.insert entry)
-  whenJustM (asks remoteStorageClientInfo) $ runNoLoggingT . sendEntryToStorageServer entry
+storeHistory :: (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => Entry -> m (Entity Entry)
+storeHistory entry@Entry {..} = runDb (upsertBy uniqueRecord entry noUpdate)
+  where
+    uniqueRecord = EntryData entryText entryWorkingDir entryDateTime entryUser
+    noUpdate = []

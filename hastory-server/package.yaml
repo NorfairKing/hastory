@@ -34,7 +34,7 @@ library:
   - hashable
   - hashable-time
   - hastory-data
-  - hastory-server-data
+  - hastory-api
   - hostname
   - hspec
   - http-client
@@ -92,10 +92,10 @@ tests:
     - bytestring
     - case-insensitive
     - genvalidity-hspec
+    - hastory-api
     - hastory-data
     - hastory-data-gen
     - hastory-server
-    - hastory-server-data
     - hspec
     - http-conduit
     - http-types

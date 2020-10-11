@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 970eb2ae14a9a10dcc21aaa171ba47e80fd6ea7c19b4475993466e9c176edac2
+-- hash: ae2ab85ff3c60ae43a40fe0013438b3c6337e69d9c1f457a355d38e726f1da70
 
 name:           hastory-server
 version:        0.0.0.0
@@ -19,15 +19,15 @@ build-type:     Simple
 
 library
   exposed-modules:
-      Data.Hastory.Server
-      Data.Hastory.Server.Handler
-      Data.Hastory.Server.Handler.Entries
-      Data.Hastory.Server.Handler.Import
-      Data.Hastory.Server.Handler.Sessions
-      Data.Hastory.Server.Handler.Users
-      Data.Hastory.Server.HastoryHandler
-      Data.Hastory.Server.TestUtils
-      Data.Hastory.Server.Utils
+      Hastory.Server
+      Hastory.Server.Handler
+      Hastory.Server.Handler.Entries
+      Hastory.Server.Handler.Import
+      Hastory.Server.Handler.Sessions
+      Hastory.Server.Handler.Users
+      Hastory.Server.HastoryHandler
+      Hastory.Server.TestUtils
+      Hastory.Server.Utils
   other-modules:
       Paths_hastory_server
   hs-source-dirs:
@@ -46,8 +46,8 @@ library
     , exceptions
     , hashable
     , hashable-time
+    , hastory-api
     , hastory-data
-    , hastory-server-data
     , hostname
     , hspec
     , http-client
@@ -97,9 +97,9 @@ test-suite hastory-server-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      Data.Hastory.Handler.EntriesSpec
-      Data.Hastory.Handler.SessionsSpec
-      Data.Hastory.Handler.UsersSpec
+      Hastory.Handler.EntriesSpec
+      Hastory.Handler.SessionsSpec
+      Hastory.Handler.UsersSpec
       Paths_hastory_server
   hs-source-dirs:
       test
@@ -110,10 +110,10 @@ test-suite hastory-server-test
     , bytestring
     , case-insensitive
     , genvalidity-hspec
+    , hastory-api
     , hastory-data
     , hastory-data-gen
     , hastory-server
-    , hastory-server-data
     , hspec
     , http-conduit
     , http-types

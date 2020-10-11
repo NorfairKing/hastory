@@ -4,10 +4,6 @@
 
 module Hastory.Cli.Internal where
 
-import Data.Hastory
-import Hastory.Cli.Data (migrateAll)
-import Hastory.Cli.OptParse.Types
-
 import Control.Monad.Catch
 import Control.Monad.IO.Unlift (MonadUnliftIO)
 import Control.Monad.Logger (NoLoggingT)
@@ -19,6 +15,9 @@ import Database.Persist.Sqlite (SqlBackend)
 import qualified Database.Persist.Sqlite as SQL
 import Path (Abs, Dir, File, Path, (</>), mkRelDir, parent, parseRelFile, toFilePath)
 import Path.IO (ensureDir)
+
+import Hastory.Cli.OptParse.Types
+import Hastory.Data.Client.DB
 
 hastoryDir :: MonadReader Settings m => m (Path Abs Dir)
 hastoryDir = asks setCacheDir
@@ -47,6 +46,18 @@ runDb ::
   -> m a
 runDb dbAction = do
   hDb <- histDb
+  ensureDir $ parent hDb
+  SQL.runSqlite (T.pack . toFilePath $ hDb) $ do
+    SQL.runMigration migrateAll
+    dbAction
+
+runDb' ::
+     (MonadReader Settings m, MonadUnliftIO m)
+  => ReaderT SqlBackend (NoLoggingT (ResourceT m)) a
+  -> m a
+runDb' dbAction = do
+  sets <- ask
+  hDb <- liftIO $ runReaderT histDb sets
   ensureDir $ parent hDb
   SQL.runSqlite (T.pack . toFilePath $ hDb) $ do
     SQL.runMigration migrateAll

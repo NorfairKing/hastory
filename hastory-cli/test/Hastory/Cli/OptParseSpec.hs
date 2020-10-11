@@ -5,10 +5,9 @@ module Hastory.Cli.OptParseSpec
   ) where
 
 import qualified Data.ByteString as B
-import Data.Hastory
-import qualified Data.Text as T
 import Env
 import Hastory.Cli.OptParse
+import Hastory.Data
 import Options.Applicative
 import Servant.Client
 import TestImport hiding (Failure, Success)
@@ -98,36 +97,6 @@ describeFlags =
         let res = runArgumentsParser args
             args = ["gather", "--config-file="]
         res `shouldSatisfy` isCliParserFailure
-    context "storage-server-url is provided" $ do
-      it "contains a BaseUrl when url is valid" $ do
-        let (Success (Arguments _cmd flags)) = runArgumentsParser args
-            args = ["gather", "--storage-server-url=" <> rawUrl]
-            rawUrl = "api.example.com"
-        url <- parseBaseUrl rawUrl
-        flags `shouldBe` emptyFlags {flagStorageServer = Just url}
-      it "is an error when BaseUrl is invalid" $ do
-        let res = runArgumentsParser args
-            args = ["gather", "--storage-server-url=" <> rawUrl]
-            rawUrl = "ftps://1"
-        res `shouldSatisfy` isCliParserFailure
-    context "storage-server-username is provided" $ do
-      it "contains a Username when username is valid" $ do
-        let (Success (Arguments _cmd flags)) = runArgumentsParser args
-            args = ["gather", "--storage-server-username=" <> rawUsername]
-            rawUsername = "hastory"
-        username <- parseUsername (T.pack rawUsername)
-        flags `shouldBe` emptyFlags {flagStorageUsername = Just username}
-      it "is an error when Username is invalid" $ do
-        let res = runArgumentsParser args
-            args = ["gather", "--storage-server-username=" <> rawUsername]
-            rawUsername = "1"
-        res `shouldSatisfy` isCliParserFailure
-    context "storage-server-password is provided" $
-      it "contains a password" $ do
-        let (Success (Arguments _cmd flags)) = runArgumentsParser args
-            args = ["gather", "--storage-server-password=" <> rawPassword]
-            rawPassword = "Passw0rd"
-        flags `shouldBe` emptyFlags {flagStoragePassword = Just (T.pack rawPassword)}
     context "user provides NO flags" $
       it "is an empty Flags data type" $ do
         let (Success (Arguments _cmd flags)) = runArgumentsParser args
@@ -187,6 +156,18 @@ describeCommand =
         let (Success (Arguments cmd _flags)) = runArgumentsParser args
             args = ["suggest-alias"]
         cmd `shouldBe` CommandSuggestAlias SuggestAliasFlags
+    context "user provides the 'sync' command" $
+      it "parses to CommandSync" $ do
+        url <- parseBaseUrl "api.google.com"
+        let (Success (Arguments cmd _flags)) = runArgumentsParser args
+            args =
+              [ "sync"
+              , "--storage-server=api.google.com"
+              , "--storage-username=steven"
+              , "--storage-password=letmein"
+              ]
+            expectedSyncFlags = SyncFlags (Just url) (Just $ Username "steven") (Just "letmein")
+        cmd `shouldBe` CommandSync expectedSyncFlags
 
 envParserSpec :: Spec
 envParserSpec =
@@ -285,7 +266,7 @@ combineToInstructionsSpec =
             flags
             env
             Nothing
-        settings `shouldBe` Settings stevenAbsDir Nothing
+        settings `shouldBe` Settings stevenAbsDir
       it "falls back to Environment cache if Flags cache is missing" $ do
         let flags = emptyFlags
             env = emptyEnvironment {envCacheDir = Just chrisHomeDir}
@@ -297,7 +278,7 @@ combineToInstructionsSpec =
             flags
             env
             Nothing
-        settings `shouldBe` Settings chrisAbsDir Nothing
+        settings `shouldBe` Settings chrisAbsDir
       it "falls back to Config when Flags / Environment is missing" $ do
         let stevenHomeDir = "/home/steven"
         stevenAbsDir <- resolveDir' stevenHomeDir
@@ -307,7 +288,7 @@ combineToInstructionsSpec =
             emptyFlags
             emptyEnvironment
             (Just (emptyConfiguration {configCacheDir = Just stevenHomeDir}))
-        settings `shouldBe` Settings stevenAbsDir Nothing
+        settings `shouldBe` Settings stevenAbsDir
       it "has default when Configuration / Flags / Environment / Config cache is missing" $ do
         defaultCacheDir <- getHomeDir >>= flip resolveDir ".hastory"
         Instructions _ settings <-
@@ -316,144 +297,16 @@ combineToInstructionsSpec =
             emptyFlags
             emptyEnvironment
             Nothing
-        settings `shouldBe` Settings defaultCacheDir Nothing
-    context "remoteStorageClientInfo" $ do
-      it "prefers Flags over Environment" $ do
-        let flagUsername = Username "flagUser"
-            flagPassword = "flagPassword"
-            envUsername = Username "envUser"
-        flagBaseUrl <- parseBaseUrl "flag.example.com"
-        envBaseUrl <- parseBaseUrl "env.example.com"
-        let flags =
-              emptyFlags
-                { flagStorageServer = Just flagBaseUrl
-                , flagStorageUsername = Just flagUsername
-                , flagStoragePassword = Just flagPassword
-                }
-            env =
-              emptyEnvironment
-                { envStorageServer = Just envBaseUrl
-                , envStorageUsername = Just envUsername
-                , envStoragePassword = Just "envPassword"
-                }
-        Instructions _ settings <-
-          combineToInstructions
-            (CommandGenGatherWrapperScript GenGatherWrapperScriptFlags)
-            flags
-            env
-            Nothing
-        remoteStorageClientInfo settings `shouldBe`
-          Just (RemoteStorageClientInfo flagBaseUrl flagUsername flagPassword)
-      it "combines Flags, Environment, and Configuration correctly" $ do
-        flagBaseUrl <- parseBaseUrl "flag.example.com"
-        let envUsername = Username "envUser"
-            confPassword = "Passw0rd"
-        let flags = emptyFlags {flagStorageServer = Just flagBaseUrl}
-            env = emptyEnvironment {envStorageUsername = Just envUsername}
-            mConf = Just (emptyConfiguration {configStoragePassword = Just "Passw0rd"})
-        Instructions _ settings <-
-          combineToInstructions
-            (CommandGenGatherWrapperScript GenGatherWrapperScriptFlags)
-            flags
-            env
-            mConf
-        remoteStorageClientInfo settings `shouldBe`
-          Just (RemoteStorageClientInfo flagBaseUrl envUsername confPassword)
-      it "is nothing when Flags / Environment / Configuration do not contains full remote data" $
-        -- N.B. URL is missing
-       do
-        let flags = emptyFlags {flagStoragePassword = Just "flagPassword"}
-            env = emptyEnvironment {envStorageUsername = Just (Username "envUsername")}
-        Instructions _ settings <-
-          combineToInstructions
-            (CommandGenGatherWrapperScript GenGatherWrapperScriptFlags)
-            flags
-            env
-            Nothing
-        remoteStorageClientInfo settings `shouldBe` Nothing
-    describe "CommandGenGatherWrapperScript" $ do
-      context "Flags contains all 3 fields of a RemoteStorageClientInfo" $
-        it "is DispatchGenGatherWrapperScript with remote storage info" $ do
-          url <- parseBaseUrl "api.example.com"
-          username <- parseUsername "hastory"
-          let cmd = CommandGenGatherWrapperScript GenGatherWrapperScriptFlags
-              flags =
-                emptyFlags
-                  { flagCacheDir = Nothing
-                  , flagStorageServer = Just url
-                  , flagStorageUsername = Just username
-                  , flagStoragePassword = Just password
-                  }
-              password = "Passw0rd"
-              remoteInfo =
-                RemoteStorageClientInfo
-                  { remoteStorageClientInfoBaseUrl = url
-                  , remoteStorageClientInfoUsername = username
-                  , remoteStorageClientInfoPassword = password
-                  }
-          Instructions dispatch _settings <-
-            combineToInstructions cmd flags emptyEnvironment Nothing
-          dispatch `shouldBe`
-            DispatchGenGatherWrapperScript
-              GenGatherWrapperScriptSettings {genGatherWrapperScriptSetRemoteInfo = Just remoteInfo}
-      context "Environment contains all 3 fields of a RemoteStorageClientInfo" $
-        it "is DispatchGenGatherWrapperScript with remote storage info" $ do
-          url <- parseBaseUrl "api.example.com"
-          username <- parseUsername "hastory"
-          let cmd = CommandGenGatherWrapperScript GenGatherWrapperScriptFlags
-              env =
-                emptyEnvironment
-                  { envCacheDir = Nothing
-                  , envStorageServer = Just url
-                  , envStorageUsername = Just username
-                  , envStoragePassword = Just password
-                  }
-              password = "Passw0rd"
-              remoteInfo =
-                RemoteStorageClientInfo
-                  { remoteStorageClientInfoBaseUrl = url
-                  , remoteStorageClientInfoUsername = username
-                  , remoteStorageClientInfoPassword = password
-                  }
-          Instructions dispatch _settings <- combineToInstructions cmd emptyFlags env Nothing
-          dispatch `shouldBe`
-            DispatchGenGatherWrapperScript
-              GenGatherWrapperScriptSettings {genGatherWrapperScriptSetRemoteInfo = Just remoteInfo}
-      context "Configuration contains all 3 fields of a RemoteStorageClientInfo" $
-        it "is DispatchGenGatherWrapperScript with remote storage info" $ do
-          url <- parseBaseUrl "api.example.com"
-          username <- parseUsername "hastory"
-          let cmd = CommandGenGatherWrapperScript GenGatherWrapperScriptFlags
-              mConf =
-                Just
-                  (emptyConfiguration
-                     { configCacheDir = Nothing
-                     , configStorageServer = Just url
-                     , configStorageUsername = Just username
-                     , configStoragePassword = Just password
-                     })
-              password = "Passw0rd"
-              remoteInfo =
-                RemoteStorageClientInfo
-                  { remoteStorageClientInfoBaseUrl = url
-                  , remoteStorageClientInfoUsername = username
-                  , remoteStorageClientInfoPassword = password
-                  }
-          Instructions dispatch _settings <-
-            combineToInstructions cmd emptyFlags emptyEnvironment mConf
-          dispatch `shouldBe`
-            DispatchGenGatherWrapperScript
-              GenGatherWrapperScriptSettings {genGatherWrapperScriptSetRemoteInfo = Just remoteInfo}
+        settings `shouldBe` Settings defaultCacheDir
+    describe "CommandGenGatherWrapperScript" $
+      it "is DispatchGenGatherWrapperScript with GenGatherWrapperScriptSettings" $ do
+        let cmd = CommandGenGatherWrapperScript GenGatherWrapperScriptFlags
+        Instructions dispatch _settings <-
+          combineToInstructions cmd emptyFlags emptyEnvironment Nothing
+        dispatch `shouldBe` DispatchGenGatherWrapperScript GenGatherWrapperScriptSettings
 
 emptyFlags :: Flags
-emptyFlags =
-  Flags
-    { flagCacheDir = Nothing
-    , flagConfigFile = Nothing
-    , flagStorageServer = Nothing
-    , flagStorageUsername = Nothing
-    , flagStoragePassword = Nothing
-    }
+emptyFlags = Flags {flagCacheDir = Nothing, flagConfigFile = Nothing}
 
 emptyConfiguration :: Configuration
 emptyConfiguration =

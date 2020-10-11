@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: cf288614c2e34b64609b603e4e661d9e00128da5402b24c677897d899362fc8b
+-- hash: beb32647e11acd9206165e2dd22e959a373ab360019d339da9bf40d763ae4f4b
 
 name:           hastory-data
 version:        0.0.0.0
@@ -12,66 +12,50 @@ category:       Command Line
 homepage:       https://github.com/NorfairKing/hastory
 author:         Tom Sydney Kerckhove
 maintainer:     syd.kerckhove@gmail.com
-copyright:      Copyright: (c) 2016-2018 Tom Sydney Kerckhove
+copyright:      2020 Tom Sydney Kerckhove
 license:        AllRightsReserved
 license-file:   LICENSE
 build-type:     Simple
 
 library
   exposed-modules:
-      Data.Hastory
-      Data.Hastory.Gather
-      Data.Hastory.Types
-      Data.Hastory.Utils
-      Data.Hastory.API
+      Hastory.Data
+      Hastory.Data.AuthCookie
+      Hastory.Data.Client.DB
+      Hastory.Data.Digest
+      Hastory.Data.Password
+      Hastory.Data.PasswordDifficulty
+      Hastory.Data.Path
+      Hastory.Data.Server.DB
+      Hastory.Data.SyncRequest
+      Hastory.Data.UserForm
+      Hastory.Data.Username
   other-modules:
-      Data.Hastory.Types.AuthCookie
-      Data.Hastory.Types.SyncRequest
       Paths_hastory_data
   hs-source-dirs:
       src/
-  ghc-options: -Wall -Wincomplete-uni-patterns -Wincomplete-record-updates -Wredundant-constraints
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -fhide-source-paths
   build-depends:
       aeson
     , base >=4.9 && <=5
-    , conduit
-    , cookie
+    , base64
+    , bytestring
+    , cryptonite
     , deepseq
-    , exceptions
-    , genvalidity
     , genvalidity-path
     , genvalidity-text
     , genvalidity-time
-    , hashable
-    , hashable-time
-    , hastory-cli-data
-    , hastory-path
-    , hastory-server-data
     , hostname
-    , hspec
-    , http-client
-    , lifted-base
-    , monad-control
-    , monad-logger
-    , mtl
+    , memory
+    , password
+    , password-instances
     , path
-    , path-io
     , persistent
     , persistent-sqlite
     , persistent-template
-    , safe
-    , servant
-    , servant-auth-client
     , servant-auth-server
-    , servant-client
-    , servant-client-core
-    , servant-server
     , text
     , time
-    , unix
-    , unordered-containers
     , validity
-    , validity-path
     , validity-text
-    , validity-time
   default-language: Haskell2010

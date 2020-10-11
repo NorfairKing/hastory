@@ -1,11 +1,9 @@
 resolver: lts-14.23
 packages:
+- hastory-api
 - hastory-cli
 - hastory-data
-- hastory-cli-data
 - hastory-data-gen
-- hastory-server-data
-- hastory-path
 - hastory-server
 extra-deps:
 - base64-0.4.2

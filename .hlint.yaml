@@ -1,0 +1,6 @@
+# HLint configuration file
+# https://github.com/ndmitchell/hlint
+# https://github.com/ndmitchell/hlint/blob/master/data/default.yaml
+##########################
+
+- ignore: {name: "Reduce duplication"}

@@ -10,6 +10,7 @@ import Hastory.Cli.Commands.GenChangeWrapper (genChangeWrapperScript)
 import Hastory.Cli.Commands.GenGatherWrapper (genGatherWrapperScript)
 import Hastory.Cli.Commands.ListDir (listRecentDirs)
 import Hastory.Cli.Commands.SuggestAlias (suggest)
+import Hastory.Cli.Commands.Sync (sync)
 import Hastory.Cli.OptParse
 
 import Control.Monad.Catch
@@ -22,9 +23,10 @@ hastoryCli = do
   runReaderT (dispatch d) sets
 
 dispatch :: (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => Dispatch -> m ()
-dispatch (DispatchGather _) = gather
-dispatch (DispatchGenGatherWrapperScript mRemoteInfo) = liftIO (genGatherWrapperScript mRemoteInfo)
+dispatch (DispatchGather _) = void gather
+dispatch (DispatchGenGatherWrapperScript _) = liftIO genGatherWrapperScript
 dispatch (DispatchChangeDir changeDirSettings) = change changeDirSettings
 dispatch (DispatchListRecentDirs lrds) = listRecentDirs lrds
 dispatch (DispatchGenChangeWrapperScript _) = liftIO genChangeWrapperScript
 dispatch (DispatchSuggestAlias _) = suggest
+dispatch (DispatchSync syncSettings) = sync syncSettings

@@ -15,11 +15,9 @@ dependencies:
 library:
   source-dirs: src/
   ghc-options: -Wall
-  exposed-modules:
-  - Data.Hastory.Gen
   dependencies:
-  - QuickCheck
   - base >=4.9 && <=5
+  - QuickCheck
   - genvalidity
   - genvalidity-hspec
   - genvalidity-hspec-aeson
@@ -27,10 +25,11 @@ library:
   - genvalidity-text
   - genvalidity-time
   - hspec
+  - persistent
+  - text
   - validity
   - validity-path
   - validity-text
-  - text
 
 tests:
   hastory-data-test:
@@ -70,10 +69,12 @@ benchmarks:
     - -with-rtsopts=-T
     - -Wall
     dependencies:
+    - QuickCheck
     - base
-    - hastory-data-gen
+    - criterion
     - exceptions
     - genvalidity
-    - criterion
-    - QuickCheck
+    - hastory-api
+    - hastory-data
+    - hastory-data-gen
     - mtl

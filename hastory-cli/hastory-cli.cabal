@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 77889adaa944082352239b5cc75b9e72d11a146925e3e639446eb26c1df5f595
+-- hash: bede62d307395020377b075a34022cb8d282faf1733be9c179fdd5e48a52eda1
 
 name:           hastory-cli
 version:        0.0.0.0
@@ -27,6 +27,7 @@ library
       Hastory.Cli.Commands.ListDir
       Hastory.Cli.Commands.Recent
       Hastory.Cli.Commands.SuggestAlias
+      Hastory.Cli.Commands.Sync
       Hastory.Cli.Internal
       Hastory.Cli.OptParse
       Hastory.Cli.OptParse.Types
@@ -47,7 +48,7 @@ library
     , extra
     , hashable
     , hashable-time
-    , hastory-cli-data
+    , hastory-api
     , hastory-data
     , hostname
     , monad-logger
@@ -81,8 +82,9 @@ executable hastory
   ghc-options: -optP-Wno-nonportable-include-path -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.9 && <=5
+    , hastory-api
     , hastory-cli
-    , hastory-cli-data
+    , hastory-data
   default-language: Haskell2010
 
 test-suite hastory-cli-test
@@ -91,6 +93,7 @@ test-suite hastory-cli-test
   other-modules:
       Hastory.Cli.Commands.GenGatherWrapperSpec
       Hastory.Cli.Commands.SuggestionSpec
+      Hastory.Cli.Commands.SyncSpec
       Hastory.Cli.OptParse.TypesSpec
       Hastory.Cli.OptParseSpec
       TestImport
@@ -110,11 +113,13 @@ test-suite hastory-cli-test
     , genvalidity-path
     , genvalidity-text
     , genvalidity-time
+    , hastory-api
     , hastory-cli
-    , hastory-cli-data
     , hastory-data
     , hastory-data-gen
+    , hastory-server
     , hspec
+    , mtl
     , optparse-applicative
     , path
     , path-io
@@ -143,8 +148,8 @@ benchmark hastory-cli-bench
     , criterion
     , exceptions
     , genvalidity
+    , hastory-api
     , hastory-cli
-    , hastory-cli-data
     , hastory-data
     , hastory-data-gen
     , mtl

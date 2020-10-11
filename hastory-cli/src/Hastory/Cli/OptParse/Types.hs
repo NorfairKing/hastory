@@ -3,8 +3,8 @@
 module Hastory.Cli.OptParse.Types where
 
 import Data.Aeson
-import Data.Hastory.Types
 import Data.Text (Text)
+import Hastory.Data
 import Path (Abs, Dir, Path)
 import Servant.Client.Core.Reexport (BaseUrl, parseBaseUrl)
 import YamlParse.Applicative
@@ -24,6 +24,15 @@ data Command
   | CommandChangeDir ChangeDirFlags
   | CommandGenChangeWrapperScript GenChangeWrapperScriptFlags
   | CommandSuggestAlias SuggestAliasFlags
+  | CommandSync SyncFlags
+  deriving (Show, Eq)
+
+data SyncFlags =
+  SyncFlags
+    { syncFlagsStorageServer :: Maybe BaseUrl
+    , syncFlagsUsername :: Maybe Username
+    , syncFlagsPassword :: Maybe Text
+    }
   deriving (Show, Eq)
 
 data GatherFlags =
@@ -58,9 +67,6 @@ data Flags =
   Flags
     { flagCacheDir :: Maybe FilePath
     , flagConfigFile :: Maybe FilePath
-    , flagStorageServer :: Maybe BaseUrl
-    , flagStorageUsername :: Maybe Username
-    , flagStoragePassword :: Maybe Text
     }
   deriving (Show, Eq)
 
@@ -114,16 +120,15 @@ data Dispatch
   | DispatchChangeDir ChangeDirSettings
   | DispatchGenChangeWrapperScript GenChangeWrapperScriptSettings
   | DispatchSuggestAlias SuggestAliasSettings
+  | DispatchSync SyncSettings
   deriving (Show, Eq)
 
 data GatherSettings =
   GatherSettings
   deriving (Show, Eq)
 
-newtype GenGatherWrapperScriptSettings =
+data GenGatherWrapperScriptSettings =
   GenGatherWrapperScriptSettings
-    { genGatherWrapperScriptSetRemoteInfo :: Maybe RemoteStorageClientInfo
-    }
   deriving (Show, Eq)
 
 newtype ListRecentDirSettings =
@@ -146,17 +151,22 @@ data SuggestAliasSettings =
   SuggestAliasSettings
   deriving (Show, Eq)
 
-data Settings =
-  Settings
-    { setCacheDir :: Path Abs Dir
-    , remoteStorageClientInfo :: Maybe RemoteStorageClientInfo
+newtype SyncSettings =
+  SyncSettings
+    { syncSettingsRemoteStorage :: RemoteStorage
     }
   deriving (Show, Eq)
 
-data RemoteStorageClientInfo =
-  RemoteStorageClientInfo
-    { remoteStorageClientInfoBaseUrl :: BaseUrl
-    , remoteStorageClientInfoUsername :: Username
-    , remoteStorageClientInfoPassword :: Text
+newtype Settings =
+  Settings
+    { setCacheDir :: Path Abs Dir
+    }
+  deriving (Show, Eq)
+
+data RemoteStorage =
+  RemoteStorage
+    { remoteStorageBaseUrl :: BaseUrl
+    , remoteStorageUsername :: Username
+    , remoteStoragePassword :: Text
     }
   deriving (Show, Eq)
