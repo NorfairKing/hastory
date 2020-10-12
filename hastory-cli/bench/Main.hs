@@ -1,6 +1,5 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell #-}
 
 module Main where
 
@@ -25,7 +24,6 @@ import Hastory.Gen ()
 
 import Hastory.Cli
 import Hastory.Cli.Commands.Gather
-import Hastory.Cli.Internal
 import Hastory.Cli.OptParse
 
 main :: IO ()
@@ -45,27 +43,43 @@ main =
         , bgroup "list-recent-directories" $ map listRecentDirsBenchmark [10, 1000, 100000]
         ]
 
-benchSets :: Settings
-benchSets = Settings {setCacheDir = $(mkAbsDir "/tmp/hastory-cache")}
+runHastory :: [String] -> IO ()
+runHastory args = silence $ withArgs args hastoryCli
 
 gatherBenchmark :: Int -> Benchmark
-gatherBenchmark i =
-  env
-    (runReaderT (prepareEntries i) benchSets)
-    (\ ~() -> bench ("gather-" ++ show i) $ whnfIO $ runReaderT (gatherFrom "ls -lr") benchSets)
+gatherBenchmark entryCount =
+  envWithCleanup
+    (createEnv entryCount)
+    cleanupEnv
+    (bench ("gather-" ++ show entryCount) . whnfIO . runReaderT (gatherFrom "ls -lr"))
 
 listRecentDirsBenchmark :: Int -> Benchmark
-listRecentDirsBenchmark i =
-  env
-    (runReaderT (prepareEntries i) benchSets)
-    (\ ~() ->
-       bench ("list-recent-directories-" ++ show i) $
+listRecentDirsBenchmark entryCount =
+  envWithCleanup
+    (createEnv entryCount)
+    cleanupEnv
+    (\_settings ->
+       bench ("list-recent-directories-" ++ show entryCount) $
        whnfIO $
        runHastory ["list-recent-directories", "--bypass-cache", "--cache-dir", "/tmp/hastory-cache"])
 
+createEnv :: Int -> IO Settings
+createEnv entryCount = do
+  settings <- prepareSettings
+  _ <- runReaderT (prepareEntries entryCount) settings
+  pure settings
+
+cleanupEnv :: Settings -> IO ()
+cleanupEnv = removeDirRecur . setCacheDir
+
+prepareSettings :: IO Settings
+prepareSettings = do
+  systemTempDir <- getTempDir
+  hastoryTempDir <- createTempDir systemTempDir "hastory"
+  pure $ Settings hastoryTempDir
+
 prepareEntries :: (MonadUnliftIO m, MonadReader Settings m) => Int -> m ()
 prepareEntries i = do
-  clearCacheDir
   absDirs <- liftIO getSomeAbsDirs
   replicateM_ i $ do
     entry <-
@@ -102,11 +116,3 @@ getSomeAbsDirs = do
          modify (+ length ds)
          pure ds)
       home
-
-clearCacheDir :: (MonadIO m, MonadReader Settings m) => m ()
-clearCacheDir = do
-  cacheDir <- hastoryDir
-  liftIO $ ignoringAbsence $ removeDirRecur cacheDir
-
-runHastory :: [String] -> IO ()
-runHastory args = silence $ withArgs args hastoryCli

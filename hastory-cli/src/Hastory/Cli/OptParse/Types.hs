@@ -1,9 +1,12 @@
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Hastory.Cli.OptParse.Types where
 
+import Control.DeepSeq
 import Data.Aeson
 import Data.Text (Text)
+import GHC.Generics
 import Hastory.Data
 import Path (Abs, Dir, Path)
 import Servant.Client.Core.Reexport (BaseUrl, parseBaseUrl)
@@ -161,7 +164,9 @@ newtype Settings =
   Settings
     { setCacheDir :: Path Abs Dir
     }
-  deriving (Show, Eq)
+  deriving (Show, Eq, Generic)
+
+instance NFData Settings
 
 data RemoteStorage =
   RemoteStorage
