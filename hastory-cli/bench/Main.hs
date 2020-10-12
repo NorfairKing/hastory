@@ -63,7 +63,7 @@ listRecentDirsBenchmark i =
        whnfIO $
        runHastory ["list-recent-directories", "--bypass-cache", "--cache-dir", "/tmp/hastory-cache"])
 
-prepareEntries :: (MonadIO m, MonadThrow m, MonadUnliftIO m, MonadReader Settings m) => Int -> m ()
+prepareEntries :: (MonadUnliftIO m, MonadReader Settings m) => Int -> m ()
 prepareEntries i = do
   clearCacheDir
   absDirs <- liftIO getSomeAbsDirs
@@ -86,7 +86,7 @@ prepareEntries i = do
             }
     storeHistory entry
 
-getSomeAbsDirs :: (MonadIO m, MonadThrow m) => m [Path Abs Dir]
+getSomeAbsDirs :: MonadIO m => m [Path Abs Dir]
 getSomeAbsDirs = do
   home <- getHomeDir
   flip evalStateT 0 $

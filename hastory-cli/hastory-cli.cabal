@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: bede62d307395020377b075a34022cb8d282faf1733be9c179fdd5e48a52eda1
+-- hash: 5c91ae32197ab84f128c716ce4a0cfcd83d181475b5afadff6da8d9fdd7256cb
 
 name:           hastory-cli
 version:        0.0.0.0
@@ -44,7 +44,6 @@ library
     , bytestring
     , deepseq
     , envparse
-    , exceptions
     , extra
     , hashable
     , hashable-time

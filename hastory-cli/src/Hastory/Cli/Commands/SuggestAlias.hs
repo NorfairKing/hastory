@@ -3,7 +3,6 @@
 module Hastory.Cli.Commands.SuggestAlias where
 
 import Control.Arrow ((***))
-import Control.Monad.Catch
 import Control.Monad.IO.Unlift (MonadUnliftIO)
 import Control.Monad.Reader
 import Data.Hashable (Hashable)
@@ -20,7 +19,7 @@ import Hastory.Cli.OptParse.Types
 import Hastory.Cli.Utils (doCountsWith)
 import Hastory.Data.Client.DB
 
-suggest :: (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => m ()
+suggest :: (MonadReader Settings m, MonadUnliftIO m) => m ()
 suggest = do
   rawEnts <- getLastNDaysOfHistory 7
   let tups = take 10 $ suggestions rawEnts

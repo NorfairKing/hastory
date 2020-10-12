@@ -8,7 +8,6 @@ module Hastory.Cli.Commands.Recent
   ( getRecentDirOpts
   ) where
 
-import Control.Monad.Catch
 import Control.Monad.IO.Unlift (MonadUnliftIO)
 import Control.Monad.Reader
 import Data.Aeson as JSON
@@ -30,7 +29,7 @@ import Hastory.Cli.OptParse.Types
 import Hastory.Cli.Utils (doCountsWith)
 import Hastory.Data.Client.DB
 
-getRecentDirOpts :: (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => Bool -> m [FilePath]
+getRecentDirOpts :: (MonadReader Settings m, MonadUnliftIO m) => Bool -> m [FilePath]
 getRecentDirOpts bypassCache =
   if bypassCache
     then recompute
@@ -59,7 +58,7 @@ getRecentDirOpts bypassCache =
 cacheInvalidationDuration :: NominalDiffTime
 cacheInvalidationDuration = 10 -- seconds
 
-computeRecentDirOpts :: (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => m [FilePath]
+computeRecentDirOpts :: (MonadReader Settings m, MonadUnliftIO m) => m [FilePath]
 computeRecentDirOpts = do
   rawEnts <- getLastNDaysOfHistory 7
   home <- liftIO getHomeDir

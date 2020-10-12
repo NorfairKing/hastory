@@ -13,7 +13,6 @@ import Hastory.Cli.Commands.SuggestAlias (suggest)
 import Hastory.Cli.Commands.Sync (sync)
 import Hastory.Cli.OptParse
 
-import Control.Monad.Catch
 import Control.Monad.IO.Unlift (MonadUnliftIO)
 import Control.Monad.Reader
 
@@ -22,7 +21,7 @@ hastoryCli = do
   Instructions d sets <- getInstructions
   runReaderT (dispatch d) sets
 
-dispatch :: (MonadReader Settings m, MonadThrow m, MonadUnliftIO m) => Dispatch -> m ()
+dispatch :: (MonadReader Settings m, MonadUnliftIO m) => Dispatch -> m ()
 dispatch (DispatchGather _) = void gather
 dispatch (DispatchGenGatherWrapperScript _) = liftIO genGatherWrapperScript
 dispatch (DispatchChangeDir changeDirSettings) = change changeDirSettings
