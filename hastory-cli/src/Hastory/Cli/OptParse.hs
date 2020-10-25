@@ -1,3 +1,4 @@
+{-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
 
@@ -20,7 +21,14 @@ import qualified Env
 import Options.Applicative
 import qualified Options.Applicative.Help.Pretty as OptParseHelp
 import Path
-import Path.IO (getAppUserDataDir, getHomeDir, resolveDir, resolveDir', resolveFile, resolveFile')
+import Path.IO
+  ( XdgDirectory(..)
+  , getAppUserDataDir
+  , getXdgDir
+  , resolveDir'
+  , resolveFile
+  , resolveFile'
+  )
 import Servant.Client.Core.Reexport (parseBaseUrl)
 import System.Environment (getArgs)
 import System.Exit (die)
@@ -73,10 +81,9 @@ combineToInstructions cmd Flags {..} Environment {..} mConf =
           Just pw -> pure pw
       pure RemoteStorage {..}
     getSettings = do
-      home <- getHomeDir
       cacheDir <-
         case flagCacheDir <|> envCacheDir <|> mc configCacheDir of
-          Nothing -> resolveDir home ".hastory"
+          Nothing -> getXdgDir XdgCache (Just [reldir|hastory|])
           Just cd -> resolveDir' cd
       pure Settings {setCacheDir = cacheDir}
     mc :: (Configuration -> Maybe a) -> Maybe a
