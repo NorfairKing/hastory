@@ -70,6 +70,7 @@ data Flags =
   Flags
     { flagCacheDir :: Maybe FilePath
     , flagConfigFile :: Maybe FilePath
+    , flagDataDir :: Maybe FilePath
     }
   deriving (Show, Eq)
 
@@ -81,6 +82,7 @@ data Environment =
     , envStorageUsername :: Maybe Username
     , envStoragePassword :: Maybe Text
     , envLrdBypassCache :: Maybe Bool
+    , envDataDir :: Maybe FilePath
     }
   deriving (Show, Eq)
 
@@ -91,6 +93,7 @@ data Configuration =
     , configStorageUsername :: Maybe Username
     , configStoragePassword :: Maybe Text
     , configLrdBypassCache :: Maybe Bool
+    , configDataDir :: Maybe FilePath
     }
   deriving (Show, Eq)
 
@@ -111,7 +114,8 @@ instance YamlSchema Configuration where
         optionalField "password" "Password for the central storage server" <*>
         optionalField
           "bypass-cache"
-          "Whether to recompute the recent directory options or use a cache when available"
+          "Whether to recompute the recent directory options or use a cache when available" <*>
+        optionalField "data-dir" "the data directory for hastory"
 
 instance FromJSON Configuration where
   parseJSON = viaYamlSchema
@@ -160,9 +164,10 @@ newtype SyncSettings =
     }
   deriving (Show, Eq)
 
-newtype Settings =
+data Settings =
   Settings
     { setCacheDir :: Path Abs Dir
+    , setDataDir :: Path Abs Dir
     }
   deriving (Show, Eq, Generic)
 

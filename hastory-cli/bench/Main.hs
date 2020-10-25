@@ -76,7 +76,7 @@ prepareSettings :: IO Settings
 prepareSettings = do
   systemTempDir <- getTempDir
   hastoryTempDir <- createTempDir systemTempDir "hastory"
-  pure $ Settings hastoryTempDir
+  pure $ Settings hastoryTempDir hastoryTempDir
 
 prepareEntries :: (MonadUnliftIO m, MonadReader Settings m) => Int -> m ()
 prepareEntries i = do

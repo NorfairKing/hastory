@@ -85,7 +85,11 @@ combineToInstructions cmd Flags {..} Environment {..} mConf =
         case flagCacheDir <|> envCacheDir <|> mc configCacheDir of
           Nothing -> getXdgDir XdgCache (Just [reldir|hastory|])
           Just cd -> resolveDir' cd
-      pure Settings {setCacheDir = cacheDir}
+      dataDir <-
+        case flagDataDir <|> envDataDir <|> mc configDataDir of
+          Nothing -> getXdgDir XdgData (Just [reldir|hastory|])
+          Just cd -> resolveDir' cd
+      pure Settings {setCacheDir = cacheDir, setDataDir = dataDir}
     mc :: (Configuration -> Maybe a) -> Maybe a
     mc func = mConf >>= func
 
@@ -132,7 +136,11 @@ envParser =
      Env.var
        (fmap Just . Env.auto)
        "BYPASS_CACHE"
-       (Env.help "Always recompute the recent directory options" <> Env.def Nothing))
+       (Env.help "Always recompute the recent directory options" <> Env.def Nothing) <*>
+     Env.var
+       (pure . Just <=< Env.nonempty)
+       "DATA_DIR"
+       (Env.help "the data directory for hastory" <> Env.def Nothing))
   where
     baseUrlParser unparsedUrl =
       maybe (Left $ Env.UnreadError unparsedUrl) (Right . Just) (parseBaseUrl unparsedUrl)
@@ -261,7 +269,11 @@ parseFlags =
   optional
     (option
        nonEmptyString
-       (mconcat [long "config-file", metavar "FILEPATH", help "path to a config file"]))
+       (mconcat [long "config-file", metavar "FILEPATH", help "path to a config file"])) <*>
+  optional
+    (option
+       nonEmptyString
+       (mconcat [long "data-dir", metavar "FILEPATH", help "the data directory for hastory"]))
   where
     nonEmptyString =
       maybeReader $ \s ->

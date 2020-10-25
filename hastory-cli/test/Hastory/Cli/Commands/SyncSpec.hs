@@ -32,7 +32,7 @@ spec =
               password = userFormPassword userForm
           withNewUser siClientEnv userForm $ \_registrationData ->
             withSystemTempDir "local-hastory" $ \tmpDir -> do
-              let settings = Settings tmpDir
+              let settings = Settings tmpDir tmpDir
                   localEntries = nub (map nullifySyncWitness entries)
               _ <- createUnsyncdEntries localEntries settings
               runReaderT (sync $ SyncSettings remoteInfo) settings
@@ -49,7 +49,7 @@ spec =
               let entries = map nullifySyncWitness [entryOne, entryTwo]
                   serverEntries = map (toServerEntry userId "localhost") entries
               _ <- runSqlPool (insertMany serverEntries) siPool
-              let settings = Settings tmpDir
+              let settings = Settings tmpDir tmpDir
               _ <- runReaderT (sync $ SyncSettings remoteStorage) settings
               localEntities <- runReaderT (runDb $ selectList [] [Desc EntrySyncWitness]) settings
               serverEntities <- runSqlPool (selectList [] [Desc ServerEntryId]) siPool
@@ -64,7 +64,7 @@ spec =
               password = userFormPassword userForm
           withNewUser siClientEnv userForm $ \(_userId, _token) ->
             withSystemTempDir "local-hastory" $ \tmpDir -> do
-              let set = Settings tmpDir
+              let set = Settings tmpDir tmpDir
                   entries = map nullifySyncWitness [entry]
               _ <- createUnsyncdEntries entries set
               _ <- runReaderT (sync $ SyncSettings remote) set
@@ -78,7 +78,7 @@ spec =
               password = userFormPassword userForm
           withNewUser siClientEnv userForm $ \(_userId, _token) ->
             withSystemTempDir "local-hastory" $ \tmpDir -> do
-              let set = Settings tmpDir
+              let set = Settings tmpDir tmpDir
                   entries = map (nullifyHostName . nullifySyncWitness) [entry]
               _ <- createUnsyncdEntries entries set
               _ <- runReaderT (sync $ SyncSettings remote) set
