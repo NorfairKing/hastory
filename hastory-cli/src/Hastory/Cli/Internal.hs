@@ -41,6 +41,8 @@ getLastNDaysOfHistory n = do
   entries <- runDb $ SQL.selectList [EntryDateTime SQL.>=. minDateTime] []
   pure (SQL.entityVal <$> entries)
 
+-- |The 'runDb' function should used, at most, once per command invocation.
+-- Please refer hastory <https://github.com/NorfairKing/hastory/issues/35 issue>.
 runDb ::
      (MonadReader Settings m, MonadUnliftIO m)
   => ReaderT SqlBackend (NoLoggingT (ResourceT m)) a
