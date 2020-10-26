@@ -44,15 +44,28 @@ spec =
         let Success config = fromJSON value
         configCacheDir config `shouldBe` Just "~/home"
       it "is an error when cache-dir key is provided but value is invalid" $ do
+        value <- Data.Yaml.decodeThrow "cache-dir: {}"
+        (fromJSON value :: Result Configuration) `shouldSatisfy` isConfigParserError
+      it "is an error when cache-dir key is provided but value is empty" $ do
         value <- Data.Yaml.decodeThrow "cache-dir: "
         let Success config = fromJSON value
         configCacheDir config `shouldBe` Nothing
-      it "is an error when cache-dir key is provided but value is invalid" $ do
-        value <- Data.Yaml.decodeThrow "cache-dir: {}"
+    context "data-dir" $ do
+      it "parses correctly when data-dir key is not provided" $ do
+        value <- Data.Yaml.decodeThrow "url: api.example.com"
+        let Success config = fromJSON value
+        configDataDir config `shouldBe` Nothing
+      it "parses correctly when data-dir key is provided and value is valid" $ do
+        value <- Data.Yaml.decodeThrow "data-dir: ~/home"
+        let Success config = fromJSON value
+        configDataDir config `shouldBe` Just "~/home"
+      it "is an error when data-dir key is provided but value is invalid" $ do
+        value <- Data.Yaml.decodeThrow "data-dir: {}"
         (fromJSON value :: Result Configuration) `shouldSatisfy` isConfigParserError
-      it "is an error when cache-dir key is provided but value is invalid" $ do
-        value <- Data.Yaml.decodeThrow "cache-dir: []"
-        (fromJSON value :: Result Configuration) `shouldSatisfy` isConfigParserError
+      it "is an error when data-dir key is provided but value is empty" $ do
+        value <- Data.Yaml.decodeThrow "data-dir: "
+        let Success config = fromJSON value
+        configDataDir config `shouldBe` Nothing
     context "url" $ do
       it "parses correctly when url key is not provided" $ do
         value <- Data.Yaml.decodeThrow "password: Passw0rd"
@@ -117,4 +130,5 @@ emptyConfiguration =
     , configStorageUsername = Nothing
     , configStoragePassword = Nothing
     , configLrdBypassCache = Nothing
+    , configDataDir = Nothing
     }

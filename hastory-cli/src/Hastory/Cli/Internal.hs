@@ -20,7 +20,7 @@ import Hastory.Cli.OptParse.Types
 import Hastory.Data.Client.DB
 
 hastoryDir :: MonadReader Settings m => m (Path Abs Dir)
-hastoryDir = asks setCacheDir
+hastoryDir = asks setDataDir
 
 histDir :: MonadReader Settings m => m (Path Abs Dir)
 histDir = fmap (</> $(mkRelDir "command-history")) hastoryDir

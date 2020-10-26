@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes #-}
 
 module Hastory.Cli.OptParseSpec
   ( spec
@@ -86,6 +87,16 @@ describeFlags =
       it "is an error when FilePath is empty" $ do
         let res = runArgumentsParser args
             args = ["gather", "--cache-dir="]
+        res `shouldSatisfy` isCliParserFailure
+    context "data-dir is provided" $ do
+      it "contains a FilePath when FilePath is provided" $ do
+        let (Success (Arguments _cmd flags)) = runArgumentsParser args
+            args = ["gather", "--data-dir=" <> filePath]
+            filePath = "~/hastory"
+        flags `shouldBe` emptyFlags {flagDataDir = Just filePath}
+      it "is an error when FilePath is empty" $ do
+        let res = runArgumentsParser args
+            args = ["gather", "--data-dir="]
         res `shouldSatisfy` isCliParserFailure
     context "config-file is provided" $ do
       it "contains a Filepath when FilePath is provided" $ do
@@ -210,6 +221,13 @@ envParserSpec =
         it "is an error when CACHE_DIR is invalid" $ do
           let res = Env.parsePure envParser [("HASTORY_CACHE_DIR", "")]
           res `shouldSatisfy` isEnvParserFailure
+      context "DATA_DIR is set in environment" $ do
+        it "parses correctly when DATA_DIR is valid" $ do
+          let res = Env.parsePure envParser [("HASTORY_DATA_DIR", "~/home")]
+          res `shouldBe` Right emptyEnvironment {envDataDir = Just "~/home"}
+        it "is an error when DATA_DIR is invalid" $ do
+          let res = Env.parsePure envParser [("HASTORY_DATA_DIR", "")]
+          res `shouldSatisfy` isEnvParserFailure
       context "CONFIG_FILE is set in environment" $ do
         it "parses correctly when CONFIG_FILE is valid" $ do
           let res = Env.parsePure envParser [("HASTORY_CONFIG_FILE", "~/home")]
@@ -266,7 +284,7 @@ combineToInstructionsSpec =
             flags
             env
             Nothing
-        settings `shouldBe` Settings stevenAbsDir
+        setCacheDir settings `shouldBe` stevenAbsDir
       it "falls back to Environment cache if Flags cache is missing" $ do
         let flags = emptyFlags
             env = emptyEnvironment {envCacheDir = Just chrisHomeDir}
@@ -278,7 +296,7 @@ combineToInstructionsSpec =
             flags
             env
             Nothing
-        settings `shouldBe` Settings chrisAbsDir
+        setCacheDir settings `shouldBe` chrisAbsDir
       it "falls back to Config when Flags / Environment is missing" $ do
         let stevenHomeDir = "/home/steven"
         stevenAbsDir <- resolveDir' stevenHomeDir
@@ -288,16 +306,17 @@ combineToInstructionsSpec =
             emptyFlags
             emptyEnvironment
             (Just (emptyConfiguration {configCacheDir = Just stevenHomeDir}))
-        settings `shouldBe` Settings stevenAbsDir
+        setCacheDir settings `shouldBe` stevenAbsDir
       it "has default when Configuration / Flags / Environment / Config cache is missing" $ do
-        defaultCacheDir <- getHomeDir >>= flip resolveDir ".hastory"
+        defaultCacheDir <- getXdgDir XdgCache (Just [reldir|hastory|])
+        defaultDataDir <- getXdgDir XdgData (Just [reldir|hastory|])
         Instructions _ settings <-
           combineToInstructions
             (CommandGenGatherWrapperScript GenGatherWrapperScriptFlags)
             emptyFlags
             emptyEnvironment
             Nothing
-        settings `shouldBe` Settings defaultCacheDir
+        settings `shouldBe` Settings defaultCacheDir defaultDataDir
     describe "CommandGenGatherWrapperScript" $
       it "is DispatchGenGatherWrapperScript with GenGatherWrapperScriptSettings" $ do
         let cmd = CommandGenGatherWrapperScript GenGatherWrapperScriptFlags
@@ -306,7 +325,7 @@ combineToInstructionsSpec =
         dispatch `shouldBe` DispatchGenGatherWrapperScript GenGatherWrapperScriptSettings
 
 emptyFlags :: Flags
-emptyFlags = Flags {flagCacheDir = Nothing, flagConfigFile = Nothing}
+emptyFlags = Flags {flagCacheDir = Nothing, flagConfigFile = Nothing, flagDataDir = Nothing}
 
 emptyConfiguration :: Configuration
 emptyConfiguration =
@@ -316,6 +335,7 @@ emptyConfiguration =
     , configStorageUsername = Nothing
     , configStoragePassword = Nothing
     , configLrdBypassCache = Nothing
+    , configDataDir = Nothing
     }
 
 emptyEnvironment :: Environment
@@ -327,6 +347,7 @@ emptyEnvironment =
     , envStorageUsername = Nothing
     , envStoragePassword = Nothing
     , envLrdBypassCache = Nothing
+    , envDataDir = Nothing
     }
 
 isCliParserFailure :: ParserResult a -> Bool
