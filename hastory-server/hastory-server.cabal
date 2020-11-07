@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: ae2ab85ff3c60ae43a40fe0013438b3c6337e69d9c1f457a355d38e726f1da70
+-- hash: 10feaef022152d8e25bd345a9da4f7b8e08db61e627a626744293d2aabdb56e4
 
 name:           hastory-server
 version:        0.0.0.0
@@ -35,8 +35,6 @@ library
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -fhide-source-paths
   build-depends:
       QuickCheck
-    , aeson
-    , aeson-pretty
     , base
     , bytestring
     , conduit
