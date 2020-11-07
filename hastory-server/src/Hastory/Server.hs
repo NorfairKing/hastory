@@ -36,9 +36,9 @@ import Hastory.Server.Handler
 
 data Options =
   Options
-    { _oPort :: Int
+    { optPort :: Int
     -- ^ Port that will be used by the server.
-    , _oLogFile :: Maybe String
+    , optLogFile :: Maybe String
       -- ^ If provided, server will log to this file. If not provided, server
       -- doesn't log anything by default.
     }
@@ -78,11 +78,11 @@ mkWarpLogger logPath req _ _ = appendFile logPath $ show req <> "\n"
 mkWarpSettings :: Options -> Warp.Settings
 mkWarpSettings Options {..} =
   Warp.setTimeout 20 $
-  Warp.setPort _oPort $ maybe id (Warp.setLogger . mkWarpLogger) _oLogFile Warp.defaultSettings
+  Warp.setPort optPort $ maybe id (Warp.setLogger . mkWarpLogger) optLogFile Warp.defaultSettings
 
 -- | Displays the port this server will use. This port is configurable via command-line flags.
 reportPort :: MonadLogger m => Options -> m ()
-reportPort Options {..} = logInfo $ "Starting server on port " <> T.pack (show _oPort)
+reportPort Options {..} = logInfo $ "Starting server on port " <> T.pack (show optPort)
 
 -- | Starts a webserver by reading command line flags and the HASTORY_SERVER_JWK
 -- environmental variable.
