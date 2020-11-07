@@ -12,8 +12,7 @@ import Control.Monad.IO.Class (MonadIO, liftIO)
 import Control.Monad.Logger (MonadLogger)
 import Control.Monad.Logger.CallStack (logInfo)
 import Crypto.JOSE.JWK
-import Data.Aeson (eitherDecode)
-import qualified Data.ByteString.Lazy.Char8 as C
+import Data.Maybe
 import Data.Semigroup ((<>))
 import qualified Data.Text as T
 import qualified Database.Persist.Sqlite as SQL
@@ -27,8 +26,6 @@ import Path.IO
 import Prelude
 import Servant hiding (BadPassword, NoSuchUser)
 import Servant.Auth.Server
-import System.Environment
-import System.Exit
 
 import Hastory.API
 import Hastory.Data.Server.DB (migrateAll)
@@ -41,6 +38,9 @@ data Options =
     , optLogFile :: Maybe FilePath
     -- ^ If provided, server will log to this file. If not provided, server
     -- will log to "server.logs".
+    , optKeyFile :: Maybe FilePath
+    -- ^ If provided, server will read / write JWK key to this file. Default is
+    -- "hastory.key".
     }
   deriving (Show, Eq)
 
@@ -49,7 +49,8 @@ optParser :: A.ParserInfo Options
 optParser =
   A.info
     (Options <$> A.option A.auto (A.value 8080 <> A.showDefault <> A.long "port" <> A.short 'p') <*>
-     A.option A.auto (A.value (Just "server.logs") <> A.long "log-output" <> A.short 'l'))
+     A.option A.auto (A.value (Just "server.logs") <> A.long "log-output" <> A.short 'l') <*>
+     A.option A.auto (A.value (Just "hastory.key") <> A.long "hastory-key" <> A.short 'k'))
     mempty
 
 -- | Main server logic for Hastory Server.
@@ -88,7 +89,8 @@ reportPort Options {..} = logInfo $ "Starting server on port " <> T.pack (show o
 hastoryServer :: (MonadIO m, MonadLogger m, MonadUnliftIO m) => m ()
 hastoryServer = do
   options@Options {..} <- liftIO $ A.execParser optParser
-  signingKey <- liftIO getSigningKey
+  keyFile <- resolveFile' (fromMaybe "hastory.key" optKeyFile)
+  signingKey <- liftIO (getSigningKey keyFile)
   serverSetPwDifficulty <- liftIO (passwordDifficultyOrExit 10)
   let serverSetCookieSettings = defaultCookieSettings
       serverSetJWTSettings = defaultJWTSettings signingKey
@@ -101,18 +103,15 @@ hastoryServer = do
     void $ SQL.runSqlPool (SQL.runMigrationSilent migrateAll) serverSetPool
     liftIO $ Warp.runSettings (mkWarpSettings options) (app ServerSettings {..})
 
--- | Reads the signing key for json web tokens from the HASTORY_SERVER_JWK
--- environmental variable.
-getSigningKey :: IO JWK
-getSigningKey = do
-  rawJwk <- lookupEnv envKey >>= ensureEnv
-  ensureDecode (eitherDecode . C.pack $ rawJwk)
+-- | Reads the signing key from the given file. If the file does not exist, then
+-- the file, with a JWK, will be created and read from.
+getSigningKey :: Path Abs File -> IO JWK
+getSigningKey keyPath = do
+  fileExists <- doesFileExist keyPath
+  unless fileExists (writeKey path)
+  readKey path
   where
-    ensureEnv Nothing = die $ envKey <> " environmental variable not found"
-    ensureEnv (Just jwk) = pure jwk
-    ensureDecode (Left err) = die $ "Unable to decode JWK: " <> err
-    ensureDecode (Right jwk) = pure jwk
-    envKey = "HASTORY_SERVER_JWK"
+    path = toFilePath keyPath
 
 withAuthenticated :: (b -> a) -> a -> AuthResult b -> a
 withAuthenticated whenAuthenticated whenNotAuthenticated authRes =

@@ -22,8 +22,6 @@ library:
   source-dirs: src/
   dependencies:
   - QuickCheck
-  - aeson
-  - aeson-pretty
   - base
   - bytestring
   - conduit
