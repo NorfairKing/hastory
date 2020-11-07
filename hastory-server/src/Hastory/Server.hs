@@ -53,8 +53,8 @@ optParser =
     mempty
 
 -- | Main server logic for Hastory Server.
-server :: Options -> ServerSettings -> Server HastoryAPI
-server Options {..} serverSettings = userHandler :<|> sessionHandler :<|> postEntryHandler
+server :: ServerSettings -> Server HastoryAPI
+server serverSettings = userHandler :<|> sessionHandler :<|> postEntryHandler
   where
     userHandler = flip runReaderT serverSettings . createUserHandler
     sessionHandler = flip runReaderT serverSettings . createSessionHandler
@@ -64,9 +64,8 @@ server Options {..} serverSettings = userHandler :<|> sessionHandler :<|> postEn
         (\_ -> runReaderT unAuthenticated serverSettings)
 
 -- | Main warp application. Consumes requests and produces responses.
-app :: Options -> ServerSettings -> Application
-app options serverSettings@ServerSettings {..} =
-  serveWithContext api context (server options serverSettings)
+app :: ServerSettings -> Application
+app serverSettings@ServerSettings {..} = serveWithContext api context (server serverSettings)
   where
     context = serverSetCookieSettings :. serverSetJWTSettings :. EmptyContext
 
@@ -100,7 +99,7 @@ hastoryServer = do
     (SQL.mkSqliteConnectionInfo (T.pack $ fromAbsFile dbFile) & SQL.fkEnabled .~ False)
     1 $ \serverSetPool -> do
     void $ SQL.runSqlPool (SQL.runMigrationSilent migrateAll) serverSetPool
-    liftIO $ Warp.runSettings (mkWarpSettings options) (app options ServerSettings {..})
+    liftIO $ Warp.runSettings (mkWarpSettings options) (app ServerSettings {..})
 
 -- | Reads the signing key for json web tokens from the HASTORY_SERVER_JWK
 -- environmental variable.

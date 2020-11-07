@@ -67,8 +67,7 @@ withTestServer func = do
         1 $ \siPool ->
         liftIO $ do
           void $ runSqlPool (runMigrationSilent migrateAll) siPool
-          let mkApp = pure $ app opts settings
-              opts = Options 10 Nothing
+          let mkApp = pure $ app settings
               settings = ServerSettings siPool jwtSettings defaultCookieSettings pwDifficulty
           testWithApplication mkApp $ \p ->
             let siClientEnv = mkClientEnv manager (BaseUrl Http "127.0.0.1" p "")
