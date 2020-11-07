@@ -37,10 +37,10 @@ import Hastory.Server.Handler
 data Options =
   Options
     { optPort :: Int
-    -- ^ Port that will be used by the server.
-    , optLogFile :: Maybe String
-      -- ^ If provided, server will log to this file. If not provided, server
-      -- doesn't log anything by default.
+    -- ^ Port that will be used by the server; defaults to 8080.
+    , optLogFile :: Maybe FilePath
+    -- ^ If provided, server will log to this file. If not provided, server
+    -- will log to "server.logs".
     }
   deriving (Show, Eq)
 
