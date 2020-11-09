@@ -13,6 +13,7 @@ in {
         mkOption {
           type = types.listOf ( types.string );
           example = [ "hastory.example.com" ];
+          default = [];
           description = "The host to serve web requests on";
         };
       port =
