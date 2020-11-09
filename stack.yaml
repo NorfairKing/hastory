@@ -1,4 +1,4 @@
-resolver: lts-14.23
+resolver: lts-15.15
 packages:
 - hastory-api
 - hastory-cli
@@ -15,7 +15,7 @@ extra-deps:
 - github: supki/envparse
   commit: de5944fb09e9d941fafa35c0f05446af348e7b4d
 - github: NorfairKing/validity
-  commit: 04ef274e8be3595f5846645f5922791292653e03
+  commit: c38fc635f98580548f82314504e9f8742519f94d
   subdirs:
   - genvalidity
   - genvalidity-aeson
@@ -49,7 +49,9 @@ extra-deps:
   - validity-uuid
   - validity-vector
 nix:
-  path: [ "nixpkgs=https://github.com/NixOS/nixpkgs/archive/e6b93257b0ba070bd12810eeacbe281396c24316.tar.gz" ]
+  path: [ "nixpkgs=https://github.com/NixOS/nixpkgs/archive/e3a2247046d4de66b9b193a6ab3ff040fa3da86d.tar.gz" ]
   add-gc-roots: true
   packages:
+  - haskellPackages.autoexporter
+  - killall
   - zlib

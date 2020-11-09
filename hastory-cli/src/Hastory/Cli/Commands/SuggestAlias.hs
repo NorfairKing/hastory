@@ -5,19 +5,17 @@ module Hastory.Cli.Commands.SuggestAlias where
 import Control.Arrow ((***))
 import Control.Monad.IO.Unlift (MonadUnliftIO)
 import Control.Monad.Reader
+import qualified Data.HashMap.Lazy as HM
 import Data.Hashable (Hashable)
 import Data.List (inits, sortOn)
-import Data.Ord (Down(..))
+import Data.Ord (Down (..))
 import Data.Text (Text)
-import Safe (tailSafe)
-
-import qualified Data.HashMap.Lazy as HM
 import qualified Data.Text as T
-
 import Hastory.Cli.Internal
 import Hastory.Cli.OptParse.Types
 import Hastory.Cli.Utils (doCountsWith)
 import Hastory.Data.Client.DB
+import Safe (tailSafe)
 
 suggest :: (MonadReader Settings m, MonadUnliftIO m) => m ()
 suggest = do

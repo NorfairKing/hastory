@@ -6,7 +6,8 @@ let
   cfg = config.programs.hastory;
 
 
-in {
+in
+{
   options =
     {
       programs.hastory =
@@ -65,7 +66,7 @@ ${cfg.extraConfig}
       '';
       syncConfigContents =
         syncCfg:
-          optionalString ( syncCfg.enable or false ) ''
+          optionalString (syncCfg.enable or false) ''
 
 server-url: "${cfg.sync.server-url}"
 username: "${cfg.sync.username}"
@@ -112,19 +113,19 @@ password: "${cfg.sync.password}"
 
       hastoryConfigContents =
         concatStringsSep "\n" [
-          ( configContents cfg )
-          ( syncConfigContents cfg.sync )
+          (configContents cfg)
+          (syncConfigContents cfg.sync)
         ];
 
       services =
         (
-          optionalAttrs ( cfg.sync.enable or false ) {
+          optionalAttrs (cfg.sync.enable or false) {
             "${syncSparepName}" = syncSparepService;
           }
         );
       timers =
         (
-          optionalAttrs ( cfg.sync.enable or false ) {
+          optionalAttrs (cfg.sync.enable or false) {
             "${syncSparepName}" = syncSparepTimer;
           }
         );

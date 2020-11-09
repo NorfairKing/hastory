@@ -6,11 +6,10 @@ module Hastory.Cli.Commands.ChangeDir where
 
 import Control.Monad.IO.Unlift (MonadUnliftIO)
 import Control.Monad.Reader
-import Safe (atMay)
-import System.Exit (die)
-
 import Hastory.Cli.Commands.Recent
 import Hastory.Cli.OptParse.Types
+import Safe (atMay)
+import System.Exit (die)
 
 change :: (MonadReader Settings m, MonadUnliftIO m) => ChangeDirSettings -> m ()
 change ChangeDirSettings {..} = do

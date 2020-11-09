@@ -1,14 +1,15 @@
-{-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Hastory.Data.Path
-  ( module Path
-  ) where
+  ( module Path,
+  )
+where
 
 import Data.Text (unpack)
-import Database.Persist (PersistField(..), PersistValue(..))
-import Database.Persist.Sqlite (PersistFieldSql(..), SqlType(..))
+import Database.Persist (PersistField (..), PersistValue (..))
+import Database.Persist.Sqlite (PersistFieldSql (..), SqlType (..))
 import Path
 
 instance PersistField (Path Abs Dir) where

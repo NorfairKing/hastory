@@ -8,14 +8,13 @@ import Data.Text (Text)
 import Data.Validity
 import Data.Validity.Text ()
 import GHC.Generics
-
 import Hastory.Data.Username
 
-data UserForm =
-  UserForm
-    { userFormUserName :: Username
-    , userFormPassword :: Text
-    }
+data UserForm
+  = UserForm
+      { userFormUserName :: Username,
+        userFormPassword :: Text
+      }
   deriving (Show, Generic)
 
 instance FromJSON UserForm where

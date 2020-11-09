@@ -5,21 +5,19 @@
 
 module Hastory.Data.Username where
 
-import Control.Monad.Fail (MonadFail)
 import qualified Control.Monad.Fail as Fail
-import GHC.Generics
-
-import Data.Aeson (FromJSON(parseJSON), ToJSON(toJSON), withText)
+import Data.Aeson (FromJSON (parseJSON), ToJSON (toJSON), withText)
 import Data.Char
 import Data.Text (Text)
 import qualified Data.Text as T
 import Data.Validity
 import Database.Persist.Sql (PersistField, PersistFieldSql)
+import GHC.Generics
 
-newtype Username =
-  Username
-    { usernameText :: Text
-    }
+newtype Username
+  = Username
+      { usernameText :: Text
+      }
   deriving (Eq, Generic)
   deriving newtype (Show, PersistField, PersistFieldSql)
 
@@ -38,8 +36,8 @@ instance Validity Username where
       allAsciiLetterOrDigit = decorateList (T.unpack . usernameText $ userName) asciiLetterOrDigit
       asciiLetterOrDigit c =
         mconcat
-          [ check (isAscii c) "Char is ASCII"
-          , check (isDigit c || isLetter c) "Char is letter or digit"
+          [ check (isAscii c) "Char is ASCII",
+            check (isDigit c || isLetter c) "Char is letter or digit"
           ]
 
 parseUsername :: MonadFail m => Text -> m Username

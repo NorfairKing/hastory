@@ -3,39 +3,37 @@
 {-# LANGUAGE TypeApplications #-}
 
 module Hastory.Cli.OptParse
-  ( combineToInstructions
-  , getConfiguration
-  , getInstructions
-  , envParser
-  , runArgumentsParser
-  , Instructions(..)
-  , Dispatch(..)
-  , Settings(..)
-  ) where
+  ( combineToInstructions,
+    getConfiguration,
+    getInstructions,
+    envParser,
+    runArgumentsParser,
+    Instructions (..),
+    Dispatch (..),
+    Settings (..),
+  )
+where
 
 import Control.Monad
 import Data.Maybe (fromMaybe)
-import Data.Semigroup ((<>))
 import qualified Data.Text as T
 import qualified Env
+import Hastory.Cli.OptParse.Types
+import Hastory.Data
 import Options.Applicative
 import qualified Options.Applicative.Help.Pretty as OptParseHelp
-import Path
 import Path.IO
-  ( XdgDirectory(..)
-  , getAppUserDataDir
-  , getXdgDir
-  , resolveDir'
-  , resolveFile
-  , resolveFile'
+  ( XdgDirectory (..),
+    getAppUserDataDir,
+    getXdgDir,
+    resolveDir',
+    resolveFile,
+    resolveFile',
   )
 import Servant.Client.Core.Reexport (parseBaseUrl)
 import System.Environment (getArgs)
 import System.Exit (die)
 import YamlParse.Applicative hiding (Parser)
-
-import Hastory.Cli.OptParse.Types
-import Hastory.Data
 
 getInstructions :: IO Instructions
 getInstructions = do
@@ -57,8 +55,8 @@ combineToInstructions cmd Flags {..} Environment {..} mConf =
         CommandListRecentDirs ListRecentDirFlags {..} ->
           let lrdBypassCache = lrdArgBypassCache <|> envLrdBypassCache <|> mc configLrdBypassCache
            in pure $
-              DispatchListRecentDirs
-                ListRecentDirSettings {lrdSetBypassCache = fromMaybe False lrdBypassCache}
+                DispatchListRecentDirs
+                  ListRecentDirSettings {lrdSetBypassCache = fromMaybe False lrdBypassCache}
         CommandChangeDir ChangeDirFlags {..} ->
           pure $ DispatchChangeDir ChangeDirSettings {changeDirSetIdx = changeDirFlagsIdx}
         CommandGenChangeWrapperScript _ ->
@@ -112,35 +110,36 @@ envParser :: Env.Parser Env.Error Environment
 envParser =
   Env.prefixed
     "HASTORY_"
-    (Environment <$>
-     Env.var
-       (pure . Just <=< Env.nonempty)
-       "CACHE_DIR"
-       (Env.help "the cache directory for hastory" <> Env.def Nothing) <*>
-     Env.var
-       (pure . Just <=< Env.nonempty)
-       "CONFIG_FILE"
-       (Env.help "path to a config file" <> Env.def Nothing) <*>
-     Env.var
-       baseUrlParser
-       "STORAGE_SERVER_URL"
-       (Env.help "URL of the central storage server" <> Env.def Nothing) <*>
-     Env.var
-       usernameParser
-       "STORAGE_SERVER_USERNAME"
-       (Env.help "Username for the central storage server" <> Env.def Nothing) <*>
-     Env.var
-       (pure . Just <=< Env.nonempty)
-       "STORAGE_SERVER_PASSWORD"
-       (Env.help "Password for the central storage server" <> Env.def Nothing) <*>
-     Env.var
-       (fmap Just . Env.auto)
-       "BYPASS_CACHE"
-       (Env.help "Always recompute the recent directory options" <> Env.def Nothing) <*>
-     Env.var
-       (pure . Just <=< Env.nonempty)
-       "DATA_DIR"
-       (Env.help "the data directory for hastory" <> Env.def Nothing))
+    ( Environment
+        <$> Env.var
+          (pure . Just <=< Env.nonempty)
+          "CACHE_DIR"
+          (Env.help "the cache directory for hastory" <> Env.def Nothing)
+        <*> Env.var
+          (pure . Just <=< Env.nonempty)
+          "CONFIG_FILE"
+          (Env.help "path to a config file" <> Env.def Nothing)
+        <*> Env.var
+          baseUrlParser
+          "STORAGE_SERVER_URL"
+          (Env.help "URL of the central storage server" <> Env.def Nothing)
+        <*> Env.var
+          usernameParser
+          "STORAGE_SERVER_USERNAME"
+          (Env.help "Username for the central storage server" <> Env.def Nothing)
+        <*> Env.var
+          (pure . Just <=< Env.nonempty)
+          "STORAGE_SERVER_PASSWORD"
+          (Env.help "Password for the central storage server" <> Env.def Nothing)
+        <*> Env.var
+          (fmap Just . Env.auto)
+          "BYPASS_CACHE"
+          (Env.help "Always recompute the recent directory options" <> Env.def Nothing)
+        <*> Env.var
+          (pure . Just <=< Env.nonempty)
+          "DATA_DIR"
+          (Env.help "the data directory for hastory" <> Env.def Nothing)
+    )
   where
     baseUrlParser unparsedUrl =
       maybe (Left $ Env.UnreadError unparsedUrl) (Right . Just) (parseBaseUrl unparsedUrl)
@@ -150,28 +149,25 @@ envParser =
 runArgumentsParser :: [String] -> ParserResult Arguments
 runArgumentsParser =
   execParserPure
-    ParserPrefs
-      { prefMultiSuffix = "HASTORY"
-      , prefDisambiguate = True
-      , prefShowHelpOnError = True
-      , prefShowHelpOnEmpty = True
-      , prefBacktrack = True
-      , prefColumns = 80
-      }
+    ( defaultPrefs
+        { prefShowHelpOnError = True,
+          prefShowHelpOnEmpty = True
+        }
+    )
     argParser
 
 argParser :: ParserInfo Arguments
 argParser = info (helper <*> parseArgs) (fullDesc <> progDesc "Hastory" <> footerDoc footerStr)
   where
     footerStr =
-      Just $
-      OptParseHelp.string $
-      unlines
-        [ Env.helpDoc envParser
-        , ""
-        , "Configuration file format:"
-        , T.unpack (prettySchemaDoc @Configuration)
-        ]
+      Just
+        $ OptParseHelp.string
+        $ unlines
+          [ Env.helpDoc envParser,
+            "",
+            "Configuration file format:",
+            T.unpack (prettySchemaDoc @Configuration)
+          ]
 
 parseArgs :: Parser Arguments
 parseArgs = Arguments <$> parseCommand <*> parseFlags
@@ -179,15 +175,15 @@ parseArgs = Arguments <$> parseCommand <*> parseFlags
 parseCommand :: Parser Command
 parseCommand =
   hsubparser $
-  mconcat
-    [ command "gather" parseCommandGather
-    , command "generate-gather-wrapper-script" parseGenGatherWrapperScript
-    , command "change-directory" parseCommandChangeDir
-    , command "list-recent-directories" parseCommandListRecentDirs
-    , command "generate-change-directory-wrapper-script" parseGenChangeDirectoryWrapperScript
-    , command "suggest-alias" parseSuggestAlias
-    , command "sync" parseSync
-    ]
+    mconcat
+      [ command "gather" parseCommandGather,
+        command "generate-gather-wrapper-script" parseGenGatherWrapperScript,
+        command "change-directory" parseCommandChangeDir,
+        command "list-recent-directories" parseCommandListRecentDirs,
+        command "generate-change-directory-wrapper-script" parseGenChangeDirectoryWrapperScript,
+        command "suggest-alias" parseSuggestAlias,
+        command "sync" parseSync
+      ]
 
 parseCommandGather :: ParserInfo Command
 parseCommandGather =
@@ -204,27 +200,32 @@ parseGenGatherWrapperScript =
 parseCommandChangeDir :: ParserInfo Command
 parseCommandChangeDir =
   info
-    (CommandChangeDir . ChangeDirFlags <$>
-     argument
-       auto
-       (mconcat
-          [ help "The index of the directory to change to, see 'list-recent-directories'"
-          , metavar "INT"
-          ]))
+    ( CommandChangeDir . ChangeDirFlags
+        <$> argument
+          auto
+          ( mconcat
+              [ help "The index of the directory to change to, see 'list-recent-directories'",
+                metavar "INT"
+              ]
+          )
+    )
     (progDesc "Output a directory to change to based on the gathered data.")
 
 parseCommandListRecentDirs :: ParserInfo Command
 parseCommandListRecentDirs =
   info
-    (CommandListRecentDirs <$>
-     (ListRecentDirFlags <$>
-      (flag'
-         (Just True)
-         (mconcat [long "bypass-cache", help "Always recompute the recent directory options"]) <|>
-       flag'
-         (Just False)
-         (mconcat [long "no-bypass-cache", help "Use the recent directory cache when available"]) <|>
-       pure Nothing)))
+    ( CommandListRecentDirs
+        <$> ( ListRecentDirFlags
+                <$> ( flag'
+                        (Just True)
+                        (mconcat [long "bypass-cache", help "Always recompute the recent directory options"])
+                        <|> flag'
+                          (Just False)
+                          (mconcat [long "no-bypass-cache", help "Use the recent directory cache when available"])
+                        <|> pure Nothing
+                    )
+            )
+    )
     (progDesc "List the directories that were the working directory most often (recently )")
 
 parseGenChangeDirectoryWrapperScript :: ParserInfo Command
@@ -247,33 +248,36 @@ parseSync =
       SyncFlags <$> syncFlagStorageParser <*> syncFlagUsernameParser <*> syncFlagPasswordParser
     syncFlagStorageParser =
       optional $
-      option
-        (maybeReader parseBaseUrl)
-        (long "storage-server" <> help "Remote storage url" <> metavar "URL")
+        option
+          (maybeReader parseBaseUrl)
+          (long "storage-server" <> help "Remote storage url" <> metavar "URL")
     syncFlagUsernameParser =
       optional $
-      option
-        (maybeReader $ parseUsername . T.pack)
-        (long "storage-username" <> help "Remote storage username" <> metavar "USERNAME")
+        option
+          (maybeReader $ parseUsername . T.pack)
+          (long "storage-username" <> help "Remote storage username" <> metavar "USERNAME")
     syncFlagPasswordParser =
       optional $
-      strOption (long "storage-password" <> help "Remote storage password" <> metavar "PASSWORD")
+        strOption (long "storage-password" <> help "Remote storage password" <> metavar "PASSWORD")
 
 parseFlags :: Parser Flags
 parseFlags =
-  Flags <$>
-  optional
-    (option
-       nonEmptyString
-       (mconcat [long "cache-dir", metavar "FILEPATH", help "the cache directory for hastory"])) <*>
-  optional
-    (option
-       nonEmptyString
-       (mconcat [long "config-file", metavar "FILEPATH", help "path to a config file"])) <*>
-  optional
-    (option
-       nonEmptyString
-       (mconcat [long "data-dir", metavar "FILEPATH", help "the data directory for hastory"]))
+  Flags
+    <$> optional
+      ( option
+          nonEmptyString
+          (mconcat [long "cache-dir", metavar "FILEPATH", help "the cache directory for hastory"])
+      )
+    <*> optional
+      ( option
+          nonEmptyString
+          (mconcat [long "config-file", metavar "FILEPATH", help "path to a config file"])
+      )
+    <*> optional
+      ( option
+          nonEmptyString
+          (mconcat [long "data-dir", metavar "FILEPATH", help "the data directory for hastory"])
+      )
   where
     nonEmptyString =
       maybeReader $ \s ->

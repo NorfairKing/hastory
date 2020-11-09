@@ -2,8 +2,9 @@
 {-# LANGUAGE QuasiQuotes #-}
 
 module Hastory.Cli.OptParseSpec
-  ( spec
-  ) where
+  ( spec,
+  )
+where
 
 import qualified Data.ByteString as B
 import Env
@@ -22,40 +23,42 @@ spec = do
 
 getConfigurationSpec :: Spec
 getConfigurationSpec =
-  describe "getConfigurationSpec" $
-  around withDefaultConfigFile $ do
-    it "prefers Flags over Environment file" $ \defaultConfigFile -> do
-      let contentsOfFileInFlags = "url: flag.example.com"
-      withFile contentsOfFileInFlags $ \path -> do
-        let flags = emptyFlags {flagConfigFile = Just (toFilePath path)}
-            environment = emptyEnvironment {envConfigFile = Just "~/randomUser"}
-        url <- parseBaseUrl "flag.example.com"
-        mConf <- getConfiguration defaultConfigFile flags environment
-        mConf `shouldBe` Just (emptyConfiguration {configStorageServer = Just url})
-    it "prefers Environment over default file" $ \defaultConfigFile -> do
-      let contentsOfFileInEnv = "url: environment.example.com"
-      withFile contentsOfFileInEnv $ \path -> do
-        let flags = emptyFlags
-            environment = emptyEnvironment {envConfigFile = Just (toFilePath path)}
-        url <- parseBaseUrl "environment.example.com"
-        mConf <- getConfiguration defaultConfigFile flags environment
-        mConf `shouldBe` Just (emptyConfiguration {configStorageServer = Just url})
-    context "Flags and Environment do NOT specify a config" $ do
-      context "default config file exists" $ do
-        it "uses the default config file" $ \defaultConfigFile -> do
-          let defaultConfigContents = "url: default.example.com"
-          B.writeFile (toFilePath defaultConfigFile) defaultConfigContents
-          mConf <- getConfiguration defaultConfigFile emptyFlags emptyEnvironment
-          url <- parseBaseUrl "default.example.com"
+  describe "getConfigurationSpec"
+    $ around withDefaultConfigFile
+    $ do
+      it "prefers Flags over Environment file" $ \defaultConfigFile -> do
+        let contentsOfFileInFlags = "url: flag.example.com"
+        withFile contentsOfFileInFlags $ \path -> do
+          let flags = emptyFlags {flagConfigFile = Just (toFilePath path)}
+              environment = emptyEnvironment {envConfigFile = Just "~/randomUser"}
+          url <- parseBaseUrl "flag.example.com"
+          mConf <- getConfiguration defaultConfigFile flags environment
           mConf `shouldBe` Just (emptyConfiguration {configStorageServer = Just url})
-        it "does not parse malformed config files" $ \defaultConfigFile -> do
-          let defaultConfigContents = "url: 1"
-          B.writeFile (toFilePath defaultConfigFile) defaultConfigContents
-          getConfiguration defaultConfigFile emptyFlags emptyEnvironment `shouldThrow` anyException
-      context "default config file does not exist" $
-        it "has 'empty' configuration" $ \defaultConfigFile -> do
-          mConf <- getConfiguration defaultConfigFile emptyFlags emptyEnvironment
-          mConf `shouldBe` Nothing
+      it "prefers Environment over default file" $ \defaultConfigFile -> do
+        let contentsOfFileInEnv = "url: environment.example.com"
+        withFile contentsOfFileInEnv $ \path -> do
+          let flags = emptyFlags
+              environment = emptyEnvironment {envConfigFile = Just (toFilePath path)}
+          url <- parseBaseUrl "environment.example.com"
+          mConf <- getConfiguration defaultConfigFile flags environment
+          mConf `shouldBe` Just (emptyConfiguration {configStorageServer = Just url})
+      context "Flags and Environment do NOT specify a config" $ do
+        context "default config file exists" $ do
+          it "uses the default config file" $ \defaultConfigFile -> do
+            let defaultConfigContents = "url: default.example.com"
+            B.writeFile (toFilePath defaultConfigFile) defaultConfigContents
+            mConf <- getConfiguration defaultConfigFile emptyFlags emptyEnvironment
+            url <- parseBaseUrl "default.example.com"
+            mConf `shouldBe` Just (emptyConfiguration {configStorageServer = Just url})
+          it "does not parse malformed config files" $ \defaultConfigFile -> do
+            let defaultConfigContents = "url: 1"
+            B.writeFile (toFilePath defaultConfigFile) defaultConfigContents
+            getConfiguration defaultConfigFile emptyFlags emptyEnvironment `shouldThrow` anyException
+        context "default config file does not exist"
+          $ it "has 'empty' configuration"
+          $ \defaultConfigFile -> do
+            mConf <- getConfiguration defaultConfigFile emptyFlags emptyEnvironment
+            mConf `shouldBe` Nothing
 
 type ConfigFileContents = B.ByteString
 
@@ -108,8 +111,9 @@ describeFlags =
         let res = runArgumentsParser args
             args = ["gather", "--config-file="]
         res `shouldSatisfy` isCliParserFailure
-    context "user provides NO flags" $
-      it "is an empty Flags data type" $ do
+    context "user provides NO flags"
+      $ it "is an empty Flags data type"
+      $ do
         let (Success (Arguments _cmd flags)) = runArgumentsParser args
             args = ["gather"]
         flags `shouldBe` emptyFlags
@@ -117,13 +121,15 @@ describeFlags =
 describeCommand :: Spec
 describeCommand =
   describe "Command" $ do
-    context "user provides the 'gather' command" $
-      it "parses to CommandGather" $ do
+    context "user provides the 'gather' command"
+      $ it "parses to CommandGather"
+      $ do
         let (Success (Arguments cmd _flags)) = runArgumentsParser args
             args = ["gather"]
         cmd `shouldBe` CommandGather GatherFlags
-    context "user provides the 'generate-gather-wrapper-script' command" $
-      it "parses to CommandGenGatherWrapperScript" $ do
+    context "user provides the 'generate-gather-wrapper-script' command"
+      $ it "parses to CommandGenGatherWrapperScript"
+      $ do
         let (Success (Arguments cmd _flags)) = runArgumentsParser args
             args = ["generate-gather-wrapper-script"]
         cmd `shouldBe` CommandGenGatherWrapperScript GenGatherWrapperScriptFlags
@@ -157,25 +163,28 @@ describeCommand =
         let res = runArgumentsParser args
             args = ["list-recent-directories", "--invalid"]
         res `shouldSatisfy` isCliParserFailure
-    context "user provides the 'generate-change-directory-wrapper-script' command" $
-      it "parses to CommandGenChangeWrapperScript" $ do
+    context "user provides the 'generate-change-directory-wrapper-script' command"
+      $ it "parses to CommandGenChangeWrapperScript"
+      $ do
         let (Success (Arguments cmd _flags)) = runArgumentsParser args
             args = ["generate-change-directory-wrapper-script"]
         cmd `shouldBe` CommandGenChangeWrapperScript GenChangeWrapperScriptFlags
-    context "user provides the 'suggest-alias' command" $
-      it "parses to CommandSuggestAlias" $ do
+    context "user provides the 'suggest-alias' command"
+      $ it "parses to CommandSuggestAlias"
+      $ do
         let (Success (Arguments cmd _flags)) = runArgumentsParser args
             args = ["suggest-alias"]
         cmd `shouldBe` CommandSuggestAlias SuggestAliasFlags
-    context "user provides the 'sync' command" $
-      it "parses to CommandSync" $ do
+    context "user provides the 'sync' command"
+      $ it "parses to CommandSync"
+      $ do
         url <- parseBaseUrl "api.google.com"
         let (Success (Arguments cmd _flags)) = runArgumentsParser args
             args =
-              [ "sync"
-              , "--storage-server=api.google.com"
-              , "--storage-username=steven"
-              , "--storage-password=letmein"
+              [ "sync",
+                "--storage-server=api.google.com",
+                "--storage-username=steven",
+                "--storage-password=letmein"
               ]
             expectedSyncFlags = SyncFlags (Just url) (Just $ Username "steven") (Just "letmein")
         cmd `shouldBe` CommandSync expectedSyncFlags
@@ -183,32 +192,34 @@ describeCommand =
 envParserSpec :: Spec
 envParserSpec =
   describe "envParser" $ do
-    context "user provides NO environmental variables" $
-      it "parses to an empty Environment" $ do
+    context "user provides NO environmental variables"
+      $ it "parses to an empty Environment"
+      $ do
         let res = Env.parsePure envParser []
         res `shouldBe` Right emptyEnvironment
-    context "users provides ALL environmental variables" $
-      it "parses to a full Environment" $ do
+    context "users provides ALL environmental variables"
+      $ it "parses to a full Environment"
+      $ do
         let url = "api.example.com"
         parsedUrl <- parseBaseUrl url
         let res = Env.parsePure envParser fullEnvironment
             fullEnvironment =
-              [ ("HASTORY_CACHE_DIR", "~/home")
-              , ("HASTORY_CONFIG_FILE", "~/home/.hastory.yaml")
-              , ("HASTORY_STORAGE_SERVER_URL", url)
-              , ("HASTORY_STORAGE_SERVER_USERNAME", "steven")
-              , ("HASTORY_STORAGE_SERVER_PASSWORD", "Passw0rd")
-              , ("HASTORY_BYPASS_CACHE", "True")
+              [ ("HASTORY_CACHE_DIR", "~/home"),
+                ("HASTORY_CONFIG_FILE", "~/home/.hastory.yaml"),
+                ("HASTORY_STORAGE_SERVER_URL", url),
+                ("HASTORY_STORAGE_SERVER_USERNAME", "steven"),
+                ("HASTORY_STORAGE_SERVER_PASSWORD", "Passw0rd"),
+                ("HASTORY_BYPASS_CACHE", "True")
               ]
-        res `shouldBe`
-          Right
+        res
+          `shouldBe` Right
             emptyEnvironment
-              { envCacheDir = Just "~/home"
-              , envConfigFile = Just "~/home/.hastory.yaml"
-              , envStorageServer = Just parsedUrl
-              , envStorageUsername = Just (Username "steven")
-              , envStoragePassword = Just "Passw0rd"
-              , envLrdBypassCache = Just True
+              { envCacheDir = Just "~/home",
+                envConfigFile = Just "~/home/.hastory.yaml",
+                envStorageServer = Just parsedUrl,
+                envStorageUsername = Just (Username "steven"),
+                envStoragePassword = Just "Passw0rd",
+                envLrdBypassCache = Just True
               }
     context "users provides SOME environmental variables" $ do
       it "successfully parses to an Environment" $ do
@@ -317,8 +328,9 @@ combineToInstructionsSpec =
             emptyEnvironment
             Nothing
         settings `shouldBe` Settings defaultCacheDir defaultDataDir
-    describe "CommandGenGatherWrapperScript" $
-      it "is DispatchGenGatherWrapperScript with GenGatherWrapperScriptSettings" $ do
+    describe "CommandGenGatherWrapperScript"
+      $ it "is DispatchGenGatherWrapperScript with GenGatherWrapperScriptSettings"
+      $ do
         let cmd = CommandGenGatherWrapperScript GenGatherWrapperScriptFlags
         Instructions dispatch _settings <-
           combineToInstructions cmd emptyFlags emptyEnvironment Nothing
@@ -330,24 +342,24 @@ emptyFlags = Flags {flagCacheDir = Nothing, flagConfigFile = Nothing, flagDataDi
 emptyConfiguration :: Configuration
 emptyConfiguration =
   Configuration
-    { configCacheDir = Nothing
-    , configStorageServer = Nothing
-    , configStorageUsername = Nothing
-    , configStoragePassword = Nothing
-    , configLrdBypassCache = Nothing
-    , configDataDir = Nothing
+    { configCacheDir = Nothing,
+      configStorageServer = Nothing,
+      configStorageUsername = Nothing,
+      configStoragePassword = Nothing,
+      configLrdBypassCache = Nothing,
+      configDataDir = Nothing
     }
 
 emptyEnvironment :: Environment
 emptyEnvironment =
   Environment
-    { envCacheDir = Nothing
-    , envConfigFile = Nothing
-    , envStorageServer = Nothing
-    , envStorageUsername = Nothing
-    , envStoragePassword = Nothing
-    , envLrdBypassCache = Nothing
-    , envDataDir = Nothing
+    { envCacheDir = Nothing,
+      envConfigFile = Nothing,
+      envStorageServer = Nothing,
+      envStorageUsername = Nothing,
+      envStoragePassword = Nothing,
+      envLrdBypassCache = Nothing,
+      envDataDir = Nothing
     }
 
 isCliParserFailure :: ParserResult a -> Bool

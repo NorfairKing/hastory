@@ -1,5 +1,5 @@
-{-# OPTIONS_GHC -Wno-orphans #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 
 module Hastory.Gen where
 
@@ -8,11 +8,10 @@ import Data.GenValidity
 import Data.GenValidity.Text
 import qualified Data.Text as T
 import Database.Persist.Sql (fromSqlKey, toSqlKey)
+import Hastory.Data
 import Hastory.Data.Client.DB
 import Hastory.Data.Server.DB
 import Test.QuickCheck
-
-import Hastory.Data
 
 instance GenValid Entry where
   genValid = genValidStructurally

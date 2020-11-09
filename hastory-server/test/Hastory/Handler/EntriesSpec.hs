@@ -3,21 +3,21 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module Hastory.Handler.EntriesSpec
-  ( spec
-  ) where
+  ( spec,
+  )
+where
 
 import Control.Monad
-import Servant.Auth.Client
-import Servant.Client
-import Test.Hspec
-import Test.Validity
-
 import Hastory.API
 import Hastory.Data
 import Hastory.Data.Server.DB
 import Hastory.Gen ()
 import Hastory.Server.TestUtils
 import Hastory.Server.Utils
+import Servant.Auth.Client
+import Servant.Client
+import Test.Hspec
+import Test.Validity
 
 spec :: Spec
 spec = serverSpec postEntries
@@ -25,8 +25,9 @@ spec = serverSpec postEntries
 postEntries :: SpecWith ServerInfo
 postEntries =
   describe "POST /entries" $ do
-    context "incorrect token" $
-      it "is a 401" $ \ServerInfo {..} ->
+    context "incorrect token"
+      $ it "is a 401"
+      $ \ServerInfo {..} ->
         forAllValid $ \syncReq -> do
           let incorrectToken = Token "badToken"
           Left (FailureResponse _requestF resp) <-

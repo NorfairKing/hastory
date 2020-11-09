@@ -3,21 +3,18 @@
 module Hastory.Server.Utils where
 
 import Control.Monad.Error.Class
-import Crypto.Hash (Digest, SHA256(..), hashWith)
 import Data.ByteString (ByteString)
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import Data.Time.Format (defaultTimeLocale, formatTime, iso8601DateFormat)
 import Database.Persist
-import Path (fromAbsDir)
-import Servant.Auth.Server
-import Servant.Server
-
 import Hastory.Data
 import Hastory.Data.Client.DB
 import Hastory.Data.Server.DB
 import Hastory.Server.HastoryHandler
+import Servant.Auth.Server
+import Servant.Server
 
 withUser :: Username -> (Entity User -> HastoryHandler a) -> HastoryHandler a
 withUser username k = do
@@ -41,11 +38,11 @@ hashEntry Entry {..} host = hashWith SHA256 (unifiedData :: ByteString)
   where
     unifiedData =
       mconcat
-        [ T.encodeUtf8 entryText
-        , hashPrepare $ fromAbsDir entryWorkingDir
-        , hashPrepare $ formatIso8601 entryDateTime
-        , T.encodeUtf8 entryUser
-        , T.encodeUtf8 host
+        [ T.encodeUtf8 entryText,
+          hashPrepare $ fromAbsDir entryWorkingDir,
+          hashPrepare $ formatIso8601 entryDateTime,
+          T.encodeUtf8 entryUser,
+          T.encodeUtf8 host
         ]
     hashPrepare = T.encodeUtf8 . T.pack
     formatIso8601 = formatTime defaultTimeLocale formatString

@@ -10,10 +10,10 @@ with final.haskell.lib;
             addBuildDepend (
               failOnAllWarnings (
                 disableLibraryProfiling (
-                  final.haskellPackages.callCabal2nix name ( final.gitignoreSource ( ../. + "/${name}" ) ) {}
+                  final.haskellPackages.callCabal2nix name (final.gitignoreSource (../. + "/${name}")) {}
                 )
               )
-            ) ( final.haskellPackages.autoexporter )
+            ) (final.haskellPackages.autoexporter)
           );
     in
       final.lib.genAttrs [
@@ -29,9 +29,11 @@ with final.haskell.lib;
         {
           overrides =
             final.lib.composeExtensions (
-              old.overrides or (_:
-            _:
-              {})
+              old.overrides or (
+                _:
+                _:
+                  {}
+              )
             ) (
               self: super:
                 let
@@ -47,7 +49,7 @@ with final.haskell.lib;
                   passwordPkg =
                     name:
                       dontCheck (
-                        self.callCabal2nix name ( passwordRepo + "/${name}" ) {}
+                        self.callCabal2nix name (passwordRepo + "/${name}") {}
                       );
                   passwordPackages =
                     final.lib.genAttrs [
@@ -67,7 +69,7 @@ with final.haskell.lib;
                   yamlparseApplicativePkg =
                     name:
                       dontCheck (
-                        self.callCabal2nix name ( yamlparseApplicativeRepo + "/${name}" ) {}
+                        self.callCabal2nix name (yamlparseApplicativeRepo + "/${name}") {}
                       );
                   yamlparseApplicativePackages =
                     final.lib.genAttrs [
@@ -84,7 +86,7 @@ with final.haskell.lib;
                     };
                   envparsePkg =
                     dontCheck (
-                      self.callCabal2nix "envparse" ( envparseRepo ) {}
+                      self.callCabal2nix "envparse" (envparseRepo) {}
                     );
                 in
                   final.hastoryPackages // {

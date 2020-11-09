@@ -1,16 +1,16 @@
 {-# LANGUAGE FlexibleContexts #-}
 
 module Hastory.API.Gather
-  ( gatherEntryWith
-  ) where
+  ( gatherEntryWith,
+  )
+where
 
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Time as Time
+import Hastory.Data.Client.DB (Entry (..))
 import Path.IO (getCurrentDir)
 import System.Posix.User (getEffectiveUserName)
-
-import Hastory.Data.Client.DB (Entry(..))
 
 gatherEntryWith :: Text -> IO Entry
 gatherEntryWith text = do
@@ -19,10 +19,10 @@ gatherEntryWith text = do
   user <- getEffectiveUserName
   pure
     Entry
-      { entryText = text
-      , entryDateTime = curtime
-      , entryWorkingDir = curdir
-      , entryUser = T.pack user
-      , entrySyncWitness = Nothing
-      , entryHostName = Nothing
+      { entryText = text,
+        entryDateTime = curtime,
+        entryWorkingDir = curdir,
+        entryUser = T.pack user,
+        entrySyncWitness = Nothing,
+        entryHostName = Nothing
       }

@@ -1,6 +1,7 @@
 module Hastory.Server.Handler.Entries
-  ( createEntryHandler
-  ) where
+  ( createEntryHandler,
+  )
+where
 
 import Hastory.Server.Handler.Import
 

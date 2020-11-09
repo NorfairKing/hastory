@@ -1,13 +1,11 @@
 {-# LANGUAGE FlexibleContexts #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Hastory.Server.Handler.Users where
 
 import qualified Data.ByteString.Lazy.Char8 as C
-
 import Hastory.Data.PasswordDifficulty
-
 import Hastory.Server.Handler.Import
 
 createUserHandler :: UserForm -> HastoryHandler UserId
@@ -23,6 +21,6 @@ buildAndInsertUser :: UserForm -> HastoryHandler UserId
 buildAndInsertUser UserForm {..} = do
   difficulty <- asks (unPasswordDifficulty . serverSetPwDifficulty)
   user <-
-    User userFormUserName <$>
-    liftIO (hashPasswordWithParams difficulty . mkPassword $ userFormPassword)
+    User userFormUserName
+      <$> liftIO (hashPasswordWithParams difficulty . mkPassword $ userFormPassword)
   runDB $ insert user

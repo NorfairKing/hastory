@@ -1,9 +1,12 @@
 {-# LANGUAGE FlexibleContexts #-}
 
 module Hastory.Cli
-  ( hastoryCli
-  ) where
+  ( hastoryCli,
+  )
+where
 
+import Control.Monad.IO.Unlift (MonadUnliftIO)
+import Control.Monad.Reader
 import Hastory.Cli.Commands.ChangeDir (change)
 import Hastory.Cli.Commands.Gather (gather)
 import Hastory.Cli.Commands.GenChangeWrapper (genChangeWrapperScript)
@@ -12,9 +15,6 @@ import Hastory.Cli.Commands.ListDir (listRecentDirs)
 import Hastory.Cli.Commands.SuggestAlias (suggest)
 import Hastory.Cli.Commands.Sync (sync)
 import Hastory.Cli.OptParse
-
-import Control.Monad.IO.Unlift (MonadUnliftIO)
-import Control.Monad.Reader
 
 hastoryCli :: IO ()
 hastoryCli = do

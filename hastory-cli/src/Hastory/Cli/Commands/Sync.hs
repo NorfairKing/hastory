@@ -3,24 +3,24 @@
 {-# LANGUAGE RecordWildCards #-}
 
 module Hastory.Cli.Commands.Sync
-  ( sync
-  , toEntry
-  ) where
+  ( sync,
+    toEntry,
+  )
+where
 
 import Control.Monad.IO.Unlift (MonadUnliftIO)
 import Control.Monad.Reader
 import Data.Int
 import Data.Maybe
 import Database.Persist.Sqlite
-import Network.HostName (getHostName)
-import System.Exit
-
 import Hastory.API
 import Hastory.Cli.Internal
 import Hastory.Cli.OptParse.Types
 import Hastory.Data
 import Hastory.Data.Client.DB hiding (migrateAll)
 import Hastory.Data.Server.DB hiding (migrateAll)
+import Network.HostName (getHostName)
+import System.Exit
 
 -- | Send local entries to sync server and fetch new entries from sync server.
 sync :: (MonadReader Settings m, MonadUnliftIO m) => SyncSettings -> m ()
@@ -45,10 +45,10 @@ updateOrInsert serverEntity = do
   let entry@Entry {..} = toEntry serverEntity
   entity <-
     runDb $
-    upsertBy
-      (EntryData entryText entryWorkingDir entryDateTime entryUser)
-      entry
-      [EntrySyncWitness =. entrySyncWitness]
+      upsertBy
+        (EntryData entryText entryWorkingDir entryDateTime entryUser)
+        entry
+        [EntrySyncWitness =. entrySyncWitness]
   pure $ entityKey entity
 
 -- | Mechanically, the syncWitness is the id (Int64) of the entry on the remote

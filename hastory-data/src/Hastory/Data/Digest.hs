@@ -1,10 +1,11 @@
-{-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Hastory.Data.Digest
-  ( module Hastory.Data.Digest
-  ) where
+  ( module Hastory.Data.Digest,
+  )
+where
 
 import Crypto.Hash as Hastory.Data.Digest
 import Data.Aeson
@@ -12,12 +13,12 @@ import Data.ByteArray (convert)
 import qualified Data.ByteArray as BA
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Base64 as Base64
-import Data.Proxy (Proxy(Proxy))
+import Data.Proxy (Proxy (Proxy))
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
-import Database.Persist.Class (PersistField(fromPersistValue, toPersistValue))
-import Database.Persist.Sql (PersistFieldSql(sqlType))
-import Database.Persist.Types (PersistValue(PersistByteString))
+import Database.Persist.Class (PersistField (fromPersistValue, toPersistValue))
+import Database.Persist.Sql (PersistFieldSql (sqlType))
+import Database.Persist.Types (PersistValue (PersistByteString))
 
 instance HashAlgorithm a => PersistField (Digest a) where
   toPersistValue = toPersistValue . B.pack . BA.unpack

@@ -1,5 +1,5 @@
 let
-  pkgsv = import ( import ./nixpkgs.nix );
+  pkgsv = import (import ./nixpkgs.nix);
   pkgs = pkgsv {};
   validity-overlay =
     import (
@@ -10,10 +10,10 @@ let
       overlays =
         [
           validity-overlay
-          ( import ./gitignore-src.nix )
-          ( import ./overlay.nix )
+          (import ./gitignore-src.nix)
+          (import ./overlay.nix)
         ];
       config.allowUnfree = true;
     };
 in
-  hastoryPkgs
+hastoryPkgs

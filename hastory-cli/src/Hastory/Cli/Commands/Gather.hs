@@ -8,7 +8,6 @@ import Control.Monad.Reader
 import Data.Text (Text)
 import qualified Data.Text.IO as T
 import Database.Persist.Sqlite (Entity, upsertBy)
-
 import Hastory.API.Gather
 import Hastory.Cli.Internal
 import Hastory.Cli.OptParse.Types

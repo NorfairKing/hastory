@@ -1,6 +1,7 @@
 module Hastory.Cli.Utils
-  ( doCountsWith
-  ) where
+  ( doCountsWith,
+  )
+where
 
 import Data.HashMap.Lazy (HashMap)
 import qualified Data.HashMap.Lazy as HM

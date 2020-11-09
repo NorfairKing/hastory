@@ -4,14 +4,13 @@ module Hastory.Data.AuthCookie where
 
 import Data.Aeson
 import GHC.Generics (Generic)
+import Hastory.Data.Username
 import Servant.Auth.Server
 
-import Hastory.Data.Username
-
-newtype AuthCookie =
-  AuthCookie
-    { unAuthCookie :: Username
-    }
+newtype AuthCookie
+  = AuthCookie
+      { unAuthCookie :: Username
+      }
   deriving (Generic)
 
 instance ToJSON AuthCookie

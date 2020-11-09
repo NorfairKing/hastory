@@ -1,7 +1,15 @@
 - header: Use sqlite instead of json for hastory-server
   state-history:
+  - state: DONE
+    time: 2020-11-09 12:40:00.384181042000
   - state: TODO
     time: 2019-09-10 13:52:01.274802781000
+- header: Hastory server to store logs from multiple sources
+  state-history:
+  - state: DONE
+    time: 2020-11-09 12:40:06.120199199000
+  - state: TODO
+    time: 2018-11-17 18:28:43.829842454000
 - entry:
     header: Alias Suggestions
     state-history:
@@ -9,9 +17,9 @@
       time: 2018-11-17 18:28:45.048446873000
   forest:
   - header: Better define what it means for an alias to be 'a good idea'
-    contents: 'For example, ''l'' is probably not a great thing to alias because
-
-      it is most likely already an alias.'
+    contents: |-
+      For example, 'l' is probably not a great thing to alias because
+      it is most likely already an alias.
     state-history:
     - state: TODO
       time: 2018-11-17 18:28:45.048446873000
@@ -27,7 +35,3 @@
   state-history:
   - state: TODO
     time: 2018-11-17 18:28:44.201328428000
-- header: Hastory server to store logs from multiple sources
-  state-history:
-  - state: TODO
-    time: 2018-11-17 18:28:43.829842454000

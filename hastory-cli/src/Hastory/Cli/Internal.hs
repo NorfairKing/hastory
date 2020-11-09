@@ -12,12 +12,11 @@ import qualified Data.Text as T
 import Data.Time
 import Database.Persist.Sqlite (SqlBackend)
 import qualified Database.Persist.Sqlite as SQL
-import Path (Abs, Dir, File, Path, (</>), mkRelDir, parent, parseRelFile, toFilePath)
-import Path.IO (ensureDir)
-import System.Exit
-
 import Hastory.Cli.OptParse.Types
 import Hastory.Data.Client.DB
+import Path
+import Path.IO (ensureDir)
+import System.Exit
 
 hastoryDir :: MonadReader Settings m => m (Path Abs Dir)
 hastoryDir = asks setDataDir
@@ -41,12 +40,12 @@ getLastNDaysOfHistory n = do
   entries <- runDb $ SQL.selectList [EntryDateTime SQL.>=. minDateTime] []
   pure (SQL.entityVal <$> entries)
 
--- |The 'runDb' function should used, at most, once per command invocation.
--- Please refer hastory <https://github.com/NorfairKing/hastory/issues/35 issue>.
+-- | The 'runDb' function should used, at most, once per command invocation.
+--  Please refer hastory <https://github.com/NorfairKing/hastory/issues/35 issue>.
 runDb ::
-     (MonadReader Settings m, MonadUnliftIO m)
-  => ReaderT SqlBackend (NoLoggingT (ResourceT m)) a
-  -> m a
+  (MonadReader Settings m, MonadUnliftIO m) =>
+  ReaderT SqlBackend (NoLoggingT (ResourceT m)) a ->
+  m a
 runDb dbAction = do
   sets <- ask
   hDb <- liftIO $ runReaderT histDb sets

@@ -5,8 +5,9 @@
 {-# LANGUAGE TemplateHaskell #-}
 
 module Hastory.Cli.Commands.Recent
-  ( getRecentDirOpts
-  ) where
+  ( getRecentDirOpts,
+  )
+where
 
 import Control.Monad.IO.Unlift (MonadUnliftIO)
 import Control.Monad.Reader
@@ -21,13 +22,12 @@ import qualified Data.Time.Clock as Time
 import Data.Time.LocalTime (ZonedTime)
 import qualified Data.Time.LocalTime as Time
 import GHC.Generics (Generic)
-import Path (Abs, File, Path, (</>), mkRelFile, toFilePath)
-import Path.IO (forgivingAbsence, getHomeDir)
-
 import Hastory.Cli.Internal
 import Hastory.Cli.OptParse.Types
 import Hastory.Cli.Utils (doCountsWith)
 import Hastory.Data.Client.DB
+import Path
+import Path.IO (forgivingAbsence, getHomeDir)
 
 getRecentDirOpts :: (MonadReader Settings m, MonadUnliftIO m) => Bool -> m [FilePath]
 getRecentDirOpts bypassCache =
@@ -43,8 +43,8 @@ getRecentDirOpts bypassCache =
             Left _ -> recompute -- If the file is corrupt, just don't care.
             Right RecentDirOptsCache {..} -> do
               now <- liftIO Time.getZonedTime
-              if Time.diffUTCTime (Time.zonedTimeToUTC now) (Time.zonedTimeToUTC cacheTimestamp) >
-                 cacheInvalidationDuration
+              if Time.diffUTCTime (Time.zonedTimeToUTC now) (Time.zonedTimeToUTC cacheTimestamp)
+                > cacheInvalidationDuration
                 then recompute
                 else do
                   cacheRecentDirOpts cacheRecentDirs
@@ -81,11 +81,11 @@ cacheRecentDirOpts fs = do
 recentDirsCacheFile :: MonadReader Settings m => m (Path Abs File)
 recentDirsCacheFile = fmap (</> $(mkRelFile "recent-dirs-cache.json")) hastoryDir
 
-data RecentDirOptsCache =
-  RecentDirOptsCache
-    { cacheTimestamp :: ZonedTime
-    , cacheRecentDirs :: [FilePath]
-    }
+data RecentDirOptsCache
+  = RecentDirOptsCache
+      { cacheTimestamp :: ZonedTime,
+        cacheRecentDirs :: [FilePath]
+      }
   deriving (Show, Generic)
 
 instance ToJSON RecentDirOptsCache

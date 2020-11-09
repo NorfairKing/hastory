@@ -5,7 +5,6 @@ module Hastory.Cli.Commands.ListDir where
 
 import Control.Monad.IO.Unlift (MonadUnliftIO)
 import Control.Monad.Reader
-
 import Hastory.Cli.Commands.Recent
 import Hastory.Cli.OptParse.Types
 
