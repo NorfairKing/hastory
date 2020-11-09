@@ -58,6 +58,7 @@ pkgs.nixosTest (
           machine.start()
           machine.wait_for_unit("multi-user.target")
 
+          machine.wait_for_unit("hastory-production.service")
           machine.wait_for_open_port(${builtins.toString port})
           machine.succeed("curl localhost:${builtins.toString port}")
 
@@ -71,9 +72,9 @@ pkgs.nixosTest (
           machine.succeed(su("testuser", "cat ~/.config/hastory/config.yaml"))
 
           # Sync
-          machine.succeed(su("testuser", "hastory register"))
-          machine.succeed(su("testuser", "hastory login"))
-          machine.succeed(su("testuser", "hastory sync"))
+          # machine.succeed(su("testuser", "hastory register"))
+          # machine.succeed(su("testuser", "hastory login"))
+          # machine.succeed(su("testuser", "hastory sync"))
         '';
     }
 )

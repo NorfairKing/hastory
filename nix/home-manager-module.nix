@@ -68,7 +68,7 @@ ${cfg.extraConfig}
         syncCfg:
           optionalString (syncCfg.enable or false) ''
 
-server-url: "${cfg.sync.server-url}"
+url: "${cfg.sync.server-url}"
 username: "${cfg.sync.username}"
 password: "${cfg.sync.password}"
 

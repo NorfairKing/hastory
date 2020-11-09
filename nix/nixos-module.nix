@@ -45,7 +45,7 @@ in
                 mkdir -p "${workingDir}"
                 cd "${workingDir}"
 
-                ${hastory-pkgs.hastory-server}/bin/hastory-server
+                ${hastory-pkgs.hastory-server}/bin/hastory-server --port ${builtins.toString cfg.port}
               '';
             serviceConfig =
               {
