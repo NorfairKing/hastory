@@ -75,9 +75,9 @@ mkHastoryClient url username password = do
         Right token -> pure $ Right (HastoryClient clientEnv token)
 
 mkUnauthenticatedClient :: MonadIO m => BaseUrl -> m ClientEnv
-mkUnauthenticatedClient host = do
+mkUnauthenticatedClient url = do
   manager <- liftIO $ newManager defaultManagerSettings
-  pure $ mkClientEnv manager host
+  pure $ mkClientEnv manager url
 
 -- | Extract token after successful login.
 extractJWTCookie :: Headers AuthCookies NoContent -> Either ClientEnvFailure Token
