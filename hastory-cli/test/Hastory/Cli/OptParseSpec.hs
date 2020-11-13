@@ -186,7 +186,7 @@ describeCommand =
                 "--storage-username=steven",
                 "--storage-password=letmein"
               ]
-            expectedSyncFlags = SyncFlags (Just url) (Just $ Username "steven") (Just "letmein")
+            expectedSyncFlags = RemoteStorageFlags (Just url) (Just $ Username "steven") (Just "letmein")
         cmd `shouldBe` CommandSync expectedSyncFlags
     context "user provides the 'register' command"
       $ it "parses to CommandRegister"
@@ -199,7 +199,7 @@ describeCommand =
                 "--storage-username=steven",
                 "--storage-password=letmein"
               ]
-            expectedRegisterFlags = RegisterFlags (Just url) (Just $ Username "steven") (Just "letmein")
+            expectedRegisterFlags = RemoteStorageFlags (Just url) (Just $ Username "steven") (Just "letmein")
         cmd `shouldBe` CommandRegister expectedRegisterFlags
 
 envParserSpec :: Spec

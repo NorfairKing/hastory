@@ -58,21 +58,11 @@ data SuggestAliasFlags
   = SuggestAliasFlags
   deriving (Show, Eq)
 
-data SyncFlags
-  = SyncFlags
-      { syncFlagsStorageServer :: Maybe BaseUrl,
-        syncFlagsUsername :: Maybe Username,
-        syncFlagsPassword :: Maybe Text
-      }
-  deriving (Show, Eq)
+type SyncFlags = RemoteStorageFlags
 
-data RegisterFlags
-  = RegisterFlags
-      { registerFlagsStorageServer :: Maybe BaseUrl,
-        registerFlagsUsername :: Maybe Username,
-        registerFlagsPassword :: Maybe Text
-      }
-  deriving (Show, Eq)
+type RegisterFlags = RemoteStorageFlags
+
+data RemoteStorageFlags = RemoteStorageFlags {remoteStorageFlagsServer :: Maybe BaseUrl, remoteStorageFlagsUsername :: Maybe Username, remoteStorageFlagsPassword :: Maybe Text} deriving (Show, Eq)
 
 data Flags
   = Flags
