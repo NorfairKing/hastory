@@ -21,6 +21,6 @@ spec =
     $ \ServerInfo {..} -> do
       let username = Username "steven"
       let remoteInfo = RemoteStorage (baseUrl siClientEnv) username "Passw0rd"
-      _ <- register remoteInfo
+      _ <- register (RegisterSettings remoteInfo)
       serverUsers <- runSqlPool (selectList [] []) siPool
       map (userName . entityVal) serverUsers `shouldBe` [username]

@@ -11,8 +11,8 @@ import Hastory.Cli.OptParse.Types
 import Hastory.Data.UserForm
 import System.Exit
 
-register :: MonadUnliftIO m => RemoteStorage -> m ()
-register RemoteStorage {..} = do
+register :: MonadUnliftIO m => RegisterSettings -> m ()
+register (RegisterSettings RemoteStorage {..}) = do
   client <- mkUnauthenticatedClient remoteStorageBaseUrl
   liftIO $ do
     resp <- runHastoryClient (createUserClient userForm) client

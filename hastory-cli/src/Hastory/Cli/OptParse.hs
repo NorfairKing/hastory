@@ -61,9 +61,10 @@ combineToInstructions cmd Flags {..} Environment {..} mConf =
         CommandGenChangeWrapperScript _ ->
           pure $ DispatchGenChangeWrapperScript GenChangeWrapperScriptSettings
         CommandSuggestAlias _ -> pure $ DispatchSuggestAlias SuggestAliasSettings
-        CommandSync syncFlags -> DispatchSync . SyncSettings <$> getRemoteStorage syncFlags
-    getRemoteStorage :: SyncFlags -> IO RemoteStorage
-    getRemoteStorage SyncFlags {..} = do
+        CommandSync syncFlags -> DispatchSync . SyncSettings <$> getRemoteStorageSync syncFlags
+        CommandRegister registerFlags -> DispatchRegister . RegisterSettings <$> getRemoteStorageRegister registerFlags
+    getRemoteStorageSync :: SyncFlags -> IO RemoteStorage
+    getRemoteStorageSync SyncFlags {..} = do
       remoteStorageBaseUrl <-
         case syncFlagsStorageServer <|> envStorageServer <|> mc configStorageServer of
           Nothing -> die "Storage server not found"
@@ -74,6 +75,21 @@ combineToInstructions cmd Flags {..} Environment {..} mConf =
           Just username -> pure username
       remoteStoragePassword <-
         case syncFlagsPassword <|> envStoragePassword <|> mc configStoragePassword of
+          Nothing -> die "Password not found"
+          Just pw -> pure pw
+      pure RemoteStorage {..}
+    getRemoteStorageRegister :: RegisterFlags -> IO RemoteStorage
+    getRemoteStorageRegister RegisterFlags {..} = do
+      remoteStorageBaseUrl <-
+        case registerFlagsStorageServer <|> envStorageServer <|> mc configStorageServer of
+          Nothing -> die "Storage server not found"
+          Just baseUrl -> pure baseUrl
+      remoteStorageUsername <-
+        case registerFlagsUsername <|> envStorageUsername <|> mc configStorageUsername of
+          Nothing -> die "Username not found"
+          Just username -> pure username
+      remoteStoragePassword <-
+        case registerFlagsPassword <|> envStoragePassword <|> mc configStoragePassword of
           Nothing -> die "Password not found"
           Just pw -> pure pw
       pure RemoteStorage {..}
@@ -181,7 +197,8 @@ parseCommand =
         command "list-recent-directories" parseCommandListRecentDirs,
         command "generate-change-directory-wrapper-script" parseGenChangeDirectoryWrapperScript,
         command "suggest-alias" parseSuggestAlias,
-        command "sync" parseSync
+        command "sync" parseSync,
+        command "register" parseRegister
       ]
 
 parseCommandGather :: ParserInfo Command
@@ -256,6 +273,26 @@ parseSync =
           (maybeReader $ parseUsername . T.pack)
           (long "storage-username" <> help "Remote storage username" <> metavar "USERNAME")
     syncFlagPasswordParser =
+      optional $
+        strOption (long "storage-password" <> help "Remote storage password" <> metavar "PASSWORD")
+
+parseRegister :: ParserInfo Command
+parseRegister =
+  info (CommandRegister <$> registerParser) (progDesc "register with a remote server.")
+  where
+    registerParser =
+      RegisterFlags <$> registerFlagStorageParser <*> registerFlagUsernameParser <*> registerFlagPasswordParser
+    registerFlagStorageParser =
+      optional $
+        option
+          (maybeReader parseBaseUrl)
+          (long "storage-server" <> help "Remote storage url" <> metavar "URL")
+    registerFlagUsernameParser =
+      optional $
+        option
+          (maybeReader $ parseUsername . T.pack)
+          (long "storage-username" <> help "Remote storage username" <> metavar "USERNAME")
+    registerFlagPasswordParser =
       optional $
         strOption (long "storage-password" <> help "Remote storage password" <> metavar "PASSWORD")
 

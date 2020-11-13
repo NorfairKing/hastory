@@ -188,6 +188,19 @@ describeCommand =
               ]
             expectedSyncFlags = SyncFlags (Just url) (Just $ Username "steven") (Just "letmein")
         cmd `shouldBe` CommandSync expectedSyncFlags
+    context "user provides the 'register' command"
+      $ it "parses to CommandRegister"
+      $ do
+        url <- parseBaseUrl "api.google.com"
+        let (Success (Arguments cmd _flags)) = runArgumentsParser args
+            args =
+              [ "register",
+                "--storage-server=api.google.com",
+                "--storage-username=steven",
+                "--storage-password=letmein"
+              ]
+            expectedRegisterFlags = RegisterFlags (Just url) (Just $ Username "steven") (Just "letmein")
+        cmd `shouldBe` CommandRegister expectedRegisterFlags
 
 envParserSpec :: Spec
 envParserSpec =
