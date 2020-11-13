@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 5c91ae32197ab84f128c716ce4a0cfcd83d181475b5afadff6da8d9fdd7256cb
+-- hash: 10c653987e87263276903d36cb9a509deaf0a163d1b16ddc116d7117785765a3
 
 name:           hastory-cli
 version:        0.0.0.0
@@ -26,6 +26,7 @@ library
       Hastory.Cli.Commands.GenGatherWrapper
       Hastory.Cli.Commands.ListDir
       Hastory.Cli.Commands.Recent
+      Hastory.Cli.Commands.Register
       Hastory.Cli.Commands.SuggestAlias
       Hastory.Cli.Commands.Sync
       Hastory.Cli.Internal
@@ -91,6 +92,7 @@ test-suite hastory-cli-test
   main-is: Spec.hs
   other-modules:
       Hastory.Cli.Commands.GenGatherWrapperSpec
+      Hastory.Cli.Commands.RegisterSpec
       Hastory.Cli.Commands.SuggestionSpec
       Hastory.Cli.Commands.SyncSpec
       Hastory.Cli.OptParse.TypesSpec
