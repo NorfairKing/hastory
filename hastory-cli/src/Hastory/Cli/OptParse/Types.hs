@@ -29,20 +29,18 @@ data Command
   | CommandSync SyncFlags
   deriving (Show, Eq)
 
-data SyncFlags
-  = SyncFlags
-      { syncFlagsStorageServer :: Maybe BaseUrl,
-        syncFlagsUsername :: Maybe Username,
-        syncFlagsPassword :: Maybe Text
-      }
-  deriving (Show, Eq)
-
 data GatherFlags
   = GatherFlags
   deriving (Show, Eq)
 
 data GenGatherWrapperScriptFlags
   = GenGatherWrapperScriptFlags
+  deriving (Show, Eq)
+
+newtype ListRecentDirFlags
+  = ListRecentDirFlags
+      { lrdArgBypassCache :: Maybe Bool
+      }
   deriving (Show, Eq)
 
 newtype ChangeDirFlags
@@ -59,9 +57,11 @@ data SuggestAliasFlags
   = SuggestAliasFlags
   deriving (Show, Eq)
 
-newtype ListRecentDirFlags
-  = ListRecentDirFlags
-      { lrdArgBypassCache :: Maybe Bool
+data SyncFlags
+  = SyncFlags
+      { syncFlagsStorageServer :: Maybe BaseUrl,
+        syncFlagsUsername :: Maybe Username,
+        syncFlagsPassword :: Maybe Text
       }
   deriving (Show, Eq)
 
