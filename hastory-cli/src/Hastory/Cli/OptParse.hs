@@ -24,7 +24,6 @@ import Options.Applicative
 import qualified Options.Applicative.Help.Pretty as OptParseHelp
 import Path.IO
   ( XdgDirectory (..),
-    getAppUserDataDir,
     getXdgDir,
     resolveDir',
     resolveFile,
@@ -39,7 +38,7 @@ getInstructions :: IO Instructions
 getInstructions = do
   Arguments cmd flags <- getArguments
   environment <- getEnvironment
-  defaultConfigFile <- getAppUserDataDir "hastory" >>= flip resolveFile "hastory.yaml"
+  defaultConfigFile <- getXdgDir XdgConfig (Just [reldir|hastory|]) >>= flip resolveFile "hastory.yaml"
   mConfig <- getConfiguration defaultConfigFile flags environment
   combineToInstructions cmd flags environment mConfig
 
