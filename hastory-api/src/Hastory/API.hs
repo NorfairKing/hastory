@@ -14,6 +14,7 @@ import Database.Persist
 import Hastory.Data
 import Hastory.Data.Server.DB (ServerEntry, UserId)
 import Network.HTTP.Client hiding (Proxy)
+import Network.HTTP.Conduit (tlsManagerSettings)
 import Servant
 import Servant.Auth.Client
 import Servant.Auth.Server hiding (BasicAuth)
@@ -63,7 +64,7 @@ data ClientEnvFailure
 mkHastoryClient ::
   MonadIO m => BaseUrl -> Username -> Text -> m (Either ClientEnvFailure HastoryClient)
 mkHastoryClient url username password = do
-  manager <- liftIO $ newManager defaultManagerSettings
+  manager <- liftIO $ newManager tlsManagerSettings
   let clientEnv = mkClientEnv manager url
       userForm = UserForm username password
   res <- liftIO $ runClientM (createSessionClient userForm) clientEnv
@@ -75,7 +76,7 @@ mkHastoryClient url username password = do
         Right token -> pure $ Right (HastoryClient clientEnv token)
 
 mkUnauthenticatedClient :: MonadIO m => BaseUrl -> m ClientEnv
-mkUnauthenticatedClient url = liftIO (acceptManager <$> newManager defaultManagerSettings)
+mkUnauthenticatedClient url = liftIO (acceptManager <$> newManager tlsManagerSettings)
   where
     acceptManager = flip mkClientEnv url
 

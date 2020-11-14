@@ -35,6 +35,7 @@ library:
   - hostname
   - hspec
   - http-client
+  - http-conduit
   - lifted-base
   - monad-control
   - monad-logger
