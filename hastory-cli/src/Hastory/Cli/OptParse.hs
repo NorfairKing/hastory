@@ -245,7 +245,7 @@ parseSync :: ParserInfo Command
 parseSync = info (CommandSync <$> remoteStorageParser) (progDesc "Sync the local database with a remote server.")
 
 parseRegister :: ParserInfo Command
-parseRegister = info (CommandRegister <$> remoteStorageParser) (progDesc "register with a remote server.")
+parseRegister = info (CommandRegister <$> remoteStorageParser) (progDesc "Register with a remote server.")
 
 remoteStorageParser :: Parser RemoteStorageFlags
 remoteStorageParser = RemoteStorageFlags <$> remoteStorageFlagServerParser <*> remoteStorageFlagUsernameParser <*> remoteStorageFlagPasswordParser
