@@ -178,11 +178,11 @@ describeCommand =
     context "user provides the 'sync' command"
       $ it "parses to CommandSync"
       $ do
-        url <- parseBaseUrl "api.google.com"
+        url <- parseBaseUrl "hastory.cs-syd.eu"
         let (Success (Arguments cmd _flags)) = runArgumentsParser args
             args =
               [ "sync",
-                "--storage-server=api.google.com",
+                "--storage-server=hastory.cs-syd.eu",
                 "--storage-username=steven",
                 "--storage-password=letmein"
               ]
@@ -191,11 +191,11 @@ describeCommand =
     context "user provides the 'register' command"
       $ it "parses to CommandRegister"
       $ do
-        url <- parseBaseUrl "api.google.com"
+        url <- parseBaseUrl "hastory.cs-syd.eu"
         let (Success (Arguments cmd _flags)) = runArgumentsParser args
             args =
               [ "register",
-                "--storage-server=api.google.com",
+                "--storage-server=hastory.cs-syd.eu",
                 "--storage-username=steven",
                 "--storage-password=letmein"
               ]
