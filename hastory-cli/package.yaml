@@ -30,6 +30,8 @@ library:
   - hashable-time
   - hastory-data
   - hostname
+  - http-client
+  - http-conduit
   - monad-logger
   - mtl
   - optparse-applicative

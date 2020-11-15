@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 98241a9728a91104d375e21120e4ec678d0aaabdab8206b5fd15be81a458a77a
+-- hash: e908d7a580637c20f05f734179f74c0678071a10cd3ea4258fb20b56db9869bd
 
 name:           hastory-api
 version:        0.0.0.0
@@ -44,6 +44,7 @@ library
     , hostname
     , hspec
     , http-client
+    , http-conduit
     , lifted-base
     , monad-control
     , monad-logger

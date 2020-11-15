@@ -27,14 +27,7 @@ data Command
   | CommandGenChangeWrapperScript GenChangeWrapperScriptFlags
   | CommandSuggestAlias SuggestAliasFlags
   | CommandSync SyncFlags
-  deriving (Show, Eq)
-
-data SyncFlags
-  = SyncFlags
-      { syncFlagsStorageServer :: Maybe BaseUrl,
-        syncFlagsUsername :: Maybe Username,
-        syncFlagsPassword :: Maybe Text
-      }
+  | CommandRegister RegisterFlags
   deriving (Show, Eq)
 
 data GatherFlags
@@ -43,6 +36,12 @@ data GatherFlags
 
 data GenGatherWrapperScriptFlags
   = GenGatherWrapperScriptFlags
+  deriving (Show, Eq)
+
+newtype ListRecentDirFlags
+  = ListRecentDirFlags
+      { lrdArgBypassCache :: Maybe Bool
+      }
   deriving (Show, Eq)
 
 newtype ChangeDirFlags
@@ -59,11 +58,11 @@ data SuggestAliasFlags
   = SuggestAliasFlags
   deriving (Show, Eq)
 
-newtype ListRecentDirFlags
-  = ListRecentDirFlags
-      { lrdArgBypassCache :: Maybe Bool
-      }
-  deriving (Show, Eq)
+type SyncFlags = RemoteStorageFlags
+
+type RegisterFlags = RemoteStorageFlags
+
+data RemoteStorageFlags = RemoteStorageFlags {remoteStorageFlagsServer :: Maybe BaseUrl, remoteStorageFlagsUsername :: Maybe Username, remoteStorageFlagsPassword :: Maybe Text} deriving (Show, Eq)
 
 data Flags
   = Flags
@@ -127,6 +126,7 @@ data Dispatch
   | DispatchGenChangeWrapperScript GenChangeWrapperScriptSettings
   | DispatchSuggestAlias SuggestAliasSettings
   | DispatchSync SyncSettings
+  | DispatchRegister RegisterSettings
   deriving (Show, Eq)
 
 data GatherSettings
@@ -160,6 +160,12 @@ data SuggestAliasSettings
 newtype SyncSettings
   = SyncSettings
       { syncSettingsRemoteStorage :: RemoteStorage
+      }
+  deriving (Show, Eq)
+
+newtype RegisterSettings
+  = RegisterSettings
+      { registerSettingsRemoteStorage :: RemoteStorage
       }
   deriving (Show, Eq)
 

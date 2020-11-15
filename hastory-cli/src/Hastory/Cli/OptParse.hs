@@ -62,18 +62,19 @@ combineToInstructions cmd Flags {..} Environment {..} mConf =
           pure $ DispatchGenChangeWrapperScript GenChangeWrapperScriptSettings
         CommandSuggestAlias _ -> pure $ DispatchSuggestAlias SuggestAliasSettings
         CommandSync syncFlags -> DispatchSync . SyncSettings <$> getRemoteStorage syncFlags
-    getRemoteStorage :: SyncFlags -> IO RemoteStorage
-    getRemoteStorage SyncFlags {..} = do
+        CommandRegister registerFlags -> DispatchRegister . RegisterSettings <$> getRemoteStorage registerFlags
+    getRemoteStorage :: RemoteStorageFlags -> IO RemoteStorage
+    getRemoteStorage RemoteStorageFlags {..} = do
       remoteStorageBaseUrl <-
-        case syncFlagsStorageServer <|> envStorageServer <|> mc configStorageServer of
+        case remoteStorageFlagsServer <|> envStorageServer <|> mc configStorageServer of
           Nothing -> die "Storage server not found"
           Just baseUrl -> pure baseUrl
       remoteStorageUsername <-
-        case syncFlagsUsername <|> envStorageUsername <|> mc configStorageUsername of
+        case remoteStorageFlagsUsername <|> envStorageUsername <|> mc configStorageUsername of
           Nothing -> die "Username not found"
           Just username -> pure username
       remoteStoragePassword <-
-        case syncFlagsPassword <|> envStoragePassword <|> mc configStoragePassword of
+        case remoteStorageFlagsPassword <|> envStoragePassword <|> mc configStoragePassword of
           Nothing -> die "Password not found"
           Just pw -> pure pw
       pure RemoteStorage {..}
@@ -181,7 +182,8 @@ parseCommand =
         command "list-recent-directories" parseCommandListRecentDirs,
         command "generate-change-directory-wrapper-script" parseGenChangeDirectoryWrapperScript,
         command "suggest-alias" parseSuggestAlias,
-        command "sync" parseSync
+        command "sync" parseSync,
+        command "register" parseRegister
       ]
 
 parseCommandGather :: ParserInfo Command
@@ -240,22 +242,25 @@ parseSuggestAlias =
     (progDesc "Suggest commands for which the user may want to make aliases.")
 
 parseSync :: ParserInfo Command
-parseSync =
-  info (CommandSync <$> syncParser) (progDesc "Sync the local database with a remote server.")
+parseSync = info (CommandSync <$> remoteStorageParser) (progDesc "Sync the local database with a remote server.")
+
+parseRegister :: ParserInfo Command
+parseRegister = info (CommandRegister <$> remoteStorageParser) (progDesc "Register with a remote server.")
+
+remoteStorageParser :: Parser RemoteStorageFlags
+remoteStorageParser = RemoteStorageFlags <$> remoteStorageFlagServerParser <*> remoteStorageFlagUsernameParser <*> remoteStorageFlagPasswordParser
   where
-    syncParser =
-      SyncFlags <$> syncFlagStorageParser <*> syncFlagUsernameParser <*> syncFlagPasswordParser
-    syncFlagStorageParser =
+    remoteStorageFlagServerParser =
       optional $
         option
           (maybeReader parseBaseUrl)
           (long "storage-server" <> help "Remote storage url" <> metavar "URL")
-    syncFlagUsernameParser =
+    remoteStorageFlagUsernameParser =
       optional $
         option
           (maybeReader $ parseUsername . T.pack)
           (long "storage-username" <> help "Remote storage username" <> metavar "USERNAME")
-    syncFlagPasswordParser =
+    remoteStorageFlagPasswordParser =
       optional $
         strOption (long "storage-password" <> help "Remote storage password" <> metavar "PASSWORD")
 

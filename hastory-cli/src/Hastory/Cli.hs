@@ -12,6 +12,7 @@ import Hastory.Cli.Commands.Gather (gather)
 import Hastory.Cli.Commands.GenChangeWrapper (genChangeWrapperScript)
 import Hastory.Cli.Commands.GenGatherWrapper (genGatherWrapperScript)
 import Hastory.Cli.Commands.ListDir (listRecentDirs)
+import Hastory.Cli.Commands.Register (register)
 import Hastory.Cli.Commands.SuggestAlias (suggest)
 import Hastory.Cli.Commands.Sync (sync)
 import Hastory.Cli.OptParse
@@ -29,3 +30,4 @@ dispatch (DispatchListRecentDirs lrds) = listRecentDirs lrds
 dispatch (DispatchGenChangeWrapperScript _) = liftIO genChangeWrapperScript
 dispatch (DispatchSuggestAlias _) = suggest
 dispatch (DispatchSync syncSettings) = sync syncSettings
+dispatch (DispatchRegister registerSettings) = register registerSettings
