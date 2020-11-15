@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 10c653987e87263276903d36cb9a509deaf0a163d1b16ddc116d7117785765a3
+-- hash: 32b8e2ff1ae30e7095751ded07f16ff4358ded748bbb450b3d24e4d03ce792d4
 
 name:           hastory-cli
 version:        0.0.0.0
@@ -51,6 +51,8 @@ library
     , hastory-api
     , hastory-data
     , hostname
+    , http-client
+    , http-conduit
     , monad-logger
     , mtl
     , optparse-applicative
