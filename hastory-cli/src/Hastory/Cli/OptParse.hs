@@ -65,17 +65,18 @@ combineToInstructions cmd Flags {..} Environment {..} mConf =
         CommandRegister registerFlags -> DispatchRegister . RegisterSettings <$> getRemoteStorage registerFlags
     getRemoteStorage :: RemoteStorageFlags -> IO RemoteStorage
     getRemoteStorage RemoteStorageFlags {..} = do
+      let helpMsg = "Use 'hastory -h' or 'hastory <subcommand> -h' for usage details."
       remoteStorageBaseUrl <-
         case remoteStorageFlagsServer <|> envStorageServer <|> mc configStorageServer of
-          Nothing -> die "Storage server not found"
+          Nothing -> die $ unwords ["URL not found.", helpMsg]
           Just baseUrl -> pure baseUrl
       remoteStorageUsername <-
         case remoteStorageFlagsUsername <|> envStorageUsername <|> mc configStorageUsername of
-          Nothing -> die "Username not found"
+          Nothing -> die $ unwords ["Username not found.", helpMsg]
           Just username -> pure username
       remoteStoragePassword <-
         case remoteStorageFlagsPassword <|> envStoragePassword <|> mc configStoragePassword of
-          Nothing -> die "Password not found"
+          Nothing -> die $ unwords ["Password not found.", helpMsg]
           Just pw -> pure pw
       pure RemoteStorage {..}
     getSettings = do
