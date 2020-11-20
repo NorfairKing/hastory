@@ -115,31 +115,31 @@ envParser =
         <$> Env.var
           (pure . Just <=< Env.nonempty)
           "CACHE_DIR"
-          (Env.help "the cache directory for hastory" <> Env.def Nothing)
+          (Env.help "The cache directory." <> Env.def Nothing)
         <*> Env.var
           (pure . Just <=< Env.nonempty)
           "CONFIG_FILE"
-          (Env.help "path to a config file" <> Env.def Nothing)
+          (Env.help "Path to a config file." <> Env.def Nothing)
         <*> Env.var
           baseUrlParser
           "STORAGE_SERVER_URL"
-          (Env.help "URL of the central storage server" <> Env.def Nothing)
+          (Env.help "URL of the sync server." <> Env.def Nothing)
         <*> Env.var
           usernameParser
           "STORAGE_SERVER_USERNAME"
-          (Env.help "Username for the central storage server" <> Env.def Nothing)
+          (Env.help "Username for the sync server." <> Env.def Nothing)
         <*> Env.var
           (pure . Just <=< Env.nonempty)
           "STORAGE_SERVER_PASSWORD"
-          (Env.help "Password for the central storage server" <> Env.def Nothing)
+          (Env.help "Password for the sync server." <> Env.def Nothing)
         <*> Env.var
           (fmap Just . Env.auto)
           "BYPASS_CACHE"
-          (Env.help "Always recompute the recent directory options" <> Env.def Nothing)
+          (Env.help "Always recompute the recent directory options." <> Env.def Nothing)
         <*> Env.var
           (pure . Just <=< Env.nonempty)
           "DATA_DIR"
-          (Env.help "the data directory for hastory" <> Env.def Nothing)
+          (Env.help "Data directory for hastory." <> Env.def Nothing)
     )
   where
     baseUrlParser unparsedUrl =
@@ -197,7 +197,7 @@ parseGenGatherWrapperScript :: ParserInfo Command
 parseGenGatherWrapperScript =
   info
     (pure $ CommandGenGatherWrapperScript GenGatherWrapperScriptFlags)
-    (progDesc "Generate the wrapper script to use 'gather'")
+    (progDesc "Generate the wrapper script to use 'gather'.")
 
 parseCommandChangeDir :: ParserInfo Command
 parseCommandChangeDir =
@@ -206,7 +206,7 @@ parseCommandChangeDir =
         <$> argument
           auto
           ( mconcat
-              [ help "The index of the directory to change to, see 'list-recent-directories'",
+              [ help "The index of the directory to change to, see 'list-recent-directories'.",
                 metavar "INT"
               ]
           )
@@ -220,21 +220,21 @@ parseCommandListRecentDirs =
         <$> ( ListRecentDirFlags
                 <$> ( flag'
                         (Just True)
-                        (mconcat [long "bypass-cache", help "Always recompute the recent directory options"])
+                        (mconcat [long "bypass-cache", help "Always recompute the recent directory options."])
                         <|> flag'
                           (Just False)
-                          (mconcat [long "no-bypass-cache", help "Use the recent directory cache when available"])
+                          (mconcat [long "no-bypass-cache", help "Use the recent directory cache when available."])
                         <|> pure Nothing
                     )
             )
     )
-    (progDesc "List the directories that were the working directory most often (recently )")
+    (progDesc "List the directories that were the working directory most often / recently.")
 
 parseGenChangeDirectoryWrapperScript :: ParserInfo Command
 parseGenChangeDirectoryWrapperScript =
   info
     (pure $ CommandGenChangeWrapperScript GenChangeWrapperScriptFlags)
-    (progDesc "Generate the wrapper script to use 'change-directory'")
+    (progDesc "Generate the wrapper script to use 'change-directory'.")
 
 parseSuggestAlias :: ParserInfo Command
 parseSuggestAlias =
@@ -255,15 +255,15 @@ remoteStorageParser = RemoteStorageFlags <$> remoteStorageFlagServerParser <*> r
       optional $
         option
           (maybeReader parseBaseUrl)
-          (long "storage-server" <> help "Remote storage url" <> metavar "URL")
+          (long "storage-server" <> help "Remote storage url." <> metavar "URL")
     remoteStorageFlagUsernameParser =
       optional $
         option
           (maybeReader $ parseUsername . T.pack)
-          (long "storage-username" <> help "Remote storage username" <> metavar "USERNAME")
+          (long "storage-username" <> help "Remote storage username." <> metavar "USERNAME")
     remoteStorageFlagPasswordParser =
       optional $
-        strOption (long "storage-password" <> help "Remote storage password" <> metavar "PASSWORD")
+        strOption (long "storage-password" <> help "Remote storage password." <> metavar "PASSWORD")
 
 parseFlags :: Parser Flags
 parseFlags =
@@ -271,17 +271,17 @@ parseFlags =
     <$> optional
       ( option
           nonEmptyString
-          (mconcat [long "cache-dir", metavar "FILEPATH", help "the cache directory for hastory"])
+          (mconcat [long "cache-dir", metavar "FILEPATH", help "The cache directory for hastory."])
       )
     <*> optional
       ( option
           nonEmptyString
-          (mconcat [long "config-file", metavar "FILEPATH", help "path to a config file"])
+          (mconcat [long "config-file", metavar "FILEPATH", help "Path to a config file."])
       )
     <*> optional
       ( option
           nonEmptyString
-          (mconcat [long "data-dir", metavar "FILEPATH", help "the data directory for hastory"])
+          (mconcat [long "data-dir", metavar "FILEPATH", help "The data directory for hastory."])
       )
   where
     nonEmptyString =
