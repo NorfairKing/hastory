@@ -22,17 +22,19 @@ library:
   source-dirs: src/
   dependencies:
   - QuickCheck
+  - aeson
   - base
   - bytestring
   - conduit
   - cookie
   - cryptonite
   - deepseq
+  - envparse
   - exceptions
   - hashable
   - hashable-time
-  - hastory-data
   - hastory-api
+  - hastory-data
   - hostname
   - hspec
   - http-client
@@ -57,12 +59,15 @@ library:
   - text
   - time
   - unix
+  - unliftio-core
   - unordered-containers
   - validity
   - validity-path
   - validity-text
   - wai
   - warp
+  - yaml
+  - yamlparse-applicative
 
 executables:
   hastory-server:
@@ -89,6 +94,7 @@ tests:
     - QuickCheck
     - bytestring
     - case-insensitive
+    - envparse
     - genvalidity-hspec
     - hastory-api
     - hastory-data
@@ -97,9 +103,11 @@ tests:
     - hspec
     - http-conduit
     - http-types
+    - optparse-applicative
     - persistent
     - resource-pool
     - servant
     - servant-auth-client
     - servant-client
     - text
+    - yaml

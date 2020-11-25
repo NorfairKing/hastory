@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 10feaef022152d8e25bd345a9da4f7b8e08db61e627a626744293d2aabdb56e4
+-- hash: 386668429c8437d0b6f3554bdc96b012badbef04420cf29b0df98cb713b5aea2
 
 name:           hastory-server
 version:        0.0.0.0
@@ -26,6 +26,7 @@ library
       Hastory.Server.Handler.Sessions
       Hastory.Server.Handler.Users
       Hastory.Server.HastoryHandler
+      Hastory.Server.OptParse
       Hastory.Server.TestUtils
       Hastory.Server.Utils
   other-modules:
@@ -35,12 +36,14 @@ library
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -fhide-source-paths
   build-depends:
       QuickCheck
+    , aeson
     , base
     , bytestring
     , conduit
     , cookie
     , cryptonite
     , deepseq
+    , envparse
     , exceptions
     , hashable
     , hashable-time
@@ -70,12 +73,15 @@ library
     , text
     , time
     , unix
+    , unliftio-core
     , unordered-containers
     , validity
     , validity-path
     , validity-text
     , wai
     , warp
+    , yaml
+    , yamlparse-applicative
   default-language: Haskell2010
 
 executable hastory-server
@@ -98,6 +104,7 @@ test-suite hastory-server-test
       Hastory.Handler.EntriesSpec
       Hastory.Handler.SessionsSpec
       Hastory.Handler.UsersSpec
+      Hastory.OptParseSpec
       Paths_hastory_server
   hs-source-dirs:
       test
@@ -107,6 +114,7 @@ test-suite hastory-server-test
     , base >=4.9 && <=5
     , bytestring
     , case-insensitive
+    , envparse
     , genvalidity-hspec
     , hastory-api
     , hastory-data
@@ -115,10 +123,12 @@ test-suite hastory-server-test
     , hspec
     , http-conduit
     , http-types
+    , optparse-applicative
     , persistent
     , resource-pool
     , servant
     , servant-auth-client
     , servant-client
     , text
+    , yaml
   default-language: Haskell2010
