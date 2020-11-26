@@ -25,25 +25,57 @@ newtype Dispatch = DispatchServe ServeSettings deriving (Show, Eq, Generic)
 
 data Settings = Settings deriving (Show, Eq, Generic)
 
-data ServeSettings = ServeSettings {serveSettingsPort :: Int, serveSettingsLogFile :: Path Abs File, serveSettingsKeyFile :: Path Abs File} deriving (Show, Eq, Generic)
+data ServeSettings
+  = ServeSettings
+      { serveSettingsPort :: Int,
+        serveSettingsLogFile :: Path Abs File,
+        serveSettingsKeyFile :: Path Abs File
+      }
+  deriving (Show, Eq, Generic)
 
 data Arguments = Arguments Command Flags deriving (Show, Eq, Generic)
 
 newtype Command = CommandServe ServeArgs deriving (Show, Eq, Generic)
 
-data ServeArgs = ServeArgs {serveArgsPort :: Maybe Int, serveArgsLogFile :: Maybe FilePath, serveArgsKeyFile :: Maybe FilePath} deriving (Show, Eq, Generic)
+data ServeArgs
+  = ServeArgs
+      { serveArgsPort :: Maybe Int,
+        serveArgsLogFile :: Maybe FilePath,
+        serveArgsKeyFile :: Maybe FilePath
+      }
+  deriving (Show, Eq, Generic)
 
 newtype Flags = Flags {flagsConfigFile :: Maybe FilePath} deriving (Show, Eq, Generic)
 
-data Environment = Environment {envPort :: Maybe Int, envLogFile :: Maybe FilePath, envKeyFile :: Maybe FilePath, envConfigFile :: Maybe FilePath} deriving (Show, Eq, Generic)
+data Environment
+  = Environment
+      { envPort :: Maybe Int,
+        envLogFile :: Maybe FilePath,
+        envKeyFile :: Maybe FilePath,
+        envConfigFile :: Maybe FilePath
+      }
+  deriving (Show, Eq, Generic)
 
-data Configuration = Configuration {configPort :: Maybe Int, configLogFile :: Maybe FilePath, configKeyFile :: Maybe FilePath} deriving (Show, Eq, Generic)
+data Configuration
+  = Configuration
+      { configPort :: Maybe Int,
+        configLogFile :: Maybe FilePath,
+        configKeyFile :: Maybe FilePath
+      }
+  deriving (Show, Eq, Generic)
 
 instance FromJSON Configuration where
   parseJSON = viaYamlSchema
 
 instance YamlSchema Configuration where
-  yamlSchema = objectParser "Configuration" $ Configuration <$> optionalField "port" "Port to start server on." <*> optionalField "log" "File to save logs to." <*> optionalField "key" "File to read / write JWK key from / to."
+  yamlSchema =
+    objectParser
+      "Configuration"
+      ( Configuration
+          <$> optionalField "port" "Port to start server on."
+          <*> optionalField "log" "File to save logs to."
+          <*> optionalField "key" "File to read / write JWK key from / to."
+      )
 
 getInstructions :: IO Instructions
 getInstructions = do
@@ -64,34 +96,34 @@ combineToInstructions (Arguments cmd _flags) Environment {..} mConf = Instructio
     dispatch =
       case cmd of
         CommandServe ServeArgs {..} -> do
-          let serveSettingsPort = fromMaybe 8080 (serveArgsPort <|> envPort <|> mc configPort)
+          let serveSettingsPort = fromMaybe 8000 (serveArgsPort <|> envPort <|> mc configPort)
           serveSettingsLogFile <-
-            maybe defaultLogFile resolveFile' (serveArgsLogFile <|> envLogFile <|> mc configLogFile)
+            maybe getDefaultLogFile resolveFile' (serveArgsLogFile <|> envLogFile <|> mc configLogFile)
           serveSettingsKeyFile <-
-            maybe defaultKeyFile resolveFile' (serveArgsKeyFile <|> envKeyFile <|> mc configKeyFile)
+            maybe getDefaultKeyFile resolveFile' (serveArgsKeyFile <|> envKeyFile <|> mc configKeyFile)
           pure $ DispatchServe (ServeSettings {..})
     settings = pure Settings
     mc f = mConf >>= f
 
-defaultKeyFile :: IO (Path Abs File)
-defaultKeyFile = do
+getDefaultKeyFile :: IO (Path Abs File)
+getDefaultKeyFile = do
   xdgConfigDir <- getXdgDir XdgData (Just [reldir|hastory-server|])
   resolveFile xdgConfigDir "hastory.key"
 
-defaultLogFile :: IO (Path Abs File)
-defaultLogFile = do
+getDefaultLogFile :: IO (Path Abs File)
+getDefaultLogFile = do
   xdgConfigDir <- getXdgDir XdgData (Just [reldir|hastory-server|])
   resolveFile xdgConfigDir "hastory.logs"
 
-defaultConfigFile :: IO (Path Abs File)
-defaultConfigFile = do
+getDefaultConfigFile :: IO (Path Abs File)
+getDefaultConfigFile = do
   xdgConfigDir <- getXdgDir XdgConfig (Just [reldir|hastory-server|])
   resolveFile xdgConfigDir "config.yaml"
 
 getConfiguration :: Flags -> Environment -> IO (Maybe Configuration)
 getConfiguration Flags {..} Environment {..} =
   case flagsConfigFile <|> envConfigFile of
-    Nothing -> defaultConfigFile >>= YamlParse.readConfigFile
+    Nothing -> getDefaultConfigFile >>= YamlParse.readConfigFile
     Just cf -> resolveFile' cf >>= YamlParse.readConfigFile
 
 prefs_ :: OptParse.ParserPrefs
