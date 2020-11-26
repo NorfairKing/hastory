@@ -11,7 +11,7 @@ jobs:
     - name: free disk space
       run: |
         sudo rm -rf /opt
-    - uses: cachix/cachix-action@releases/v8
+    - uses: cachix/cachix-action@v8
       with:
         name: hastory
         extraPullNames: validity
