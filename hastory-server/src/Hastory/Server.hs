@@ -90,6 +90,7 @@ hastoryServe serveSettings@ServeSettings {..} =
 -- the file, with a JWK, will be created and read from.
 getSigningKey :: Path Abs File -> IO JWK
 getSigningKey keyPath = do
+  ensureDir (parent keyPath)
   fileExists <- doesFileExist keyPath
   unless fileExists (writeKey path)
   readKey path
