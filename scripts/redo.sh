@@ -2,4 +2,4 @@
 
 set -ex
 
-hastory-server &
+hastory-server serve &

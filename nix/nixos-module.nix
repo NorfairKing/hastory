@@ -20,8 +20,8 @@ in
       port =
         mkOption {
           type = types.int;
-          default = 8300;
-          example = 8300;
+          default = 8800;
+          example = 8800;
           description = "The port to serve requests on";
         };
     };
@@ -39,13 +39,15 @@ in
             description = "Hastory ${envname} Service";
             wantedBy = [ "multi-user.target" ];
             environment =
-              concatAttrs [];
+              concatAttrs [
+                { HASTORY_SERVER_PORT = builtins.toString cfg.port; }
+              ];
             script =
               ''
                 mkdir -p "${workingDir}"
                 cd "${workingDir}"
 
-                ${hastory-pkgs.hastory-server}/bin/hastory-server --port ${builtins.toString cfg.port}
+                ${hastory-pkgs.hastory-server}/bin/hastory-server serve
               '';
             serviceConfig =
               {
