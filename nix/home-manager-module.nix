@@ -12,7 +12,7 @@ in
     {
       programs.hastory =
         {
-          enable = mkEnableOption "Sparep cli and syncing";
+          enable = mkEnableOption "Hastory cli and syncing";
           extraConfig =
             mkOption {
               type = types.str;
@@ -27,7 +27,7 @@ in
                   types.submodule {
                     options =
                       {
-                        enable = mkEnableOption "Sparep syncing";
+                        enable = mkEnableOption "Hastory syncing";
                         server-url =
                           mkOption {
                             type = types.str;
@@ -75,8 +75,8 @@ password: "${cfg.sync.password}"
       '';
 
 
-      syncSparepName = "sync-hastory";
-      syncSparepService =
+      syncHastoryName = "sync-hastory";
+      syncHastoryService =
         {
           Unit =
             {
@@ -93,7 +93,7 @@ password: "${cfg.sync.password}"
               Type = "oneshot";
             };
         };
-      syncSparepTimer =
+      syncHastoryTimer =
         {
           Unit =
             {
@@ -107,7 +107,7 @@ password: "${cfg.sync.password}"
             {
               OnCalendar = "daily";
               Persistent = true;
-              Unit = "${syncSparepName}.service";
+              Unit = "${syncHastoryName}.service";
             };
         };
 
@@ -120,13 +120,13 @@ password: "${cfg.sync.password}"
       services =
         (
           optionalAttrs (cfg.sync.enable or false) {
-            "${syncSparepName}" = syncSparepService;
+            "${syncHastoryName}" = syncHastoryService;
           }
         );
       timers =
         (
           optionalAttrs (cfg.sync.enable or false) {
-            "${syncSparepName}" = syncSparepTimer;
+            "${syncHastoryName}" = syncHastoryTimer;
           }
         );
       packages =

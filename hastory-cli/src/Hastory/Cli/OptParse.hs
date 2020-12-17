@@ -38,7 +38,7 @@ getInstructions :: IO Instructions
 getInstructions = do
   Arguments cmd flags <- getArguments
   environment <- getEnvironment
-  defaultConfigFile <- getXdgDir XdgConfig (Just [reldir|hastory|]) >>= flip resolveFile "hastory.yaml"
+  defaultConfigFile <- getXdgDir XdgConfig (Just [reldir|hastory|]) >>= flip resolveFile "config.yaml"
   mConfig <- getConfiguration defaultConfigFile flags environment
   combineToInstructions cmd flags environment mConfig
 
@@ -160,14 +160,14 @@ argParser :: ParserInfo Arguments
 argParser = info (helper <*> parseArgs) (fullDesc <> progDesc "Hastory" <> footerDoc footerStr)
   where
     footerStr =
-      Just
-        $ OptParseHelp.string
-        $ unlines
-          [ Env.helpDoc envParser,
-            "",
-            "Configuration file format:",
-            T.unpack (prettySchemaDoc @Configuration)
-          ]
+      Just $
+        OptParseHelp.string $
+          unlines
+            [ Env.helpDoc envParser,
+              "",
+              "Configuration file format:",
+              T.unpack (prettySchemaDoc @Configuration)
+            ]
 
 parseArgs :: Parser Arguments
 parseArgs = Arguments <$> parseCommand <*> parseFlags
